@@ -106,8 +106,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .tx-summary{display:flex;align-items:center;gap:0;padding:12px 14px}
 .tx-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:16px;overflow:hidden}
 .tx-event{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;flex-shrink:0}
-.tx-info{display:flex;align-items:baseline;gap:12px;overflow:hidden;flex:1}
-.tx-info span{font-size:13px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-info{display:flex;align-items:baseline;gap:14px;overflow:hidden;flex:1}
+.tx-info span{font-size:14px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-right{text-align:right;flex-shrink:0;margin-left:16px}
 .tx-profit{font-size:14px;font-weight:700;margin-bottom:4px}
 .tx-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
@@ -163,6 +163,13 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 
 .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
 .chart-wrap{position:relative;width:100%;height:180px}
+.metric-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
+.metric-block-title{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.metric-row:last-child{border-bottom:none}
+.metric-row-total{margin-top:4px;padding-top:8px;border-top:1px solid var(--border2)}
+.metric-row-label{font-size:12px;color:var(--text2)}
+.metric-row-val{font-size:14px;font-weight:600;color:var(--text)}
 </style>
 </head>
 <body>
@@ -197,7 +204,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
   <div class="content">
 
     <div class="page active" id="page-dashboard">
-      <div class="metrics-grid" id="metricsGrid"></div>
+      <div id="metricsGrid"></div>
       <p class="stitle">Bénéfice par événement</p>
       <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
       <p class="stitle">Répartition</p>
@@ -433,13 +440,22 @@ function renderDashboard() {
   const tBuy  = transactions.reduce((s,t)=>s+t.buy,0);
   const tSell = sold.reduce((s,t)=>s+t.sell,0);
 
+  const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
   document.getElementById('metricsGrid').innerHTML=`
-    <div class="metric-card"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}">${fmt(netP)}</div></div>
-    <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmt(grossP)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total ventes</div><div class="metric-value mv-hi">${fmtFull(tSell)}</div></div>
-    <div class="metric-card"><div class="metric-label">Vendus</div><div class="metric-value mv-pos">${sold.length} lignes</div></div>
-    <div class="metric-card"><div class="metric-label">En stock</div><div class="metric-value mv-neg">${sQty} places</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="metric-block">
+        <div class="metric-block-title">Flux financiers</div>
+        <div class="metric-row"><span class="metric-row-label">Coût total achats</span><span class="metric-row-val mv-warn">${fmtFull(tBuy)}</span></div>
+        <div class="metric-row"><span class="metric-row-label">Revenu total ventes</span><span class="metric-row-val">${fmtFull(tSell)}</span></div>
+        <div class="metric-row"><span class="metric-row-label">Coûts fixes (total)</span><span class="metric-row-val">${fmtFull(totalCosts)}</span></div>
+      </div>
+      <div class="metric-block">
+        <div class="metric-block-title">Résultat</div>
+        <div class="metric-row"><span class="metric-row-label">Bénéfice brut</span><span class="metric-row-val ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</span></div>
+        <div class="metric-row"><span class="metric-row-label">Coûts fixes payés</span><span class="metric-row-val mv-warn">−${fmtFull(paidC)}</span></div>
+        <div class="metric-row metric-row-total"><span class="metric-row-label">Bénéfice net</span><span class="metric-row-val ${netP>=0?'mv-pos':'mv-neg'}">${fmtFull(netP)}</span></div>
+      </div>
+    </div>
   `;
 
   const evMap={};
@@ -493,8 +509,8 @@ function renderJournal() {
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = t.sell ? (t.sell - t.buy) : -t.buy;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
-    const isPos  = t.sell > 0 && profit >= 0;
-    const pc     = isPos ? 'var(--green)' : t.sell ? 'var(--red)' : 'var(--text2)';
+    const isPos  = profit >= 0;
+    const pc     = isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
     // Colonne gauche (top-down): Placement, Site achat, Compte, Mot de passe, Prix achat, Prix revente
@@ -575,9 +591,17 @@ function renderWTS(){
   if(!stock.length){document.getElementById('wtsPreview').innerHTML='<span style="color:var(--text3)">Aucun billet en stock.</span>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
-    if(t.event!==lastEv){lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null}
+    if(t.event!==lastEv){
+      if(lastEv!==null) lines.push('');
+      lines.push(`**${t.event}**`);
+      lastEv=t.event;lastDt=null;
+    }
     const ds=fmtDate(t.date);
-    if(ds!==lastDt){lines.push(`**${ds}**`);lastDt=ds}
+    if(ds!==lastDt){
+      if(lastDt!==null) lines.push('');
+      lines.push(`**${ds}**`);
+      lastDt=ds;
+    }
     const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
     lines.push(`${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' - '+price+'€ each':''}`);
   });
