@@ -1104,6 +1104,7 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 
 function checkAuth() {
   const loginScreen = document.getElementById('loginScreen');
+  if (!loginScreen) return;
   // Toujours afficher l'écran de login — sauf si session active (flag sessionStorage)
   if (sessionStorage.getItem('td_unlocked')) {
     loginScreen.style.display = 'none';
