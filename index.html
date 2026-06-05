@@ -6,365 +6,334 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TicketDesk">
-<meta name="theme-color" content="#0d0d0d">
+<meta name="theme-color" content="#0a0a0f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>TicketDesk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --accent: #FF5E1A;
-  --accent-dim: rgba(255,94,26,0.15);
-  --bg: #0d0d0d;
-  --bg2: #161616;
-  --bg3: #1e1e1e;
-  --bg4: #252525;
-  --text: #f0f0f0;
-  --text2: #888;
-  --text3: #555;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --green: #22c55e;
-  --red: #ef4444;
-  --yellow: #f59e0b;
+  --accent: #7c6ff7;
+  --accent2: #a78bfa;
+  --accent-dim: rgba(124,111,247,0.15);
+  --accent-dim2: rgba(124,111,247,0.08);
+  --bg:   #0a0a0f;
+  --bg2:  #12121a;
+  --bg3:  #1a1a26;
+  --bg4:  #22223a;
+  --text:  #eeeef5;
+  --text2: #7878a0;
+  --text3: #3d3d5c;
+  --border:  rgba(124,111,247,0.1);
+  --border2: rgba(124,111,247,0.2);
+  --green: #34d399;
+  --red:   #f87171;
+  --yellow:#fbbf24;
   --radius: 14px;
-  --radius-sm: 8px;
+  --radius-sm: 9px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
 
-/* LAYOUT */
-.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
-.topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: calc(var(--safe-top) + 12px) 16px 12px;
-  background: var(--bg); border-bottom: 0.5px solid var(--border);
-  flex-shrink: 0;
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* topbar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 10px) 16px 10px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  flex-shrink:0;gap:10px;
 }
-.topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--accent); }
-.topbar-actions { display: flex; gap: 8px; }
-.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px calc(80px + var(--safe-bottom)); }
-.bottomnav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  padding: 8px 0 calc(var(--safe-bottom) + 6px);
-  background: rgba(13,13,13,0.92); backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid var(--border);
-  display: flex; justify-content: space-around; z-index: 50;
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--accent2);white-space:nowrap}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#syncIndicator{font-size:11px;color:var(--text2);white-space:nowrap}
+
+/* tab nav — HAUT */
+.topnav{
+  display:flex;background:var(--bg2);border-bottom:1px solid var(--border);
+  overflow-x:auto;flex-shrink:0;scrollbar-width:none;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 20px; cursor: pointer; background: none; border: none; color: var(--text3); font-size: 10px; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
-.nav-item.active { color: var(--accent); }
-.nav-icon { font-size: 22px; }
-.page { display: none; }
-.page.active { display: block; }
+.topnav::-webkit-scrollbar{display:none}
+.tnav{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:8px 14px 7px;cursor:pointer;background:none;border:none;
+  color:var(--text2);font-size:10px;font-family:'DM Sans',sans-serif;
+  border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;
+  transition:color .2s;
+}
+.tnav.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.tnav-icon{font-size:18px}
 
-/* BUTTONS */
-.btn { padding: 9px 16px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
-.btn:active { opacity: 0.7; }
-.btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+/* content */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.page{display:none}.page.active{display:block}
 
-/* CARDS */
-.card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-.card-sm { padding: 12px 14px; }
+/* ── BUTTONS ── */
+.btn{padding:8px 15px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s,background .15s}
+.btn:active{opacity:.7}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.btn-accent:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-icon{width:34px;height:34px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
 
-/* METRICS */
-.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.metric-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; }
-.metric-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-.metric-value { font-size: 24px; font-weight: 600; }
-.metric-value.accent { color: var(--accent); }
-.metric-value.pos { color: var(--green); }
-.metric-value.neg { color: var(--red); }
-.metric-value.warn { color: var(--yellow); }
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
 
-/* BADGES */
-.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
-.badge-vendu { background: rgba(34,197,94,0.15); color: var(--green); }
-.badge-stock { background: rgba(239,68,68,0.15); color: var(--red); }
-.badge-attente { background: rgba(245,158,11,0.15); color: var(--yellow); }
-.badge-paye { background: rgba(34,197,94,0.15); color: var(--green); }
-.badge-apayer { background: rgba(245,158,11,0.15); color: var(--yellow); }
+/* ── METRICS ── */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
+.metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.metric-value{font-size:22px;font-weight:600}
+.mv-accent{color:var(--accent2)}
+.mv-pos{color:var(--green)}
+.mv-neg{color:var(--red)}
+.mv-warn{color:var(--yellow)}
 
-/* SECTION TITLE */
-.section-title { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 10px; }
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-vendu{background:rgba(52,211,153,.13);color:var(--green)}
+.b-stock{background:rgba(248,113,113,.13);color:var(--red)}
+.b-attente{background:rgba(251,191,36,.13);color:var(--yellow)}
+.b-paye{background:rgba(52,211,153,.13);color:var(--green)}
+.b-apayer{background:rgba(251,191,36,.13);color:var(--yellow)}
+.b-livre{background:rgba(52,211,153,.13);color:var(--green)}
+.b-nonlivre{background:rgba(248,113,113,.13);color:var(--red)}
 
-/* TRANSACTION ROW */
-.tx-row { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s; }
-.tx-row:active { border-color: var(--border2); }
-.tx-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.tx-dot-vendu { background: var(--green); }
-.tx-dot-stock { background: var(--red); }
-.tx-main { flex: 1; min-width: 0; }
-.tx-event { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tx-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-.tx-right { text-align: right; flex-shrink: 0; }
-.tx-profit { font-size: 14px; font-weight: 600; }
-.tx-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+/* ── SECTION TITLE ── */
+.stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px}
 
-/* FORM */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: flex-end; }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--bg2); border-radius: var(--radius) var(--radius) 0 0; padding: 20px 16px calc(16px + var(--safe-bottom)); width: 100%; max-height: 90vh; overflow-y: auto; border-top: 0.5px solid var(--border2); }
-.modal-handle { width: 36px; height: 4px; background: var(--bg4); border-radius: 2px; margin: 0 auto 16px; }
-.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
-input, select, textarea { width: 100%; padding: 11px 13px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; -webkit-appearance: none; }
-input:focus, select:focus { outline: none; border-color: var(--accent); }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.form-actions { display: flex; gap: 10px; margin-top: 20px; }
-.form-actions .btn { flex: 1; justify-content: center; }
+/* ── JOURNAL — cards mobile ── */
+.tx-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:13px;margin-bottom:8px;cursor:pointer;
+  transition:border-color .15s;
+}
+.tx-card:active{border-color:var(--accent)}
+.tx-card.is-vendu{border-left:3px solid var(--green)}
+.tx-card.is-stock{border-left:3px solid var(--red)}
+.tx-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tx-event{font-size:15px;font-weight:600;line-height:1.2}
+.tx-date{font-size:12px;color:var(--text2);margin-top:2px}
+.tx-profit{font-size:16px;font-weight:700;text-align:right;flex-shrink:0}
+.tx-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
+.tx-field{font-size:11px;color:var(--text2)}
+.tx-field span{color:var(--text);font-weight:500}
+.tx-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
 
-/* GMAIL */
-.gmail-card { border: 1px solid rgba(255,94,26,0.3); background: var(--bg2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-.gmail-status { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.gmail-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
-.gmail-dot.connected { background: var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.gmail-email { font-size: 13px; color: var(--text2); }
-.import-result { background: var(--bg3); border-radius: var(--radius-sm); padding: 12px; margin-top: 12px; }
-.import-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
-.import-item:last-child { border-bottom: none; padding-bottom: 0; }
-.import-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
-.import-check.checked { background: var(--accent); border-color: var(--accent); }
-.import-info { flex: 1; min-width: 0; }
-.import-event { font-size: 13px; font-weight: 500; }
-.import-detail { font-size: 11px; color: var(--text2); margin-top: 2px; }
+/* ── FILTERS ── */
+.filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fchip{padding:5px 13px;border-radius:99px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s}
+.fchip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent2)}
 
-/* WTS */
-.wts-preview { background: #2b2d31; border-radius: var(--radius); padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.7; white-space: pre-wrap; color: #dcddde; word-break: break-word; min-height: 120px; }
-.wts-bold { font-weight: 700; color: #fff; }
+/* ── WTS ── */
+.wts-box{background:#1a1625;border:1px solid rgba(124,111,247,.25);border-radius:var(--radius);padding:15px;font-family:monospace;font-size:13px;line-height:1.8;white-space:pre-wrap;color:#c9c7e8;word-break:break-word;min-height:100px}
+.wts-b{font-weight:700;color:#fff}
 
-/* CHART */
-.chart-wrap { position: relative; width: 100%; height: 180px; }
+/* ── GMAIL/DRIVE ── */
+.gmail-card{border:1px solid var(--border2);background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.status-dot.on{background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.import-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.import-item:last-child{border:none;padding-bottom:0}
+.icheck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;font-size:11px}
+.icheck.on{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* EMPTY */
-.empty { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 13px; }
-.empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.4; }
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;padding:18px 15px calc(16px + var(--safe-bottom));width:100%;max-height:92vh;overflow-y:auto;border-top:1px solid var(--border2)}
+.modal-handle{width:36px;height:4px;background:var(--bg4);border-radius:2px;margin:0 auto 15px}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:16px}
+.fgroup{margin-bottom:12px}
+.flabel{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-actions{display:flex;gap:10px;margin-top:18px}
+.form-actions .btn{flex:1;justify-content:center}
 
-/* FILTERS */
-.filters { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
-.filter-chip { padding: 6px 14px; border-radius: 99px; border: 0.5px solid var(--border2); background: var(--bg2); color: var(--text2); font-size: 12px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
-.filter-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+/* ── TOAST ── */
+.toast{position:fixed;top:calc(var(--safe-top) + 56px);left:50%;transform:translateX(-50%) translateY(-12px);background:var(--bg3);border:1px solid var(--border2);border-radius:99px;padding:9px 18px;font-size:13px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
 
-/* TOAST */
-.toast { position: fixed; top: calc(var(--safe-top) + 60px); left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg3); border: 0.5px solid var(--border2); border-radius: 99px; padding: 10px 20px; font-size: 13px; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.success { border-color: var(--green); color: var(--green); }
-.toast.error { border-color: var(--red); color: var(--red); }
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
+.ei{font-size:32px;margin-bottom:8px;opacity:.35}
 
-/* ICON fallback SVG inline */
-.icon { display: inline-flex; align-items: center; justify-content: center; }
+/* ── CHART ── */
+.chart-wrap{position:relative;width:100%;height:180px}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <!-- TOP BAR -->
+
+  <!-- TOPBAR -->
   <div class="topbar">
     <span class="topbar-title">TicketDesk</span>
-    <div class="topbar-actions">
-      <span id="syncIndicator" style="font-size:11px; color:var(--text3);"></span>
-      <button class="btn btn-icon" id="syncBtn" onclick="showPage('gmail')" title="Gmail sync" style="font-size:18px;">📧</button>
+    <div class="topbar-right">
+      <span id="syncIndicator"></span>
       <button class="btn btn-accent btn-sm" onclick="openAddModal()">＋ Ajouter</button>
     </div>
   </div>
 
+  <!-- NAV HAUT -->
+  <nav class="topnav">
+    <button class="tnav active" onclick="showPage('dashboard')"><span class="tnav-icon">📊</span>Dashboard</button>
+    <button class="tnav" onclick="showPage('journal')"><span class="tnav-icon">📋</span>Journal</button>
+    <button class="tnav" onclick="showPage('wts')"><span class="tnav-icon">💬</span>WTS</button>
+    <button class="tnav" onclick="showPage('gmail')"><span class="tnav-icon">📧</span>Gmail</button>
+    <button class="tnav" onclick="showPage('costs')"><span class="tnav-icon">💸</span>Coûts</button>
+  </nav>
+
   <!-- CONTENT -->
   <div class="content">
 
-    <!-- PAGE: DASHBOARD -->
+    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="metrics-grid" id="metricsGrid"></div>
-      <p class="section-title">Bénéfice par événement</p>
-      <div class="card" style="padding:14px;">
-        <div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div>
-      </div>
-      <p class="section-title">Répartition du stock</p>
-      <div class="card" style="padding:14px; display:flex; align-items:center; gap:20px;">
-        <div style="position:relative; width:120px; height:120px; flex-shrink:0;">
+      <p class="stitle">Bénéfice par événement</p>
+      <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
+      <p class="stitle">Répartition</p>
+      <div class="card" style="padding:12px;display:flex;align-items:center;gap:16px">
+        <div style="position:relative;width:110px;height:110px;flex-shrink:0">
           <canvas id="chartPie" role="img" aria-label="Stock vs Vendu"></canvas>
-          <div id="pieCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;font-size:11px;color:var(--text2)"></div>
+          <div id="pieCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"></div>
         </div>
-        <div id="pieLegend" style="flex:1;font-size:12px;"></div>
+        <div id="pieLegend" style="flex:1;font-size:12px;line-height:2"></div>
       </div>
     </div>
 
-    <!-- PAGE: JOURNAL -->
+    <!-- JOURNAL -->
     <div class="page" id="page-journal">
       <div class="filters" id="filterChips"></div>
       <div id="journalList"></div>
     </div>
 
-    <!-- PAGE: WTS -->
+    <!-- WTS -->
     <div class="page" id="page-wts">
-      <p style="font-size:13px; color:var(--text2); margin-bottom:14px;">Billets <strong style="color:var(--text)">En stock</strong> → message Discord prêt à coller.</p>
-      <div class="wts-preview" id="wtsPreview"></div>
-      <div style="display:flex; gap:10px; margin-top:12px;">
-        <button class="btn btn-accent" style="flex:1; justify-content:center;" onclick="copyWTS()">📋 Copier pour Discord</button>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> → message Discord prêt à coller.</p>
+      <div class="wts-box" id="wtsPreview"></div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-accent" style="flex:1;justify-content:center" onclick="copyWTS()">📋 Copier pour Discord</button>
       </div>
-      <p class="section-title">Aperçu des invendus</p>
-      <div id="wtsStock"></div>
     </div>
 
-    <!-- PAGE: GMAIL -->
+    <!-- GMAIL -->
     <div class="page" id="page-gmail">
       <div class="gmail-card">
-        <div class="gmail-status">
-          <div class="gmail-dot" id="gmailDot"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="status-dot" id="gmailDot"></div>
           <div>
-            <div style="font-size:14px; font-weight:500;" id="gmailStatusText">Non connecté</div>
-            <div class="gmail-email" id="gmailEmail"></div>
+            <div style="font-size:14px;font-weight:500" id="gmailStatusText">Non connecté</div>
+            <div style="font-size:12px;color:var(--text2)" id="gmailEmail"></div>
           </div>
         </div>
-        <button class="btn btn-accent" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%; justify-content:center;">
-          <span style="font-size:16px;">🔐</span> Connecter Gmail
-        </button>
-        <div style="margin-top:10px; display:none;" id="gmailScanRow">
-          <button class="btn" onclick="gmailScan()" style="width:100%; justify-content:center;">
-            🔍 Scanner les billets
-          </button>
+        <button class="btn btn-accent" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%;justify-content:center">🔐 Connecter Gmail + Drive</button>
+        <div style="margin-top:8px;display:none" id="gmailScanRow">
+          <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center">🔍 Scanner les billets</button>
         </div>
       </div>
-
-      <div id="importResults" style="display:none;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-          <p class="section-title" style="margin:0;">Billets détectés</p>
+      <div id="importResults" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <p class="stitle" style="margin:0">Billets détectés</p>
           <button class="btn btn-accent btn-sm" onclick="importSelected()">Importer sélection</button>
         </div>
-        <div class="import-result" id="importList"></div>
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:0 12px" id="importList"></div>
       </div>
-
-      <p class="section-title">Comment ça marche</p>
-      <div class="card card-sm" style="font-size:13px; color:var(--text2); line-height:1.7;">
-        TicketDesk lit tes mails de confirmation de <strong style="color:var(--text)">Ticketmaster</strong>, <strong style="color:var(--text)">Fnac Spectacles</strong> et <strong style="color:var(--text)">Stade de France</strong> pour en extraire automatiquement l'événement, la date, la catégorie et le prix payé.<br><br>
-        <span style="color:var(--yellow)">⚠️</span> Accès en lecture seule. Aucun mail n'est modifié ni supprimé.
-      </div>
-
-      <p class="section-title">Sync Google Drive</p>
-      <div class="card card-sm" id="driveStatusCard">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-          <div id="driveDot" style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;"></div>
+      <p class="stitle">Sync Google Drive</p>
+      <div class="gmail-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="status-dot" id="driveDot"></div>
           <div>
-            <div style="font-size:14px;font-weight:500;" id="driveStatusText">Non activé</div>
-            <div style="font-size:12px;color:var(--text2);" id="driveLastSync"></div>
+            <div style="font-size:14px;font-weight:500" id="driveStatusText">Non activé</div>
+            <div style="font-size:12px;color:var(--text2)" id="driveLastSync"></div>
           </div>
         </div>
-        <div style="font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:12px;" id="driveDesc">
-          Connecte Google pour activer la <strong style="color:var(--text)">sync automatique</strong> entre ton iPhone et ton PC. Les données sont sauvegardées dans ton Drive privé (dossier caché, invisible dans Drive).
-        </div>
-        <button class="btn" onclick="driveManualSync()" id="driveSyncBtn" style="width:100%; justify-content:center; display:none;">
-          ☁ Forcer la sync maintenant
-        </button>
-        <button class="btn" onclick="driveManualLoad()" id="driveLoadBtn" style="width:100%; justify-content:center; margin-top:8px; display:none;">
-          ⬇ Récupérer depuis Drive
-        </button>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px" id="driveDesc">Connecte Google pour activer la sync automatique iPhone ↔ PC.</div>
+        <button class="btn" onclick="driveManualSync()" id="driveSyncBtn" style="width:100%;justify-content:center;display:none;margin-bottom:8px">☁ Forcer la sync</button>
+        <button class="btn" onclick="driveManualLoad()" id="driveLoadBtn" style="width:100%;justify-content:center;display:none">⬇ Récupérer depuis Drive</button>
+      </div>
+      <p class="stitle">Comment ça marche</p>
+      <div class="card" style="font-size:13px;color:var(--text2);line-height:1.7">
+        TicketDesk lit tes mails <strong style="color:var(--text)">Ticketmaster</strong>, <strong style="color:var(--text)">Fnac Spectacles</strong> et <strong style="color:var(--text)">Stade de France</strong>.<br>
+        <span style="color:var(--yellow)">⚠️</span> Accès lecture seule. Aucun mail modifié.
       </div>
     </div>
 
-    <!-- PAGE: COSTS -->
+    <!-- COSTS -->
     <div class="page" id="page-costs">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-        <span style="font-size:15px; font-weight:600;">Coûts fixes</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:15px;font-weight:600">Coûts fixes</span>
         <button class="btn btn-sm" onclick="openCostModal()">＋ Ajouter</button>
       </div>
       <div id="costsList"></div>
-      <div id="costsTotal" style="margin-top:4px;"></div>
+      <div id="costsTotal"></div>
     </div>
 
-  </div>
+  </div><!-- /content -->
+</div><!-- /app -->
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottomnav">
-    <button class="nav-item active" onclick="showPage('dashboard')">
-      <span class="nav-icon">📊</span>
-      <span>Dashboard</span>
-    </button>
-    <button class="nav-item" onclick="showPage('journal')">
-      <span class="nav-icon">📋</span>
-      <span>Journal</span>
-    </button>
-    <button class="nav-item" onclick="showPage('wts')">
-      <span class="nav-icon">💬</span>
-      <span>WTS</span>
-    </button>
-    <button class="nav-item" onclick="showPage('gmail')">
-      <span class="nav-icon">📧</span>
-      <span>Gmail</span>
-    </button>
-    <button class="nav-item" onclick="showPage('costs')">
-      <span class="nav-icon">💸</span>
-      <span>Coûts</span>
-    </button>
-  </nav>
-</div>
-
-<!-- MODAL ADD/EDIT -->
+<!-- MODAL TRANSACTION -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="addModalTitle">Nouvelle transaction</div>
-    <div class="form-group">
-      <label class="form-label">Statut</label>
+    <!-- A: Statut -->
+    <div class="fgroup">
+      <label class="flabel">A · Statut</label>
       <select id="f-statut"><option value="En stock">En stock</option><option value="Vendu">Vendu</option></select>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Événement *</label>
-        <input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date concert</label>
-        <input type="date" id="f-date">
-      </div>
+    <!-- B+C -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">B · Événement *</label><input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off"></div>
+      <div class="fgroup"><label class="flabel">C · Date concert</label><input type="date" id="f-date"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Catégorie</label>
-        <input type="text" id="f-cat" placeholder="Fosse, Carré Or…">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Placement</label>
-        <input type="text" id="f-place" placeholder="Bloc A Rang 5">
-      </div>
+    <!-- D+E -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">D · Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
+      <div class="fgroup"><label class="flabel">E · Placement</label><input type="text" id="f-place" placeholder="Bloc A Rang 5"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Quantité</label>
-        <input type="number" id="f-qty" min="1" value="1">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Achat total (€)</label>
-        <input type="number" id="f-buy" min="0" step="0.01" placeholder="0">
-      </div>
+    <!-- F+G -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">F · Site d'achat</label><input type="text" id="f-site" placeholder="Ticketmaster, Fnac…"></div>
+      <div class="fgroup"><label class="flabel">G · Compte email</label><input type="email" id="f-compte" placeholder="email@…" autocomplete="off"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Revente total (€)</label>
-        <input type="number" id="f-sell" min="0" step="0.01" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Prix voulu (€)</label>
-        <input type="number" id="f-wanted" min="0" step="0.01" placeholder="0">
-      </div>
+    <!-- H+I -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">H · Mot de passe</label><input type="text" id="f-mdp" autocomplete="new-password" placeholder="••••••"></div>
+      <div class="fgroup"><label class="flabel">I · Quantité</label><input type="number" id="f-qty" min="1" value="1"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Plateforme</label>
-        <input type="text" id="f-platform" placeholder="Discord, Insta…">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Paiement</label>
+    <!-- J+K -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">J · Prix achat total (€)</label><input type="number" id="f-buy" min="0" step="0.01" placeholder="0"></div>
+      <div class="fgroup"><label class="flabel">K · Prix revente total (€)</label><input type="number" id="f-sell" min="0" step="0.01" placeholder="0"></div>
+    </div>
+    <!-- L+M -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">L · Acheteur</label><input type="text" id="f-buyer" placeholder="Pseudo client"></div>
+      <div class="fgroup"><label class="flabel">M · Plateforme revente</label><input type="text" id="f-platform" placeholder="Discord, Insta…"></div>
+    </div>
+    <!-- P+Q -->
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">P · Paiement</label>
         <select id="f-pay"><option value="">—</option><option value="Payé">Payé</option><option value="En attente">En attente</option></select>
       </div>
+      <div class="fgroup"><label class="flabel">Q · Livraison</label>
+        <select id="f-livraison"><option value="">—</option><option value="Livré">Livré</option><option value="Non livré">Non livré</option></select>
+      </div>
     </div>
+    <!-- R: Prix voulu -->
+    <div class="fgroup"><label class="flabel">R · Prix voulu (€/total invendus)</label><input type="number" id="f-wanted" min="0" step="0.01" placeholder="0"></div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('addModal')">Annuler</button>
       <button class="btn btn-accent" onclick="saveTransaction()">Enregistrer</button>
@@ -377,29 +346,14 @@ input:focus, select:focus { outline: none; border-color: var(--accent); }
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Nouveau coût fixe</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input type="date" id="fc-date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Montant (€)</label>
-        <input type="number" id="fc-amount" min="0" step="0.01">
-      </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Date</label><input type="date" id="fc-date"></div>
+      <div class="fgroup"><label class="flabel">Montant (€)</label><input type="number" id="fc-amount" min="0" step="0.01"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Type</label>
-      <input type="text" id="fc-type" placeholder="Abonnement, Frais…">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Statut</label>
-        <select id="fc-status"><option value="Payé">Payé</option><option value="À payer">À payer</option></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes</label>
-        <input type="text" id="fc-notes" placeholder="">
-      </div>
+    <div class="fgroup"><label class="flabel">Type</label><input type="text" id="fc-type" placeholder="Abonnement, Frais…"></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Statut</label><select id="fc-status"><option value="Payé">Payé</option><option value="À payer">À payer</option></select></div>
+      <div class="fgroup"><label class="flabel">Notes</label><input type="text" id="fc-notes" placeholder=""></div>
     </div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('costModal')">Annuler</button>
@@ -408,729 +362,560 @@ input:focus, select:focus { outline: none; border-color: var(--accent); }
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIGURATION — À REMPLIR (voir README)
-// ============================================================
-const GOOGLE_CLIENT_ID = 'VOTRE_CLIENT_ID_ICI'; // Remplace par ton Client ID Google OAuth
+// ── CONFIG ──
+const GOOGLE_CLIENT_ID = 'VOTRE_CLIENT_ID_ICI';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
-const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
-const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-const ALL_SCOPES = GMAIL_SCOPE + ' ' + DRIVE_SCOPE;
+const ALL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'ticketdesk-data.json';
 
-// ============================================================
-// DATA
-// ============================================================
-const TX_KEY = 'ticketdesk_tx';
+// ── STATE ──
+const TX_KEY   = 'ticketdesk_tx';
 const COST_KEY = 'ticketdesk_costs';
-const GMAIL_KEY = 'ticketdesk_gmail';
+const GMAIL_KEY= 'ticketdesk_gmail';
 
-let transactions = JSON.parse(localStorage.getItem(TX_KEY) || '[]');
-let costs = JSON.parse(localStorage.getItem(COST_KEY) || '[]');
-let gmailToken = localStorage.getItem(GMAIL_KEY) || null;
-let driveFileId = localStorage.getItem('ticketdesk_drive_file_id') || null;
-let driveSyncing = false;
-let editingId = null;
-let filterStatut = '';
-let chartEvents = null, chartPie = null;
-let importCandidates = [];
+let transactions    = JSON.parse(localStorage.getItem(TX_KEY)   || '[]');
+let costs           = JSON.parse(localStorage.getItem(COST_KEY) || '[]');
+let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
+let driveFileId     = localStorage.getItem('ticketdesk_drive_fid') || null;
+let driveSyncing    = false;
+let editingId       = null;
+let filterStatut    = '';
+let chartEvents     = null, chartPie = null;
+let importCandidates= [];
+let _driveTimer     = null;
 
-if (transactions.length === 0) {
+// ── DÉMO ──
+if (!transactions.length) {
   transactions = [
-    { id:1, statut:'Vendu', event:'David Guetta', date:'2026-06-13', cat:'Carré Or', place:'Bloc A', qty:2, buy:200, sell:300, wanted:0, platform:'Discord', pay:'Payé' },
-    { id:2, statut:'En stock', event:'Bad Bunny', date:'2026-09-20', cat:'Fosse', place:'', qty:4, buy:400, sell:0, wanted:150, platform:'', pay:'' },
-    { id:3, statut:'Vendu', event:'Bruno Mars', date:'2026-07-15', cat:'Cat 1', place:'Rang 3', qty:2, buy:180, sell:280, wanted:0, platform:'Insta', pay:'Payé' },
-    { id:4, statut:'En stock', event:'Niska', date:'2027-04-10', cat:'Pelouse', place:'', qty:8, buy:560, sell:0, wanted:90, platform:'', pay:'' },
-    { id:5, statut:'En stock', event:'Céline Dion', date:'2026-11-05', cat:'Cat 2', place:'Bloc C', qty:3, buy:450, sell:0, wanted:120, platform:'', pay:'' },
+    {id:1,statut:'Vendu',event:'David Guetta',date:'2026-06-13',cat:'Carré Or',place:'Bloc A',site:'Ticketmaster',compte:'monmail@gmail.com',mdp:'pass123',qty:2,buy:200,sell:300,buyer:'user123',platform:'Discord',pay:'Payé',livraison:'Livré',wanted:0},
+    {id:2,statut:'En stock',event:'Bad Bunny',date:'2026-09-20',cat:'Fosse',place:'',site:'Fnac',compte:'monmail@gmail.com',mdp:'pass123',qty:4,buy:400,sell:0,buyer:'',platform:'',pay:'',livraison:'',wanted:150},
+    {id:3,statut:'Vendu',event:'Bruno Mars',date:'2026-07-15',cat:'Cat 1',place:'Rang 3',site:'SDF',compte:'monmail@gmail.com',mdp:'pass123',qty:2,buy:180,sell:280,buyer:'marie_p',platform:'Insta',pay:'Payé',livraison:'Livré',wanted:0},
+    {id:4,statut:'En stock',event:'Niska',date:'2027-04-10',cat:'Pelouse',place:'',site:'Discord',compte:'monmail@gmail.com',mdp:'pass123',qty:8,buy:560,sell:0,buyer:'',platform:'',pay:'',livraison:'',wanted:90},
+    {id:5,statut:'En stock',event:'Céline Dion',date:'2026-11-05',cat:'Cat 2',place:'Bloc C',site:'Ticketmaster',compte:'monmail@gmail.com',mdp:'pass123',qty:3,buy:450,sell:0,buyer:'',platform:'',pay:'En attente',livraison:'',wanted:120},
   ];
   saveTx();
 }
+if (!costs.length) {
+  costs = [
+    {id:1,date:'2026-04-01',type:"Frais d'entrée unique",amount:280,status:'Payé',notes:''},
+    {id:2,date:'2026-04-01',type:'Abonnement mensuel',amount:80,status:'Payé',notes:'Avril'},
+    {id:3,date:'2026-05-01',type:'Abonnement mensuel',amount:80,status:'Payé',notes:'Mai'},
+    {id:4,date:'2026-06-01',type:'Abonnement mensuel',amount:90,status:'À payer',notes:'Juin'},
+  ];
+  saveCosts();
+}
 
-function saveTx() { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); }
-function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs)); driveSyncDebounced(); }
-
-// Debounce: attend 1.5s après la dernière modif avant de syncer Drive
-let _driveTimer = null;
+// ── SAVE ──
+function saveTx()    { localStorage.setItem(TX_KEY,   JSON.stringify(transactions)); driveSyncDebounced(); }
+function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs));        driveSyncDebounced(); }
 function driveSyncDebounced() {
   if (!gmailToken) return;
   clearTimeout(_driveTimer);
-  _driveTimer = setTimeout(() => driveSync(), 1500);
+  _driveTimer = setTimeout(driveSync, 1500);
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  const pages = ['dashboard','journal','wts','gmail','costs'];
-  const idx = pages.indexOf(name);
-  if (idx !== -1) document.querySelectorAll('.nav-item')[idx].classList.add('active');
-  if (name === 'dashboard') renderDashboard();
-  if (name === 'journal') renderJournal();
-  if (name === 'wts') renderWTS();
-  if (name === 'gmail') renderGmail();
-  if (name === 'costs') renderCosts();
-}
-
-// ============================================================
-// UTILS
-// ============================================================
+// ── UTILS ──
 function fmt(n) {
-  const abs = Math.abs(n);
-  const str = abs >= 1000 ? (abs/1000).toFixed(1) + 'k' : Math.round(abs) + '';
-  return (n < 0 ? '−' : '') + str + ' €';
+  const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
+  return (n<0?'−':'')+s+' €';
 }
-function fmtFull(n) {
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 }).format(n);
-}
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
-}
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 2500);
+function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n); }
+function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function showToast(msg,type='ok') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',2600);
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
+// ── NAV ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tnav').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const pages=['dashboard','journal','wts','gmail','costs'];
+  const idx=pages.indexOf(name);
+  if(idx!==-1) document.querySelectorAll('.tnav')[idx].classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='journal')   renderJournal();
+  if(name==='wts')       renderWTS();
+  if(name==='gmail')     renderGmail();
+  if(name==='costs')     renderCosts();
+}
+
+// ── DASHBOARD ──
 function renderDashboard() {
-  const sold = transactions.filter(t => t.statut === 'Vendu');
-  const stock = transactions.filter(t => t.statut === 'En stock');
-  const grossProfit = sold.reduce((s,t) => s + (t.sell - t.buy), 0);
-  const totalCostsPaid = costs.filter(c => c.status === 'Payé').reduce((s,c) => s + c.amount, 0);
-  const netProfit = grossProfit - totalCostsPaid;
-  const stockQty = stock.reduce((s,t) => s + t.qty, 0);
-  const totalBuy = transactions.reduce((s,t) => s + t.buy, 0);
-  const totalSell = sold.reduce((s,t) => s + t.sell, 0);
+  const sold  = transactions.filter(t=>t.statut==='Vendu');
+  const stock = transactions.filter(t=>t.statut==='En stock');
+  const grossP= sold.reduce((s,t)=>s+(t.sell-t.buy),0);
+  const paidC = costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
+  const netP  = grossP-paidC;
+  const sQty  = stock.reduce((s,t)=>s+t.qty,0);
+  const tBuy  = transactions.reduce((s,t)=>s+t.buy,0);
+  const tSell = sold.reduce((s,t)=>s+t.sell,0);
 
-  document.getElementById('metricsGrid').innerHTML = `
-    <div class="metric-card"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netProfit>=0?'pos':'neg'}">${fmt(netProfit)}</div></div>
-    <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossProfit>=0?'pos':'neg'}">${fmt(grossProfit)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total achats</div><div class="metric-value warn">${fmt(totalBuy)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total ventes</div><div class="metric-value accent">${fmt(totalSell)}</div></div>
-    <div class="metric-card"><div class="metric-label">Vendus</div><div class="metric-value pos">${sold.length} lignes</div></div>
-    <div class="metric-card"><div class="metric-label">En stock</div><div class="metric-value neg">${stockQty} places</div></div>
+  document.getElementById('metricsGrid').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}">${fmt(netP)}</div></div>
+    <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmt(grossP)}</div></div>
+    <div class="metric-card"><div class="metric-label">Total achats</div><div class="metric-value mv-warn">${fmt(tBuy)}</div></div>
+    <div class="metric-card"><div class="metric-label">Total ventes</div><div class="metric-value mv-accent">${fmt(tSell)}</div></div>
+    <div class="metric-card"><div class="metric-label">Vendus</div><div class="metric-value mv-pos">${sold.length} lignes</div></div>
+    <div class="metric-card"><div class="metric-label">En stock</div><div class="metric-value mv-neg">${sQty} places</div></div>
   `;
 
-  const evMap = {};
-  transactions.forEach(t => {
-    if (!evMap[t.event]) evMap[t.event] = 0;
-    evMap[t.event] += t.statut === 'Vendu' ? (t.sell - t.buy) : -t.buy;
+  const evMap={};
+  transactions.forEach(t=>{
+    if(!evMap[t.event])evMap[t.event]=0;
+    evMap[t.event]+=t.statut==='Vendu'?(t.sell-t.buy):-t.buy;
   });
-  const labels = Object.keys(evMap);
-  const data = labels.map(e => Math.round(evMap[e]));
-  const colors = data.map(v => v >= 0 ? '#22c55e' : '#ef4444');
+  const labels=Object.keys(evMap), data=labels.map(e=>Math.round(evMap[e]));
 
-  if (chartEvents) chartEvents.destroy();
-  chartEvents = new Chart(document.getElementById('chartEvents'), {
-    type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 5, borderSkipped: false }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color:'#666', font:{size:10}, maxRotation:35, autoSkip:false }, grid:{display:false} },
-        y: { ticks: { color:'#666', font:{size:10}, callback: v => fmt(v) }, grid:{color:'rgba(255,255,255,0.05)'} }
-      }
-    }
+  if(chartEvents)chartEvents.destroy();
+  chartEvents=new Chart(document.getElementById('chartEvents'),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'#34d399':'#f87171'),borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#7878a0',font:{size:10},maxRotation:35,autoSkip:false},grid:{display:false}},
+        y:{ticks:{color:'#7878a0',font:{size:10},callback:v=>fmt(v)},grid:{color:'rgba(124,111,247,0.08)'}}
+      }}
   });
 
-  if (chartPie) chartPie.destroy();
-  chartPie = new Chart(document.getElementById('chartPie'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Vendus','En stock'],
-      datasets: [{ data:[sold.length,stock.length], backgroundColor:['#22c55e','#ef4444'], borderWidth:0 }]
-    },
-    options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{display:false}} }
+  if(chartPie)chartPie.destroy();
+  chartPie=new Chart(document.getElementById('chartPie'),{
+    type:'doughnut',
+    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['#34d399','#f87171'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}
   });
-  document.getElementById('pieCenter').innerHTML = `<span style="font-size:18px;font-weight:600;color:var(--text)">${transactions.length}</span><span>total</span>`;
-  document.getElementById('pieLegend').innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;flex-shrink:0"></span><span style="color:var(--text2)">Vendus — ${sold.length}</span></div>
-    <div style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#ef4444;flex-shrink:0"></span><span style="color:var(--text2)">En stock — ${stock.length} (${stockQty} places)</span></div>
+  document.getElementById('pieCenter').innerHTML=`<span style="font-size:17px;font-weight:700;color:var(--text)">${transactions.length}</span><span style="font-size:10px;color:var(--text2)">total</span>`;
+  document.getElementById('pieLegend').innerHTML=`
+    <div style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#34d399"></span><span style="color:var(--text2)">Vendus — ${sold.length}</span></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="width:9px;height:9px;border-radius:2px;background:#f87171"></span><span style="color:var(--text2)">En stock — ${stock.length} (${sQty} places)</span></div>
   `;
 }
 
-// ============================================================
-// JOURNAL
-// ============================================================
+// ── JOURNAL ──
 function renderJournal() {
-  const events = ['', ...new Set(transactions.map(t => t.event))].sort();
-  const chips = [
-    { label:'Tous', val:'' },
-    { label:'Vendus', val:'Vendu' },
-    { label:'En stock', val:'En stock' },
-  ];
-  document.getElementById('filterChips').innerHTML = chips.map(c =>
-    `<button class="filter-chip ${filterStatut===c.val?'active':''}" onclick="setFilter('${c.val}')">${c.label}</button>`
+  const chips=[{l:'Tous',v:''},{l:'Vendus ✓',v:'Vendu'},{l:'En stock',v:'En stock'}];
+  document.getElementById('filterChips').innerHTML=chips.map(c=>
+    `<button class="fchip ${filterStatut===c.v?'active':''}" onclick="setFilter('${c.v}')">${c.l}</button>`
   ).join('');
 
-  let list = [...transactions];
-  if (filterStatut) list = list.filter(t => t.statut === filterStatut);
-  list.sort((a,b) => a.event.localeCompare(b.event) || a.date.localeCompare(b.date));
+  let list=[...transactions];
+  if(filterStatut) list=list.filter(t=>t.statut===filterStatut);
+  list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
 
-  if (list.length === 0) {
-    document.getElementById('journalList').innerHTML = '<div class="empty"><div class="empty-icon">📋</div>Aucune transaction</div>';
+  if(!list.length){
+    document.getElementById('journalList').innerHTML='<div class="empty"><div class="ei">📋</div>Aucune transaction</div>';
     return;
   }
 
-  document.getElementById('journalList').innerHTML = list.map(t => {
-    const profit = t.sell ? (t.sell - t.buy) : -t.buy;
-    const isPos = t.sell > 0 && profit >= 0;
-    return `<div class="tx-row" onclick="editTransaction(${t.id})">
-      <div class="tx-dot tx-dot-${t.statut==='Vendu'?'vendu':'stock'}"></div>
-      <div class="tx-main">
-        <div class="tx-event">${t.event}</div>
-        <div class="tx-sub">${fmtDate(t.date)} · ${t.cat||'—'} · ${t.qty}x${t.place?' · '+t.place:''}</div>
+  document.getElementById('journalList').innerHTML=list.map(t=>{
+    const profit=t.sell?(t.sell-t.buy):-t.buy;
+    const margin=t.buy&&t.sell?Math.round((t.sell-t.buy)/t.buy*100):null;
+    const isPos=t.sell>0&&profit>=0;
+    const profitColor=isPos?'var(--green)':t.sell?'var(--red)':'var(--text2)';
+
+    // Champs colonnes A→S
+    const fields=[
+      {l:'Catégorie',v:t.cat||'—'},
+      {l:'Placement',v:t.place||'—'},
+      {l:'Site achat',v:t.site||'—'},
+      {l:'Compte',v:t.compte||'—'},
+      {l:'Mot de passe',v:t.mdp?'••••••':'—'},
+      {l:'Quantité',v:t.qty+'x'},
+      {l:'Achat',v:t.buy?fmtFull(t.buy):'—'},
+      {l:'Revente',v:t.sell?fmtFull(t.sell):'—'},
+      {l:'Acheteur',v:t.buyer||'—'},
+      {l:'Plateforme',v:t.platform||'—'},
+      {l:'Marge',v:margin!==null?(margin>=0?'+':'')+margin+'%':'—'},
+      {l:'Prix voulu',v:t.wanted?fmtFull(t.wanted):'—'},
+    ];
+
+    return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}" onclick="editTransaction(${t.id})">
+      <div class="tx-top">
+        <div>
+          <div class="tx-event">${t.event}</div>
+          <div class="tx-date">${fmtDate(t.date)}</div>
+        </div>
+        <div>
+          <div class="tx-profit" style="color:${profitColor}">${fmt(profit)}</div>
+          ${margin!==null?`<div style="font-size:11px;text-align:right;color:${isPos?'var(--green)':'var(--red)'}">${margin>=0?'+':''}${margin}%</div>`:''}
+        </div>
       </div>
-      <div class="tx-right">
-        <div class="tx-profit" style="color:${isPos?'var(--green)':t.sell?'var(--red)':'var(--text2)'}">${fmt(profit)}</div>
-        <div class="tx-meta">${t.statut==='Vendu'?'<span class="badge badge-vendu">Vendu</span>':'<span class="badge badge-stock">Stock</span>'}${t.pay==='En attente'?' <span class="badge badge-attente">⏳</span>':''}</div>
+      <div class="tx-grid">
+        ${fields.map(f=>`<div class="tx-field">${f.l} <span>${f.v}</span></div>`).join('')}
+      </div>
+      <div class="tx-badges">
+        <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}">${t.statut}</span>
+        ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}">${t.pay}</span>`:''}
+        ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}">${t.livraison}</span>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
-function setFilter(val) { filterStatut = val; renderJournal(); }
+function setFilter(v){filterStatut=v;renderJournal()}
 
-// ============================================================
-// WTS
-// ============================================================
-function renderWTS() {
-  const stock = transactions.filter(t => t.statut === 'En stock')
-    .sort((a,b) => a.event.localeCompare(b.event) || a.date.localeCompare(b.date));
-
-  if (stock.length === 0) {
-    document.getElementById('wtsPreview').innerHTML = '<span style="color:#666">Aucun billet en stock.</span>';
-    document.getElementById('wtsStock').innerHTML = '<div class="empty"><div class="empty-icon">✅</div>Tout est vendu !</div>';
+// ── WTS ──
+function renderWTS(){
+  const stock=transactions.filter(t=>t.statut==='En stock')
+    .sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
+  if(!stock.length){
+    document.getElementById('wtsPreview').innerHTML='<span style="color:#4a4870">Aucun billet en stock.</span>';
     return;
   }
-
-  let lines = ['**WTS**'];
-  let lastEvent = null, lastDate = null;
-  stock.forEach(t => {
-    if (t.event !== lastEvent) { lines.push(`**${t.event}**`); lastEvent = t.event; lastDate = null; }
-    const ds = fmtDate(t.date);
-    if (ds !== lastDate) { lines.push(`**${ds}**`); lastDate = ds; }
-    const price = (t.wanted||t.sell) ? Math.round((t.wanted||t.sell)/t.qty) : null;
-    const priceStr = price ? ` - ${price}€ each` : '';
-    const plStr = t.place ? ` (${t.place})` : '';
-    lines.push(`${t.qty}x ${t.cat}${plStr}${priceStr}`);
+  let lines=['**WTS**'], lastEv=null, lastDt=null;
+  stock.forEach(t=>{
+    if(t.event!==lastEv){lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null}
+    const ds=fmtDate(t.date);
+    if(ds!==lastDt){lines.push(`**${ds}**`);lastDt=ds}
+    const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
+    const ps=price?` - ${price}€ each`:'';
+    const pl=t.place?` (${t.place})`:'';
+    lines.push(`${t.qty}x ${t.cat}${pl}${ps}`);
   });
-
-  const raw = lines.join('\n');
-  document.getElementById('wtsPreview').innerHTML = lines.map(l =>
-    l.replace(/\*\*(.+?)\*\*/g, '<span class="wts-bold">$1</span>')
-  ).join('\n');
-  document.getElementById('wtsPreview').dataset.raw = raw;
-
-  document.getElementById('wtsStock').innerHTML = stock.map(t => `
-    <div class="tx-row">
-      <div class="tx-main">
-        <div class="tx-event">${t.event}</div>
-        <div class="tx-sub">${fmtDate(t.date)} · ${t.cat} · ${t.qty}x · Prix voulu: ${t.wanted ? Math.round(t.wanted/t.qty)+'€/place' : '—'}</div>
-      </div>
-    </div>`).join('');
+  const raw=lines.join('\n');
+  document.getElementById('wtsPreview').innerHTML=lines.map(l=>l.replace(/\*\*(.+?)\*\*/g,'<span class="wts-b">$1</span>')).join('\n');
+  document.getElementById('wtsPreview').dataset.raw=raw;
 }
 
-function copyWTS() {
-  const raw = document.getElementById('wtsPreview').dataset.raw || '';
-  if (!raw || raw === '') return;
-  navigator.clipboard.writeText(raw).then(() => showToast('✅ Copié ! Colle sur Discord.')).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = raw; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('✅ Copié !');
-  });
+function copyWTS(){
+  const raw=document.getElementById('wtsPreview').dataset.raw||'';
+  if(!raw)return;
+  navigator.clipboard.writeText(raw)
+    .then(()=>showToast('✅ Copié ! Colle sur Discord.'))
+    .catch(()=>{
+      const ta=document.createElement('textarea');
+      ta.value=raw;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      showToast('✅ Copié !');
+    });
 }
 
-// ============================================================
-// GMAIL OAUTH
-// ============================================================
-function renderGmail() {
-  if (gmailToken) {
-    document.getElementById('gmailDot').classList.add('connected');
-    document.getElementById('gmailStatusText').textContent = 'Gmail connecté';
-    document.getElementById('gmailEmail').textContent = localStorage.getItem('ticketdesk_gmail_email') || '';
-    document.getElementById('gmailConnectBtn').innerHTML = '🔄 Reconnecter';
-    document.getElementById('gmailScanRow').style.display = 'block';
-    // Drive status
-    const lastSync = localStorage.getItem('ticketdesk_last_sync');
-    document.getElementById('driveDot').style.background = lastSync ? 'var(--green)' : 'var(--yellow)';
-    document.getElementById('driveStatusText').textContent = lastSync ? 'Sync active ☁' : 'Connecté, première sync en attente';
-    document.getElementById('driveLastSync').textContent = lastSync ? 'Dernière sync : ' + new Date(lastSync).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
-    document.getElementById('driveDesc').innerHTML = 'Tes données se sauvegardent <strong style="color:var(--text)">automatiquement</strong> dans ton Google Drive à chaque modification. Accessible depuis n\'importe quel appareil.';
-    document.getElementById('driveSyncBtn').style.display = 'flex';
-    document.getElementById('driveLoadBtn').style.display = 'flex';
-    updateSyncIndicator(lastSync ? 'ok' : 'syncing');
+// ── GMAIL OAUTH ──
+function renderGmail(){
+  if(gmailToken){
+    document.getElementById('gmailDot').classList.add('on');
+    document.getElementById('gmailStatusText').textContent='Gmail connecté';
+    document.getElementById('gmailEmail').textContent=localStorage.getItem('ticketdesk_gmail_email')||'';
+    document.getElementById('gmailConnectBtn').innerHTML='🔄 Reconnecter';
+    document.getElementById('gmailScanRow').style.display='block';
+    const ls=localStorage.getItem('ticketdesk_last_sync');
+    document.getElementById('driveDot').classList[ls?'add':'remove']('on');
+    document.getElementById('driveStatusText').textContent=ls?'Sync active ☁':'Connecté, première sync en attente';
+    document.getElementById('driveLastSync').textContent=ls?'Dernière sync : '+new Date(ls).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    document.getElementById('driveDesc').innerHTML='Tes données se sauvegardent <strong style="color:var(--text)">automatiquement</strong> à chaque modification.';
+    document.getElementById('driveSyncBtn').style.display='flex';
+    document.getElementById('driveLoadBtn').style.display='flex';
+    updateSyncIndicator(ls?'ok':'syncing');
   } else {
-    document.getElementById('gmailDot').classList.remove('connected');
-    document.getElementById('gmailStatusText').textContent = 'Non connecté';
-    document.getElementById('gmailEmail').textContent = '';
-    document.getElementById('gmailConnectBtn').innerHTML = '<span style="font-size:16px;">🔐</span> Connecter Gmail + Drive';
-    document.getElementById('gmailScanRow').style.display = 'none';
-    document.getElementById('driveDot').style.background = 'var(--text3)';
-    document.getElementById('driveStatusText').textContent = 'Non activé';
-    document.getElementById('driveSyncBtn').style.display = 'none';
-    document.getElementById('driveLoadBtn').style.display = 'none';
+    document.getElementById('gmailDot').classList.remove('on');
+    document.getElementById('gmailStatusText').textContent='Non connecté';
+    document.getElementById('gmailEmail').textContent='';
+    document.getElementById('gmailConnectBtn').innerHTML='🔐 Connecter Gmail + Drive';
+    document.getElementById('gmailScanRow').style.display='none';
+    document.getElementById('driveDot').classList.remove('on');
+    document.getElementById('driveSyncBtn').style.display='none';
+    document.getElementById('driveLoadBtn').style.display='none';
   }
-  // Vérifie si on revient du redirect OAuth
-  const hash = window.location.hash;
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.substring(1));
-    const token = params.get('access_token');
-    if (token) {
-      gmailToken = token;
-      localStorage.setItem(GMAIL_KEY, token);
-      window.location.hash = '';
+  // Retour OAuth
+  const hash=window.location.hash;
+  if(hash.includes('access_token')){
+    const p=new URLSearchParams(hash.substring(1));
+    const token=p.get('access_token');
+    if(token){
+      gmailToken=token;
+      localStorage.setItem(GMAIL_KEY,token);
+      window.location.hash='';
       fetchGmailProfile(token);
-      // Charge les données Drive au premier login
-      driveLoad().then(loaded => {
-        if (loaded) {
-          showToast('✅ Données récupérées depuis Drive !');
-          renderDashboard(); renderJournal(); renderWTS();
-        } else {
-          driveSync();
-          showToast('✅ Gmail + Drive connectés !');
-        }
+      driveLoad().then(loaded=>{
+        if(loaded){showToast('✅ Données récupérées depuis Drive !');renderDashboard();renderJournal();renderWTS();}
+        else{driveSync();showToast('✅ Gmail + Drive connectés !');}
         renderGmail();
       });
     }
   }
 }
 
-async function driveManualSync() {
-  showToast('☁ Sync en cours…');
-  await driveSync();
-  showToast('✅ Données sauvegardées sur Drive');
-  renderGmail();
+function gmailConnect(){
+  if(GOOGLE_CLIENT_ID==='VOTRE_CLIENT_ID_ICI'){showToast('⚠️ Configure ton Client ID Google','err');return;}
+  window.location.href=`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(ALL_SCOPES)}&prompt=consent`;
 }
 
-async function driveManualLoad() {
-  showToast('⬇ Récupération depuis Drive…');
-  const loaded = await driveLoad();
-  if (loaded) {
-    showToast('✅ Données récupérées depuis Drive !');
-    renderDashboard(); renderJournal(); renderWTS(); renderCosts(); renderGmail();
-  } else {
-    showToast('Aucune donnée Drive trouvée', 'error');
-  }
+async function fetchGmailProfile(token){
+  try{
+    const r=await fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+token}});
+    const d=await r.json();
+    if(d.emailAddress)localStorage.setItem('ticketdesk_gmail_email',d.emailAddress);
+    document.getElementById('gmailEmail').textContent=d.emailAddress||'';
+  }catch(e){}
 }
 
-function gmailConnect() {
-  if (GOOGLE_CLIENT_ID === 'VOTRE_CLIENT_ID_ICI') {
-    showToast('⚠️ Configure ton Client ID Google (voir README)', 'error');
-    return;
-  }
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(ALL_SCOPES)}&prompt=consent`;
-  window.location.href = url;
-}
-
-// ============================================================
-// GOOGLE DRIVE SYNC
-// ============================================================
-async function driveSync() {
-  if (!gmailToken || driveSyncing) return;
-  driveSyncing = true;
-  updateSyncIndicator('syncing');
-  try {
-    const payload = JSON.stringify({ transactions, costs, updatedAt: new Date().toISOString() });
-    if (driveFileId) {
-      // Update existing file
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-        method: 'PATCH',
-        headers: { Authorization: 'Bearer ' + gmailToken, 'Content-Type': 'application/json' },
-        body: payload
-      });
-    } else {
-      // Create file in appDataFolder
-      const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
-        method: 'POST',
-        headers: { Authorization: 'Bearer ' + gmailToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: DRIVE_FILE_NAME, parents: ['appDataFolder'] })
-      });
-      const metaJson = await meta.json();
-      driveFileId = metaJson.id;
-      localStorage.setItem('ticketdesk_drive_file_id', driveFileId);
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-        method: 'PATCH',
-        headers: { Authorization: 'Bearer ' + gmailToken, 'Content-Type': 'application/json' },
-        body: payload
-      });
-    }
-    localStorage.setItem('ticketdesk_last_sync', new Date().toISOString());
-    updateSyncIndicator('ok');
-  } catch(e) {
-    updateSyncIndicator('error');
-  }
-  driveSyncing = false;
-}
-
-async function driveLoad() {
-  if (!gmailToken) return false;
-  try {
-    // Cherche le fichier dans appDataFolder
-    const r = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`, {
-      headers: { Authorization: 'Bearer ' + gmailToken }
-    });
-    const d = await r.json();
-    if (!d.files || d.files.length === 0) return false;
-    driveFileId = d.files[0].id;
-    localStorage.setItem('ticketdesk_drive_file_id', driveFileId);
-    const content = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
-      headers: { Authorization: 'Bearer ' + gmailToken }
-    });
-    const data = await content.json();
-    if (data.transactions) {
-      transactions = data.transactions;
-      localStorage.setItem(TX_KEY, JSON.stringify(transactions));
-    }
-    if (data.costs) {
-      costs = data.costs;
-      localStorage.setItem(COST_KEY, JSON.stringify(costs));
-    }
-    localStorage.setItem('ticketdesk_last_sync', data.updatedAt || new Date().toISOString());
-    return true;
-  } catch(e) { return false; }
-}
-
-function updateSyncIndicator(state) {
-  const el = document.getElementById('syncIndicator');
-  if (!el) return;
-  const lastSync = localStorage.getItem('ticketdesk_last_sync');
-  const timeStr = lastSync ? new Date(lastSync).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '—';
-  if (state === 'syncing') {
-    el.innerHTML = `<span style="color:var(--yellow)">⟳ Sync…</span>`;
-  } else if (state === 'ok') {
-    el.innerHTML = `<span style="color:var(--green)">☁ Sync ${timeStr}</span>`;
-  } else {
-    el.innerHTML = `<span style="color:var(--red)">⚠ Sync échoué</span>`;
-  }
-}
-
-async function fetchGmailProfile(token) {
-  try {
-    const r = await fetch('https://www.googleapis.com/gmail/v1/users/me/profile', {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    const d = await r.json();
-    if (d.emailAddress) localStorage.setItem('ticketdesk_gmail_email', d.emailAddress);
-    document.getElementById('gmailEmail').textContent = d.emailAddress || '';
-  } catch(e) {}
-}
-
-async function gmailScan() {
-  if (!gmailToken) return;
+// ── GMAIL SCAN ──
+async function gmailScan(){
+  if(!gmailToken)return;
   showToast('🔍 Scan en cours…');
-
-  // Patterns de recherche par expéditeur
-  const queries = [
+  const queries=[
     'from:noreply@ticketmaster.fr subject:confirmation',
     'from:noreply@fnacspectacles.com subject:confirmation',
     'from:noreply@stadefrance.com subject:confirmation',
     'from:billets@ticketmaster.fr',
     'from:confirmation@fnacspectacles.com',
   ];
-
-  const allMessages = [];
-  for (const q of queries) {
-    try {
-      const r = await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`, {
-        headers: { Authorization: 'Bearer ' + gmailToken }
-      });
-      if (r.status === 401) { gmailToken = null; localStorage.removeItem(GMAIL_KEY); renderGmail(); showToast('Session expirée, reconnecte Gmail', 'error'); return; }
-      const d = await r.json();
-      if (d.messages) allMessages.push(...d.messages);
-    } catch(e) {}
+  const allMsgs=[];
+  for(const q of queries){
+    try{
+      const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});
+      if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}
+      const d=await r.json();
+      if(d.messages)allMsgs.push(...d.messages);
+    }catch(e){}
   }
-
-  if (allMessages.length === 0) {
-    showToast('Aucun mail de billet trouvé', 'error'); return;
+  if(!allMsgs.length){showToast('Aucun mail de billet trouvé','err');return;}
+  const ids=[...new Set(allMsgs.map(m=>m.id))];
+  importCandidates=[];
+  for(const id of ids.slice(0,15)){
+    try{
+      const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});
+      const msg=await r.json();
+      const parsed=parseTicketMail(msg);
+      if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});
+    }catch(e){}
   }
-
-  // Déduplication
-  const ids = [...new Set(allMessages.map(m => m.id))];
-  importCandidates = [];
-
-  for (const id of ids.slice(0, 15)) {
-    try {
-      const r = await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`, {
-        headers: { Authorization: 'Bearer ' + gmailToken }
-      });
-      const msg = await r.json();
-      const parsed = parseTicketMail(msg);
-      if (parsed) importCandidates.push({ ...parsed, mailId: id, checked: true });
-    } catch(e) {}
-  }
-
   renderImportResults();
 }
 
-function parseTicketMail(msg) {
-  try {
-    const headers = {};
-    msg.payload.headers.forEach(h => headers[h.name.toLowerCase()] = h.value);
-    const subject = headers['subject'] || '';
-    const from = headers['from'] || '';
-    const date = headers['date'] || '';
-
-    // Décoder le body
-    let body = '';
-    function extractBody(part) {
-      if (part.body && part.body.data) {
-        body += atob(part.body.data.replace(/-/g,'+').replace(/_/g,'/'));
-      }
-      if (part.parts) part.parts.forEach(extractBody);
-    }
-    extractBody(msg.payload);
-
-    const result = { event:'', date:'', cat:'', qty:1, buy:0, platform:'', statut:'En stock', place:'', wanted:0, sell:0, pay:'' };
-
-    // Detect platform
-    if (from.includes('ticketmaster')) result.platform = 'Ticketmaster';
-    else if (from.includes('fnac')) result.platform = 'Fnac Spectacles';
-    else if (from.includes('stadefrance')) result.platform = 'Stade de France';
-
-    // Extract event name from subject
-    // Patterns: "Votre billet pour X", "Confirmation X", "Vos billets - X"
-    const subPatterns = [
-      /vos? billets? (?:pour |[-:]\s*)(.+?)(?:\s*[-|]|\s*le\s|\s*du\s|$)/i,
-      /confirmation[^:]*:\s*(.+?)(?:\s*[-|]|$)/i,
-      /order confirmation.*?for (.+?)(?:\s*[-|]|$)/i,
-    ];
-    for (const p of subPatterns) {
-      const m = subject.match(p);
-      if (m) { result.event = m[1].trim().replace(/\s+/g,' ').substring(0,50); break; }
-    }
-    if (!result.event) result.event = subject.replace(/re:|fw:|confirmation|billet|commande/gi,'').trim().substring(0,50);
-
-    // Extract date from body
-    const datePatterns = [
-      /(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i,
-      /(\d{2})\/(\d{2})\/(\d{4})/,
-      /(\d{4})-(\d{2})-(\d{2})/,
-    ];
-    const months = { janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12 };
-    for (const p of datePatterns) {
-      const m = body.match(p) || subject.match(p);
-      if (m) {
-        if (months[m[2]?.toLowerCase()]) {
-          result.date = `${m[3]}-${String(months[m[2].toLowerCase()]).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-        } else if (m[0].includes('/')) {
-          result.date = `${m[3]}-${m[2]}-${m[1]}`;
-        } else {
-          result.date = m[0];
-        }
+function parseTicketMail(msg){
+  try{
+    const hdrs={};
+    msg.payload.headers.forEach(h=>hdrs[h.name.toLowerCase()]=h.value);
+    const subject=hdrs['subject']||'', from=hdrs['from']||'';
+    let body='';
+    function xb(part){if(part.body&&part.body.data)body+=atob(part.body.data.replace(/-/g,'+').replace(/_/g,'/'));if(part.parts)part.parts.forEach(xb);}
+    xb(msg.payload);
+    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:'',mdp:'',buyer:'',platform:'',livraison:''};
+    if(from.includes('ticketmaster'))res.site='Ticketmaster';
+    else if(from.includes('fnac'))res.site='Fnac Spectacles';
+    else if(from.includes('stadefrance'))res.site='Stade de France';
+    const sps=[/vos? billets? (?:pour |[-:]\s*)(.+?)(?:\s*[-|]|\s*le\s|\s*du\s|$)/i,/confirmation[^:]*:\s*(.+?)(?:\s*[-|]|$)/i];
+    for(const p of sps){const m=subject.match(p);if(m){res.event=m[1].trim().substring(0,50);break;}}
+    if(!res.event)res.event=subject.replace(/re:|fw:|confirmation|billet|commande/gi,'').trim().substring(0,50);
+    const months={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12};
+    const dps=[/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i,/(\d{2})\/(\d{2})\/(\d{4})/];
+    for(const p of dps){
+      const m=(body+subject).match(p);
+      if(m){
+        if(months[m[2]?.toLowerCase()])res.date=`${m[3]}-${String(months[m[2].toLowerCase()]).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        else res.date=`${m[3]}-${m[2]}-${m[1]}`;
         break;
       }
     }
-
-    // Extract price
-    const priceMatch = body.match(/(\d[\d\s]*[,.]?\d*)\s*€/);
-    if (priceMatch) result.buy = parseFloat(priceMatch[1].replace(/\s/g,'').replace(',','.')) || 0;
-
-    // Extract qty
-    const qtyMatch = body.match(/(\d+)\s*(?:billet|place|ticket)/i);
-    if (qtyMatch) result.qty = parseInt(qtyMatch[1]) || 1;
-
-    // Category
-    const catPatterns = ['fosse', 'carré or', 'pelouse', 'cat[ée]gorie\s*\d', 'cat\s*\d', 'tribune', 'vip', 'or'];
-    for (const p of catPatterns) {
-      const m = body.match(new RegExp(p, 'i'));
-      if (m) { result.cat = m[0].trim(); break; }
+    const pm=(body+subject).match(/(\d[\d\s]*[,.]?\d*)\s*€/);
+    if(pm)res.buy=parseFloat(pm[1].replace(/\s/g,'').replace(',','.'))||0;
+    const qm=(body+subject).match(/(\d+)\s*(?:billet|place|ticket)/i);
+    if(qm)res.qty=parseInt(qm[1])||1;
+    for(const p of ['fosse','carré or','pelouse','cat\\s*\\d','tribune','vip']){
+      const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}
     }
-
-    if (!result.event && !result.date) return null;
-    return result;
-  } catch(e) { return null; }
+    if(!res.event&&!res.date)return null;
+    return res;
+  }catch(e){return null;}
 }
 
-function renderImportResults() {
-  if (importCandidates.length === 0) {
-    showToast('Aucun billet parsé dans les mails', 'error');
-    document.getElementById('importResults').style.display = 'none';
-    return;
-  }
-  document.getElementById('importResults').style.display = 'block';
-  document.getElementById('importList').innerHTML = importCandidates.map((c,i) => `
+function renderImportResults(){
+  if(!importCandidates.length){showToast('Aucun billet parsé','err');document.getElementById('importResults').style.display='none';return;}
+  document.getElementById('importResults').style.display='block';
+  document.getElementById('importList').innerHTML=importCandidates.map((c,i)=>`
     <div class="import-item">
-      <div class="import-check ${c.checked?'checked':''}" onclick="toggleImport(${i})">
-        ${c.checked ? '✓' : ''}
-      </div>
-      <div class="import-info">
-        <div class="import-event">${c.event || 'Événement inconnu'}</div>
-        <div class="import-detail">${c.platform} · ${c.date?fmtDate(c.date):'date inconnue'} · ${c.qty}x${c.cat?' · '+c.cat:''} · ${c.buy?fmtFull(c.buy):'prix inconnu'}</div>
+      <div class="icheck ${c.checked?'on':''}" onclick="toggleImport(${i})">${c.checked?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${c.event||'Événement inconnu'}</div>
+        <div style="font-size:11px;color:var(--text2)">${c.site} · ${c.date?fmtDate(c.date):'date inconnue'} · ${c.qty}x${c.cat?' · '+c.cat:''} · ${c.buy?fmtFull(c.buy):'prix inconnu'}</div>
       </div>
     </div>`).join('');
   showToast(`${importCandidates.length} billet(s) détecté(s)`);
 }
 
-function toggleImport(i) {
-  importCandidates[i].checked = !importCandidates[i].checked;
-  renderImportResults();
-}
+function toggleImport(i){importCandidates[i].checked=!importCandidates[i].checked;renderImportResults();}
 
-function importSelected() {
-  const selected = importCandidates.filter(c => c.checked);
-  if (selected.length === 0) { showToast('Aucun billet sélectionné', 'error'); return; }
-  selected.forEach(c => {
-    // Evite doublons par mailId
-    if (transactions.find(t => t.mailId === c.mailId)) return;
-    transactions.push({ id: Date.now() + Math.random(), ...c });
+function importSelected(){
+  const sel=importCandidates.filter(c=>c.checked);
+  if(!sel.length){showToast('Aucun billet sélectionné','err');return;}
+  sel.forEach(c=>{
+    if(transactions.find(t=>t.mailId===c.mailId))return;
+    transactions.push({id:Date.now()+Math.random(),...c});
   });
   saveTx();
-  document.getElementById('importResults').style.display = 'none';
-  importCandidates = [];
-  showToast(`✅ ${selected.length} billet(s) importé(s) !`);
+  document.getElementById('importResults').style.display='none';
+  importCandidates=[];
+  showToast(`✅ ${sel.length} billet(s) importé(s) !`);
   renderDashboard();
 }
 
-// ============================================================
-// COSTS
-// ============================================================
-function renderCosts() {
-  if (costs.length === 0) {
-    document.getElementById('costsList').innerHTML = '<div class="empty"><div class="empty-icon">💸</div>Aucun coût fixe</div>';
-    document.getElementById('costsTotal').innerHTML = '';
-    return;
-  }
-  document.getElementById('costsList').innerHTML = costs.map(c => `
-    <div class="card card-sm" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:500;">${c.type}</div>
-        <div style="font-size:12px;color:var(--text2);">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
+// ── GOOGLE DRIVE ──
+async function driveSync(){
+  if(!gmailToken||driveSyncing)return;
+  driveSyncing=true; updateSyncIndicator('syncing');
+  try{
+    const payload=JSON.stringify({transactions,costs,updatedAt:new Date().toISOString()});
+    if(driveFileId){
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
+    } else {
+      const meta=await(await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:JSON.stringify({name:DRIVE_FILE_NAME,parents:['appDataFolder']})})).json();
+      driveFileId=meta.id; localStorage.setItem('ticketdesk_drive_fid',driveFileId);
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
+    }
+    localStorage.setItem('ticketdesk_last_sync',new Date().toISOString());
+    updateSyncIndicator('ok');
+  }catch(e){updateSyncIndicator('err');}
+  driveSyncing=false;
+}
+
+async function driveLoad(){
+  if(!gmailToken)return false;
+  try{
+    const r=await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`,{headers:{Authorization:'Bearer '+gmailToken}});
+    const d=await r.json();
+    if(!d.files||!d.files.length)return false;
+    driveFileId=d.files[0].id; localStorage.setItem('ticketdesk_drive_fid',driveFileId);
+    const c=await(await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:'Bearer '+gmailToken}})).json();
+    if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
+    if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
+    localStorage.setItem('ticketdesk_last_sync',c.updatedAt||new Date().toISOString());
+    return true;
+  }catch(e){return false;}
+}
+
+async function driveManualSync(){showToast('☁ Sync…');await driveSync();showToast('✅ Données sauvegardées');renderGmail();}
+async function driveManualLoad(){
+  showToast('⬇ Récupération…');
+  const ok=await driveLoad();
+  if(ok){showToast('✅ Données récupérées !');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}
+  else showToast('Aucune donnée Drive','err');
+}
+
+function updateSyncIndicator(state){
+  const el=document.getElementById('syncIndicator');
+  if(!el)return;
+  const ls=localStorage.getItem('ticketdesk_last_sync');
+  const t=ls?new Date(ls).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'—';
+  el.innerHTML=state==='syncing'?`<span style="color:var(--yellow)">⟳</span>`:state==='ok'?`<span style="color:var(--green)">☁ ${t}</span>`:`<span style="color:var(--red)">⚠</span>`;
+}
+
+// ── COSTS ──
+function renderCosts(){
+  if(!costs.length){document.getElementById('costsList').innerHTML='<div class="empty"><div class="ei">💸</div>Aucun coût fixe</div>';document.getElementById('costsTotal').innerHTML='';return;}
+  document.getElementById('costsList').innerHTML=costs.map(c=>`
+    <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:500">${c.type}</div>
+        <div style="font-size:12px;color:var(--text2)">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:15px;font-weight:600;">${fmtFull(c.amount)}</div>
-        <div><span class="badge badge-${c.status==='Payé'?'paye':'apayer'}">${c.status}</span></div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:15px;font-weight:600">${fmtFull(c.amount)}</div>
+        <span class="badge ${c.status==='Payé'?'b-paye':'b-apayer'}">${c.status}</span>
       </div>
-      <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;">✕</button>
+      <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
     </div>`).join('');
-  const total = costs.reduce((s,c) => s + c.amount, 0);
-  const paid = costs.filter(c => c.status === 'Payé').reduce((s,c) => s + c.amount, 0);
-  document.getElementById('costsTotal').innerHTML = `
-    <div class="card card-sm" style="display:flex;justify-content:space-between;align-items:center;border-color:var(--border2);">
-      <span style="color:var(--text2);font-size:13px;">Total période</span>
-      <div style="text-align:right;">
-        <span style="font-size:16px;font-weight:600;">${fmtFull(total)}</span>
-        <span style="font-size:12px;color:var(--text2);"> (dont ${fmtFull(paid)} payé)</span>
-      </div>
+  const total=costs.reduce((s,c)=>s+c.amount,0);
+  const paid=costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
+  document.getElementById('costsTotal').innerHTML=`
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;border-color:var(--border2)">
+      <span style="color:var(--text2);font-size:13px">Total période</span>
+      <span style="font-size:15px;font-weight:600">${fmtFull(total)} <span style="font-size:12px;color:var(--text2);font-weight:400">(dont ${fmtFull(paid)} payé)</span></span>
     </div>`;
 }
 
-function deleteCost(id) {
-  costs = costs.filter(c => c.id !== id);
-  saveCosts(); renderCosts(); renderDashboard();
-}
+function deleteCost(id){costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
 
-// ============================================================
-// MODALS
-// ============================================================
+// ── MODALS ──
 function openAddModal(id) {
-  editingId = id || null;
-  if (id) {
-    const t = transactions.find(x => x.id === id);
-    if (!t) return;
-    document.getElementById('addModalTitle').textContent = 'Modifier';
-    document.getElementById('f-statut').value = t.statut;
-    document.getElementById('f-event').value = t.event;
-    document.getElementById('f-date').value = t.date;
-    document.getElementById('f-cat').value = t.cat;
-    document.getElementById('f-place').value = t.place;
-    document.getElementById('f-qty').value = t.qty;
-    document.getElementById('f-buy').value = t.buy;
-    document.getElementById('f-sell').value = t.sell;
-    document.getElementById('f-wanted').value = t.wanted;
-    document.getElementById('f-platform').value = t.platform;
-    document.getElementById('f-pay').value = t.pay;
+  editingId=id||null;
+  const fields=['f-statut','f-event','f-date','f-cat','f-place','f-site','f-compte','f-mdp','f-qty','f-buy','f-sell','f-buyer','f-platform','f-pay','f-livraison','f-wanted'];
+  if(id){
+    const t=transactions.find(x=>x.id===id); if(!t)return;
+    document.getElementById('addModalTitle').textContent='Modifier';
+    document.getElementById('f-statut').value=t.statut;
+    document.getElementById('f-event').value=t.event;
+    document.getElementById('f-date').value=t.date;
+    document.getElementById('f-cat').value=t.cat;
+    document.getElementById('f-place').value=t.place;
+    document.getElementById('f-site').value=t.site||'';
+    document.getElementById('f-compte').value=t.compte||'';
+    document.getElementById('f-mdp').value=t.mdp||'';
+    document.getElementById('f-qty').value=t.qty;
+    document.getElementById('f-buy').value=t.buy;
+    document.getElementById('f-sell').value=t.sell;
+    document.getElementById('f-buyer').value=t.buyer||'';
+    document.getElementById('f-platform').value=t.platform||'';
+    document.getElementById('f-pay').value=t.pay||'';
+    document.getElementById('f-livraison').value=t.livraison||'';
+    document.getElementById('f-wanted').value=t.wanted||'';
   } else {
-    document.getElementById('addModalTitle').textContent = 'Nouvelle transaction';
-    ['f-event','f-date','f-cat','f-place','f-platform'].forEach(f => document.getElementById(f).value = '');
-    document.getElementById('f-statut').value = 'En stock';
-    document.getElementById('f-qty').value = 1;
-    ['f-buy','f-sell','f-wanted'].forEach(f => document.getElementById(f).value = '');
-    document.getElementById('f-pay').value = '';
+    document.getElementById('addModalTitle').textContent='Nouvelle transaction';
+    ['f-event','f-date','f-cat','f-place','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('f-statut').value='En stock';
+    document.getElementById('f-qty').value=1;
+    ['f-buy','f-sell','f-wanted'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('f-pay').value='';
+    document.getElementById('f-livraison').value='';
   }
   document.getElementById('addModal').classList.add('open');
 }
 
-function editTransaction(id) { openAddModal(id); }
+function editTransaction(id){openAddModal(id);}
 
-function saveTransaction() {
-  const event = document.getElementById('f-event').value.trim();
-  if (!event) { showToast('Renseigne l\'événement', 'error'); return; }
-  const t = {
-    id: editingId || Date.now(),
-    statut: document.getElementById('f-statut').value,
-    event,
-    date: document.getElementById('f-date').value,
-    cat: document.getElementById('f-cat').value.trim(),
-    place: document.getElementById('f-place').value.trim(),
-    qty: parseInt(document.getElementById('f-qty').value) || 1,
-    buy: parseFloat(document.getElementById('f-buy').value) || 0,
-    sell: parseFloat(document.getElementById('f-sell').value) || 0,
-    wanted: parseFloat(document.getElementById('f-wanted').value) || 0,
-    platform: document.getElementById('f-platform').value.trim(),
-    pay: document.getElementById('f-pay').value,
+function saveTransaction(){
+  const ev=document.getElementById('f-event').value.trim();
+  if(!ev){showToast("Renseigne l'événement",'err');return;}
+  const t={
+    id:editingId||Date.now(),
+    statut:document.getElementById('f-statut').value,
+    event:ev,
+    date:document.getElementById('f-date').value,
+    cat:document.getElementById('f-cat').value.trim(),
+    place:document.getElementById('f-place').value.trim(),
+    site:document.getElementById('f-site').value.trim(),
+    compte:document.getElementById('f-compte').value.trim(),
+    mdp:document.getElementById('f-mdp').value,
+    qty:parseInt(document.getElementById('f-qty').value)||1,
+    buy:parseFloat(document.getElementById('f-buy').value)||0,
+    sell:parseFloat(document.getElementById('f-sell').value)||0,
+    buyer:document.getElementById('f-buyer').value.trim(),
+    platform:document.getElementById('f-platform').value.trim(),
+    pay:document.getElementById('f-pay').value,
+    livraison:document.getElementById('f-livraison').value,
+    wanted:parseFloat(document.getElementById('f-wanted').value)||0,
   };
-  if (editingId) {
-    const idx = transactions.findIndex(x => x.id === editingId);
-    if (idx !== -1) transactions[idx] = t;
-  } else {
-    transactions.push(t);
-  }
+  if(editingId){const i=transactions.findIndex(x=>x.id===editingId);if(i!==-1)transactions[i]=t;}
+  else transactions.push(t);
   saveTx();
   closeModal('addModal');
-  showToast(editingId ? '✅ Modifié' : '✅ Ajouté');
-  renderDashboard(); renderJournal(); renderWTS();
+  showToast(editingId?'✅ Modifié':'✅ Ajouté');
+  renderDashboard();renderJournal();renderWTS();
 }
 
-function openCostModal() { document.getElementById('costModal').classList.add('open'); }
+function openCostModal(){document.getElementById('costModal').classList.add('open');}
 
-function saveCost() {
-  const type = document.getElementById('fc-type').value.trim();
-  if (!type) { showToast('Renseigne le type', 'error'); return; }
-  costs.push({
-    id: Date.now(),
-    date: document.getElementById('fc-date').value,
-    type,
-    amount: parseFloat(document.getElementById('fc-amount').value) || 0,
-    status: document.getElementById('fc-status').value,
-    notes: document.getElementById('fc-notes').value.trim(),
-  });
-  saveCosts();
-  closeModal('costModal');
-  showToast('✅ Coût ajouté');
-  renderCosts(); renderDashboard();
+function saveCost(){
+  const type=document.getElementById('fc-type').value.trim();
+  if(!type){showToast('Renseigne le type','err');return;}
+  costs.push({id:Date.now(),date:document.getElementById('fc-date').value,type,amount:parseFloat(document.getElementById('fc-amount').value)||0,status:document.getElementById('fc-status').value,notes:document.getElementById('fc-notes').value.trim()});
+  saveCosts();closeModal('costModal');showToast('✅ Coût ajouté');renderCosts();renderDashboard();
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  editingId = null;
-}
+function closeModal(id){document.getElementById(id).classList.remove('open');editingId=null;}
 
-// Fermer en cliquant dehors
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
 });
 
-// ============================================================
-// INIT
-// ============================================================
+// ── INIT ──
 renderDashboard();
-renderGmail(); // check OAuth redirect
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+renderGmail();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
