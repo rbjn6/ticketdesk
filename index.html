@@ -425,7 +425,7 @@ function doLogin() {
   
   if (!creds) {
     // Première fois — pas de Google connecté non plus
-    if (!gmailToken) { err.textContent = 'Connecte d'abord Gmail + Drive.'; return; }
+    if (!gmailToken) { err.textContent = 'Connecte Gmail + Drive en premier.'; return; }
     // Crée les credentials
     saveLocalCreds(user, pin);
     unlockApp();
