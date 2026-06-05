@@ -154,6 +154,16 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .form-actions .btn{flex:1;justify-content:center}
 
 /* toast */
+/* login screen */
+.login-screen{position:fixed;inset:0;background:#0c0c0c;display:flex;align-items:center;justify-content:center;z-index:500}
+.login-card{background:#161616;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:48px 40px;width:380px;text-align:center}
+.login-logo{font-family:'FreeSerif Bold',Georgia,serif;font-size:52px;font-weight:700;margin-bottom:8px}
+.login-logo-t{color:#4d9fff}
+.login-logo-d{color:#f0f0f0}
+.login-tagline{font-size:14px;color:#555;margin-bottom:36px}
+.login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.login-btn:active{opacity:.85}
+.login-note{font-size:12px;color:#444;margin-top:16px;line-height:1.6}
 .toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:9px 18px;font-size:14px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.03em}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:rgba(63,185,80,.4);color:var(--green)}
@@ -171,6 +181,18 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 </style>
 </head>
 <body>
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">D</span></div>
+    <div class="login-tagline">Gestionnaire de revente de billets</div>
+    <button class="login-btn" onclick="gmailConnect()">
+      <div style="width:20px;height:20px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
+      Connecter Gmail + Drive
+    </button>
+    <p class="login-note">Tes données sont stockées dans ton Google Drive.<br>Connexion requise pour accéder à l'app.</p>
+  </div>
+</div>
+
 <div class="app">
 
   <div class="topbar">
@@ -363,7 +385,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const GOOGLE_CLIENT_ID = '706802447910-8gqvr8oigb36g898hh91jm61f9tppl66.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = 'VOTRE_CLIENT_ID_ICI';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
 const ALL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'ticketdesk-data.json';
@@ -1307,21 +1329,7 @@ function renderGmail(){
     document.getElementById('driveSyncBtn').style.display='none';
     document.getElementById('driveLoadBtn').style.display='none';
   }
-  const hash=window.location.hash;
-  if(hash.includes('access_token')){
-    const p=new URLSearchParams(hash.substring(1));
-    const token=p.get('access_token');
-    if(token){
-      gmailToken=token;localStorage.setItem(GMAIL_KEY,token);
-      window.location.hash='';
-      fetchGmailProfile(token);
-      driveLoad().then(loaded=>{
-        if(loaded){showToast('Données récupérées depuis Drive');renderDashboard();renderJournal();renderWTS();}
-        else{driveSync();showToast('Gmail + Drive connectés');}
-        renderGmail();
-      });
-    }
-  }
+
 }
 
 function gmailConnect(){
@@ -1537,7 +1545,49 @@ function saveCost(){
 function closeModal(id){document.getElementById(id).classList.remove('open');editingId=null;}
 document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
 
-renderDashboard();
+function checkAuth() {
+  const loginScreen = document.getElementById('loginScreen');
+  if (gmailToken) {
+    loginScreen.style.display = 'none';
+    driveLoad().then(loaded => {
+      if (loaded) {
+        renderDashboard(); renderJournal(); renderWTS(); renderCosts();
+      } else {
+        driveSync();
+        renderDashboard();
+      }
+    });
+  } else {
+    loginScreen.style.display = 'flex';
+  }
+}
+
+// Après OAuth redirect — vérifier le token
+const _hash = window.location.hash;
+if (_hash.includes('access_token')) {
+  const _p = new URLSearchParams(_hash.substring(1));
+  const _token = _p.get('access_token');
+  if (_token) {
+    gmailToken = _token;
+    localStorage.setItem(GMAIL_KEY, _token);
+    window.location.hash = '';
+    fetchGmailProfile(_token);
+    driveLoad().then(loaded => {
+      document.getElementById('loginScreen').style.display = 'none';
+      if (loaded) {
+        showToast('Données récupérées depuis Drive');
+        renderDashboard(); renderJournal(); renderWTS(); renderCosts();
+      } else {
+        driveSync();
+        showToast('Gmail + Drive connectés');
+        renderDashboard();
+      }
+      renderGmail();
+    });
+  }
+}
+
+checkAuth();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
