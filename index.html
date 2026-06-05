@@ -80,7 +80,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 /* metrics */
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
-.metric-label{font-size:14px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.metric-label{font-size:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
 .metric-value{font-size:22px;font-weight:600}
 .mv-pos{color:var(--green)}.mv-neg{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-hi{color:var(--accent)}
 
@@ -94,7 +94,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .b-nonlivre{background:rgba(255,32,32,.1);color:var(--red)}
 
 /* section title */
-.stitle{font-size:16px;color:var(--accent);letter-spacing:.04em;margin:18px 0 9px;font-weight:500}
+.stitle{font-size:20px;color:#fff;letter-spacing:.01em;margin:18px 0 10px;font-weight:700;text-transform:none}
 
 /* journal cards */
 .tx-card{
@@ -129,7 +129,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 
 /* wts */
 .wts-box{background:#0d0d0d;border:1px solid var(--border2);border-radius:var(--radius);padding:16px;font-family:monospace;font-size:15px;line-height:1.85;white-space:pre-wrap;color:#b0b0a8;word-break:break-word;min-height:100px}
-.wts-b{font-weight:700;color:var(--accent)}
+.wts-b{font-weight:700;color:#fff}
 
 /* gmail */
 .gmail-card{border:1px solid var(--border2);background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:10px}
@@ -375,24 +375,566 @@ let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
 
+// Données réelles chargées depuis le localStorage ou initialisées ci-dessous
 if (!transactions.length) {
   transactions = [
-    {id:1,statut:'Vendu',event:'David Guetta',date:'2026-06-13',cat:'Carré Or',place:'Bloc A',site:'Ticketmaster',compte:'monmail@gmail.com',mdp:'pass123',qty:2,buy:200,sell:300,buyer:'user123',platform:'Discord',pay:'Payé',livraison:'Livré',wanted:0},
-    {id:2,statut:'En stock',event:'Bad Bunny',date:'2026-09-20',cat:'Fosse',place:'',site:'Fnac',compte:'monmail@gmail.com',mdp:'pass123',qty:4,buy:400,sell:0,buyer:'',platform:'',pay:'',livraison:'',wanted:150},
-    {id:3,statut:'Vendu',event:'Bruno Mars',date:'2026-07-15',cat:'Cat 1',place:'Rang 3',site:'SDF',compte:'monmail@gmail.com',mdp:'pass123',qty:2,buy:180,sell:280,buyer:'marie_p',platform:'Insta',pay:'Payé',livraison:'Livré',wanted:0},
-    {id:4,statut:'En stock',event:'Niska',date:'2027-04-10',cat:'Pelouse',place:'',site:'Discord',compte:'monmail@gmail.com',mdp:'pass123',qty:8,buy:560,sell:0,buyer:'',platform:'',pay:'',livraison:'',wanted:90},
-    {id:5,statut:'En stock',event:'Céline Dion',date:'2026-11-05',cat:'Cat 2',place:'Bloc C',site:'Ticketmaster',compte:'monmail@gmail.com',mdp:'pass123',qty:3,buy:450,sell:0,buyer:'',platform:'',pay:'En attente',livraison:'',wanted:120},
-  ];
+  {
+    "id": 1,
+    "statut": "Vendu",
+    "event": "JUL",
+    "date": "2026-06-25",
+    "cat": "fosse sud",
+    "place": "",
+    "site": "Sade DF",
+    "compte": "raphaelboujnah6@gmail.com",
+    "mdp": "Poulet11!",
+    "qty": 2,
+    "buy": 180.0,
+    "sell": 240.0,
+    "buyer": "charlotte.ldc",
+    "platform": "insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 2,
+    "statut": "Vendu",
+    "event": "JUL",
+    "date": "2026-06-26",
+    "cat": "fosse sud",
+    "place": "",
+    "site": "Stade DF",
+    "compte": "raphaelboujnah9@gmail.com",
+    "mdp": "Jul2026!",
+    "qty": 2,
+    "buy": 180.0,
+    "sell": 220.0,
+    "buyer": "dsicord kai",
+    "platform": "",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 3,
+    "statut": "Vendu",
+    "event": "JUL",
+    "date": "2026-06-26",
+    "cat": "fosse sud",
+    "place": "",
+    "site": "Ticketmaster",
+    "compte": "raphaelboujnah6@gmail.com",
+    "mdp": "",
+    "qty": 2,
+    "buy": 180.0,
+    "sell": 210.0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 4,
+    "statut": "Vendu",
+    "event": "Bruno Mars",
+    "date": "2026-08-01",
+    "cat": "fosse",
+    "place": "",
+    "site": "Ticketmaster",
+    "compte": "rungs-41-rebar@icloud.com",
+    "mdp": "Bruno2026!",
+    "qty": 2,
+    "buy": 280.0,
+    "sell": 340.0,
+    "buyer": "tllhs_",
+    "platform": "insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 5,
+    "statut": "Vendu",
+    "event": "David Guetta",
+    "date": "2026-07-24",
+    "cat": "Fosse",
+    "place": "",
+    "site": "SDF",
+    "compte": "linens.marking2f@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 3,
+    "buy": 227.25,
+    "sell": 285.0,
+    "buyer": "laziz5152",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 6,
+    "statut": "Vendu",
+    "event": "David Guetta",
+    "date": "2026-07-24",
+    "cat": "Fosse",
+    "place": "",
+    "site": "SDF",
+    "compte": "linens.marking2f@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 1,
+    "buy": 75.75,
+    "sell": 90.0,
+    "buyer": "serya6",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 100.0
+  },
+  {
+    "id": 7,
+    "statut": "Vendu",
+    "event": "David Guetta",
+    "date": "2026-07-24",
+    "cat": "Carré Or",
+    "place": "",
+    "site": "SDF",
+    "compte": "71-stabler.shield@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 213.0,
+    "sell": 300.0,
+    "buyer": "ld.zqsd",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 8,
+    "statut": "En stock",
+    "event": "David Guetta",
+    "date": "2026-07-24",
+    "cat": "Carré Or",
+    "place": "",
+    "site": "SDF",
+    "compte": "71-stabler.shield@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 213.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 300.0
+  },
+  {
+    "id": 9,
+    "statut": "Vendu",
+    "event": "Bad Bunny",
+    "date": "2026-02-01",
+    "cat": "cat 3 VR",
+    "place": "",
+    "site": "Fanc",
+    "compte": "raphaelboujnah6@gmail.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 160.0,
+    "sell": 200.0,
+    "buyer": ".joumel",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 10,
+    "statut": "Vendu",
+    "event": "Bad Bunny",
+    "date": "2026-02-01",
+    "cat": "Cat 2 VR",
+    "place": "",
+    "site": "Fnac",
+    "compte": "raphaelboujnah9@gmail.com",
+    "mdp": "Poulet11!",
+    "qty": 2,
+    "buy": 200.0,
+    "sell": 240.0,
+    "buyer": "ethan08s",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 11,
+    "statut": "Vendu",
+    "event": "Bad Bunny",
+    "date": "2026-02-01",
+    "cat": "Cat 2 VR",
+    "place": "",
+    "site": "Fnac",
+    "compte": "raphaelboujnah9@gmail.com",
+    "mdp": "Poulet11!",
+    "qty": 2,
+    "buy": 200.0,
+    "sell": 260.0,
+    "buyer": "kiliangiraud66",
+    "platform": "discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 12,
+    "statut": "Vendu",
+    "event": "Rolland garros",
+    "date": "2026-07-05",
+    "cat": "Annexe up",
+    "place": "",
+    "site": "Discord : Rb2",
+    "compte": "",
+    "mdp": "",
+    "qty": 1,
+    "buy": 150.0,
+    "sell": 180.0,
+    "buyer": "Lolatubiana",
+    "platform": "Insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 13,
+    "statut": "Vendu",
+    "event": "Jul",
+    "date": "2026-07-09",
+    "cat": "Fosse early",
+    "place": "",
+    "site": "Ticketmaster",
+    "compte": "linens.marking2f@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 284.0,
+    "sell": 290.0,
+    "buyer": "Global_amin",
+    "platform": "Discord",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 14,
+    "statut": "Vendu",
+    "event": "Roland garros",
+    "date": "2026-07-11",
+    "cat": "Annexe up",
+    "place": "",
+    "site": "Discord : .22math",
+    "compte": "",
+    "mdp": "",
+    "qty": 2,
+    "buy": 150.0,
+    "sell": 180.0,
+    "buyer": "josh_goz",
+    "platform": "insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 15,
+    "statut": "Vendu",
+    "event": "Roland garros",
+    "date": "2026-07-11",
+    "cat": "Annexes up",
+    "place": "",
+    "site": "Discord : valoushka_76",
+    "compte": "",
+    "mdp": "",
+    "qty": 2,
+    "buy": 140.0,
+    "sell": 190.0,
+    "buyer": "Lolatubiana",
+    "platform": "Insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 16,
+    "statut": "Vendu",
+    "event": "Roland garros",
+    "date": "2026-07-11",
+    "cat": "Annexe",
+    "place": "",
+    "site": "Discord : marvv4667",
+    "compte": "",
+    "mdp": "",
+    "qty": 1,
+    "buy": 60.0,
+    "sell": 75.0,
+    "buyer": "Lolatubiana",
+    "platform": "Insta",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 17,
+    "statut": "Vendu",
+    "event": "Gracie abraams",
+    "date": "",
+    "cat": "Fosse",
+    "place": "",
+    "site": "Ticketmaster",
+    "compte": "Sur le compte de talilah",
+    "mdp": "",
+    "qty": 3,
+    "buy": 270.0,
+    "sell": 300.0,
+    "buyer": "Talilah",
+    "platform": "Snap",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 18,
+    "statut": "En stock",
+    "event": "Niska",
+    "date": "2027-04-10",
+    "cat": "Prelouse",
+    "place": "",
+    "site": "Nonstop",
+    "compte": "barge.plushy.3g@icloud.com",
+    "mdp": "Sdfniska2026!",
+    "qty": 8,
+    "buy": 520.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 720.0
+  },
+  {
+    "id": 19,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-14",
+    "cat": "Cat 1 Parterre Allée",
+    "place": "Bloc P, Rang 65, Siège 187,188",
+    "site": "Fnac",
+    "compte": "pouter_surges.4a@icloud.com",
+    "mdp": "Celineraphael2026!",
+    "qty": 2,
+    "buy": 424.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 820.0
+  },
+  {
+    "id": 20,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-15",
+    "cat": "Cat Or Tribune Basse",
+    "place": "Bloc 113, Rang 9, Siège 36,37",
+    "site": "Fnac",
+    "compte": "oblong_raffish_6d@icloud.com",
+    "mdp": "Celineraphael2026!",
+    "qty": 2,
+    "buy": 468.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 1050.0
+  },
+  {
+    "id": 21,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-15",
+    "cat": "Cat Or",
+    "place": "Bloc 111, Rang 27, Siège 8,9,10,11",
+    "site": "Ticketmaster",
+    "compte": "goodly-68junkier@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 4,
+    "buy": 933.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 2100.0
+  },
+  {
+    "id": 22,
+    "statut": "Vendu",
+    "event": "Celine Dion",
+    "date": "2027-05-21",
+    "cat": "Cat 1",
+    "place": "Bloc 412, Rang 48, Siège 5,6,7,8",
+    "site": "Ticketmaster",
+    "compte": "humours.pumpkin0k@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 4,
+    "buy": 801.0,
+    "sell": 1360.0,
+    "buyer": "oceane.seydoux",
+    "platform": "insta",
+    "pay": "En attente",
+    "livraison": "Non livré",
+    "wanted": 0
+  },
+  {
+    "id": 23,
+    "statut": "Vendu",
+    "event": "Celine Dion",
+    "date": "2027-05-29",
+    "cat": "Cat 1",
+    "place": "Bloc 112, Rang 25, Siège 39,40,41,42,43,44",
+    "site": "Ticketmaster",
+    "compte": "lad-sabot.4o@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 6,
+    "buy": 1200.0,
+    "sell": 2700.0,
+    "buyer": "Louis Parenton",
+    "platform": "Message",
+    "pay": "En attente",
+    "livraison": "Non livré",
+    "wanted": 2700.0
+  },
+  {
+    "id": 24,
+    "statut": "Vendu",
+    "event": "Celine Dion",
+    "date": "2027-05-21",
+    "cat": "Cat 1 Parterre",
+    "place": "Bloc P, Rang 72, Siège 211,212",
+    "site": "Ticketmaster",
+    "compte": "muggy_indigo.3i@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 402.0,
+    "sell": 820.0,
+    "buyer": "Louis Parenton",
+    "platform": "Message",
+    "pay": "En attente",
+    "livraison": "Non livré",
+    "wanted": 820.0
+  },
+  {
+    "id": 25,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-22",
+    "cat": "Cat Or Allée",
+    "place": "Bloc 111, Rang 29, Siège 19,20",
+    "site": "Ticketmaster",
+    "compte": "natural.ankle-0f@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 490.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 1050.0
+  },
+  {
+    "id": 26,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-29",
+    "cat": "Cat 1 Allée",
+    "place": "Bloc 108, Rang 26, Siège 16,17",
+    "site": "Ticketmaster",
+    "compte": "banjo-gargle-30@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 424.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 850.0
+  },
+  {
+    "id": 27,
+    "statut": "En stock",
+    "event": "Celine Dion",
+    "date": "2027-05-21",
+    "cat": "Parterre Diamant Allée",
+    "place": "Bloc M, Rang 21, Siège 201,202",
+    "site": "Ticketmaster",
+    "compte": "inch.acrylic89@icloud.com",
+    "mdp": "Rbjn2026!",
+    "qty": 2,
+    "buy": 578.0,
+    "sell": 0,
+    "buyer": "",
+    "platform": "",
+    "pay": "",
+    "livraison": "Non livré",
+    "wanted": 1200.0
+  },
+  {
+    "id": 28,
+    "statut": "Vendu",
+    "event": "Celine dion",
+    "date": "",
+    "cat": "",
+    "place": "",
+    "site": "",
+    "compte": "",
+    "mdp": "",
+    "qty": 1,
+    "buy": 0.0,
+    "sell": 80.0,
+    "buyer": "",
+    "platform": "",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  },
+  {
+    "id": 29,
+    "statut": "Vendu",
+    "event": "Roland Garros",
+    "date": "2026-07-16",
+    "cat": "Annexe",
+    "place": "",
+    "site": "Discord : Benoit.vtr",
+    "compte": "",
+    "mdp": "",
+    "qty": 1,
+    "buy": 65.0,
+    "sell": 75.0,
+    "buyer": "",
+    "platform": "",
+    "pay": "Payé",
+    "livraison": "Livré",
+    "wanted": 0
+  }
+];
   saveTx();
 }
+// Coûts fixes — à remplir
 if (!costs.length) {
-  costs = [
-    {id:1,date:'2026-04-01',type:"Frais d'entrée unique",amount:280,status:'Payé',notes:''},
-    {id:2,date:'2026-04-01',type:'Abonnement mensuel',amount:80,status:'Payé',notes:'Avril'},
-    {id:3,date:'2026-05-01',type:'Abonnement mensuel',amount:80,status:'Payé',notes:'Mai'},
-    {id:4,date:'2026-06-01',type:'Abonnement mensuel',amount:90,status:'À payer',notes:'Juin'},
-  ];
-  saveCosts();
+  costs = [];
 }
 
 function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); }
@@ -444,13 +986,13 @@ function renderDashboard() {
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:16px;color:#fff;letter-spacing:.04em;margin-bottom:2px;font-weight:500">Flux financiers</div>
+        <div style="font-size:20px;color:#fff;letter-spacing:.01em;margin-bottom:4px;font-weight:700">Flux financiers</div>
         <div class="metric-card"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
         <div class="metric-card"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
         <div class="metric-card"><div class="metric-label">Coûts fixes total</div><div class="metric-value">${fmtFull(totalCosts)}</div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:16px;color:#fff;letter-spacing:.04em;margin-bottom:2px;font-weight:500">Résultat</div>
+        <div style="font-size:20px;color:#fff;letter-spacing:.01em;margin-bottom:4px;font-weight:700">Résultat</div>
         <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
         <div class="metric-card"><div class="metric-label">Coûts fixes payés</div><div class="metric-value mv-warn">−${fmtFull(paidC)}</div></div>
         <div class="metric-card" style="border-color:var(--border2)"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}" style="font-size:26px">${fmtFull(netP)}</div></div>
@@ -771,7 +1313,7 @@ function renderCosts(){
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:16px;font-weight:600">${fmtFull(c.amount)}</div>
-        <span class="badge ${c.status==='Payé'?'b-paye':'b-attente'}" style="margin-top:3px">${c.status}</span>
+        <button onclick="toggleCostStatus(${c.id})" class="badge ${c.status==='Payé'?'b-paye':'b-attente'}" style="margin-top:4px;cursor:pointer;background:none;border:1px solid;display:inline-flex;font-family:inherit">${c.status}</button>
       </div>
       <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0">×</button>
     </div>`).join('');
@@ -784,6 +1326,13 @@ function renderCosts(){
     </div>`;
 }
 function deleteCost(id){costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
+function toggleCostStatus(id){
+  const c=costs.find(x=>x.id===id);
+  if(!c)return;
+  c.status=c.status==='Payé'?'À payer':'Payé';
+  saveCosts();renderCosts();renderDashboard();
+  showToast(c.status==='Payé'?'Marqué Payé':'Marqué À payer');
+}
 
 // MODALS
 function openAddModal(id){
