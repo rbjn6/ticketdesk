@@ -264,7 +264,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
             <div style="font-size:14px;color:var(--text2)" id="gmailEmail"></div>
           </div>
         </div>
-        <button class="btn btn-primary" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%;justify-content:center">Connecter Gmail + Drive</button>
+        <button class="btn btn-primary" id="gmailConnectBtn" id="loginGoogleBtn" style="width:100%;justify-content:center">Connecter Gmail + Drive</button>
         <div style="margin-top:8px;display:none" id="gmailScanRow">
           <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center">Scanner les billets</button>
         </div>
@@ -1083,6 +1083,16 @@ if (_hash.includes('access_token')) {
 checkAuth();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// Login button listeners — après rendu du DOM
+window.addEventListener('DOMContentLoaded', function() {
+  const submitBtn = document.getElementById('loginSubmitBtn');
+  const googleBtn = document.getElementById('loginGoogleBtn');
+  const pinInput  = document.getElementById('loginPin');
+  if(submitBtn) submitBtn.addEventListener('click', doLogin);
+  if(googleBtn) googleBtn.addEventListener('click', gmailConnect);
+  if(pinInput)  pinInput.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+});
 </script>
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
@@ -1092,10 +1102,10 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch
     <label class="login-field-label">Identifiant</label>
     <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
     <label class="login-field-label">Code PIN</label>
-    <input class="login-field" type="password" id="loginPin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Accéder</button>
+    <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" id="loginPinInput">
+    <button class="login-btn" id="loginSubmitBtn">Accéder</button>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
-    <button class="login-google-btn" onclick="gmailConnect()">
+    <button class="login-google-btn" id="loginGoogleBtn">
       <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
       Connecter Gmail + Drive
     </button>
