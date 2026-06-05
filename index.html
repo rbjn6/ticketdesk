@@ -871,9 +871,13 @@ function parseTicketMail(msg){
     let body='';function xb(p){if(p.body&&p.body.data)body+=atob(p.body.data.replace(/-/g,'+').replace(/_/g,'/'));if(p.parts)p.parts.forEach(xb);}xb(msg.payload);
     const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:'',mdp:'',buyer:'',platform:'',livraison:''};
     if(from.includes('ticketmaster'))res.site='Ticketmaster';else if(from.includes('fnac'))res.site='Fnac Spectacles';else if(from.includes('stadefrance'))res.site='Stade de France';
-    const sps=[/vos? billets? (?:pour |[-:]\s*)(.+?)(?:\s*[-|]|\s*le\s|\s*du\s|$)/i,/confirmation[^:]*:\s*(.+?)(?:\s*[-|]|$)/i];
+    const sps=[
+      /vos? billets? (?:pour |[-:]\s*)(.+?)(?:\s*[-|]|\s*le\s|\s*du\s|$)/i,
+      /confirmation[^:]*:\s*(.+?)(?:\s*[-|]|$)/i,
+      /confirmation de votre commande sur (.+?)(?:,|\s*n°|$)/i,
+    ];
     for(const p of sps){const m=subject.match(p);if(m){res.event=m[1].trim().substring(0,50);break;}}
-    if(!res.event)res.event=subject.replace(/re:|fw:|confirmation|billet|commande/gi,'').trim().substring(0,50);
+    if(!res.event)res.event=subject.replace(/re:|fw:|confirmation|billet|commande|votre|numéro|\d{6,}/gi,'').trim().substring(0,50);
     const months={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12};
     const dps=[/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i,/(\d{2})\/(\d{2})\/(\d{4})/];
     for(const p of dps){const m=(body+subject).match(p);if(m){if(months[m[2]?.toLowerCase()])res.date=`${m[3]}-${String(months[m[2].toLowerCase()]).padStart(2,'0')}-${m[1].padStart(2,'0')}`;else res.date=`${m[3]}-${m[2]}-${m[1]}`;break;}}
