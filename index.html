@@ -16,18 +16,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg:    #080808;
-  --bg2:   #111111;
-  --bg3:   #1a1a1a;
-  --bg4:   #222222;
-  --text:  #e8e8e0;
-  --text2: #666660;
-  --text3: #333330;
+  --bg:    #0c0c0c;
+  --bg2:   #161616;
+  --bg3:   #202020;
+  --bg4:   #2a2a2a;
+  --text:  #f0f0f0;
+  --text2: #686868;
+  --text3: #383838;
   --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --green: #3fb950;
-  --red:   #f85149;
-  --yellow:#e3b341;
+  --border2: rgba(255,255,255,0.14);
+  --accent: #4d9fff;
+  --green:  #00e000;
+  --red:    #ff2020;
+  --yellow: #ffcc00;
   --radius: 10px;
   --radius-sm: 7px;
   --safe-top: env(safe-area-inset-top, 0px);
@@ -45,7 +46,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   background:var(--bg2);border-bottom:1px solid var(--border);
   flex-shrink:0;
 }
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--text)}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--accent)}
 .topbar-right{display:flex;align-items:center;gap:10px}
 #syncIndicator{font-size:11px;color:var(--text2)}
 
@@ -57,7 +58,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   color:var(--text2);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;
   transition:color .15s;
 }
-.tnav.active{color:var(--text);border-bottom-color:var(--text)}
+.tnav.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tnav-icon{font-size:16px;margin-bottom:2px;opacity:.6}
 .tnav.active .tnav-icon{opacity:1}
 
@@ -68,8 +69,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 /* buttons */
 .btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
 .btn:active{background:var(--bg4)}
-.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600}
-.btn-primary:active{opacity:.85}
+.btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.btn-primary:active{opacity:.8}
 .btn-sm{padding:5px 11px;font-size:12px}
 .btn-danger{color:var(--red);border-color:rgba(248,81,73,.3)}
 
@@ -81,16 +82,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
 .metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
 .metric-value{font-size:22px;font-weight:600}
-.mv-pos{color:var(--green)}.mv-neg{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-hi{color:var(--text)}
+.mv-pos{color:var(--green)}.mv-neg{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-hi{color:var(--accent)}
 
 /* badges */
 .badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:500;letter-spacing:.02em}
-.b-vendu{background:rgba(63,185,80,.1);color:var(--green)}
-.b-stock{background:rgba(248,81,73,.1);color:var(--red)}
-.b-paye{background:rgba(63,185,80,.1);color:var(--green)}
-.b-attente{background:rgba(227,179,65,.1);color:var(--yellow)}
-.b-livre{background:rgba(63,185,80,.1);color:var(--green)}
-.b-nonlivre{background:rgba(248,81,73,.1);color:var(--red)}
+.b-vendu{background:rgba(0,224,0,.1);color:var(--green)}
+.b-stock{background:rgba(255,32,32,.1);color:var(--red)}
+.b-paye{background:rgba(0,224,0,.1);color:var(--green)}
+.b-attente{background:rgba(255,204,0,.1);color:var(--yellow)}
+.b-livre{background:rgba(0,224,0,.1);color:var(--green)}
+.b-nonlivre{background:rgba(255,32,32,.1);color:var(--red)}
 
 /* section title */
 .stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin:18px 0 9px}
@@ -100,14 +101,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   background:var(--bg2);border:1px solid var(--border);
   border-radius:var(--radius);margin-bottom:6px;overflow:hidden;cursor:pointer;
 }
-.tx-card.is-vendu{border-left:2px solid var(--green)}
-.tx-card.is-stock{border-left:2px solid var(--red)}
-.tx-summary{display:flex;align-items:center;gap:12px;padding:13px 14px}
-.tx-main{flex:1;min-width:0}
-.tx-event{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.tx-meta{font-size:12px;color:var(--text2)}
-.tx-right{text-align:right;flex-shrink:0}
-.tx-profit{font-size:15px;font-weight:700;margin-bottom:5px}
+.tx-card.is-vendu{border-left:3px solid var(--green)}
+.tx-card.is-stock{border-left:3px solid var(--red)}
+.tx-summary{display:flex;align-items:center;gap:0;padding:12px 14px}
+.tx-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:16px;overflow:hidden}
+.tx-event{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;flex-shrink:0}
+.tx-info{display:flex;align-items:baseline;gap:12px;overflow:hidden;flex:1}
+.tx-info span{font-size:13px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-right{text-align:right;flex-shrink:0;margin-left:16px}
+.tx-profit{font-size:14px;font-weight:700;margin-bottom:4px}
 .tx-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 /* detail */
 .tx-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}
@@ -123,11 +125,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 /* filters */
 .filters{display:flex;gap:6px;margin-bottom:12px}
 .fchip{padding:5px 13px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
-.fchip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.fchip.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
 /* wts */
 .wts-box{background:#0d0d0d;border:1px solid var(--border2);border-radius:var(--radius);padding:16px;font-family:monospace;font-size:13px;line-height:1.85;white-space:pre-wrap;color:#b0b0a8;word-break:break-word;min-height:100px}
-.wts-b{font-weight:700;color:var(--text)}
+.wts-b{font-weight:700;color:var(--accent)}
 
 /* gmail */
 .gmail-card{border:1px solid var(--border2);background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:10px}
@@ -450,7 +452,7 @@ function renderDashboard() {
   if(chartEvents)chartEvents.destroy();
   chartEvents=new Chart(document.getElementById('chartEvents'),{
     type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(63,185,80,.7)':'rgba(248,81,73,.7)'),borderRadius:3,borderSkipped:false}]},
+    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(0,224,0,.75)':'rgba(255,32,32,.75)'),borderRadius:3,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
@@ -462,7 +464,7 @@ function renderDashboard() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['rgba(63,185,80,.7)','rgba(248,81,73,.7)'],borderWidth:0}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['rgba(0,224,0,.75)','rgba(255,32,32,.75)'],borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
   document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${transactions.length}</span>`;
@@ -528,7 +530,12 @@ function renderJournal() {
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <div class="tx-main">
           <div class="tx-event">${t.event}</div>
-          <div class="tx-meta">${fmtDate(t.date)} &nbsp;·&nbsp; ${t.cat||'—'} &nbsp;·&nbsp; ${t.qty}x</div>
+          <div class="tx-info">
+            <span>${fmtDate(t.date)}</span>
+            ${t.cat?`<span>${t.cat}</span>`:''}
+            <span>${t.qty}x</span>
+            ${t.place?`<span>${t.place}</span>`:''}
+          </div>
         </div>
         <div class="tx-right">
           <div class="tx-profit" style="color:${pc}">${fmt(profit)}</div>
