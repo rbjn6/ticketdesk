@@ -48,14 +48,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 }
 .topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--accent)}
 .topbar-right{display:flex;align-items:center;gap:10px}
-#syncIndicator{font-size:11px;color:var(--text2)}
+#syncIndicator{font-size:13px;color:var(--text2)}
 
 /* top nav */
 .topnav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
 .tnav{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:8px 2px 7px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;
-  color:var(--text2);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;
+  color:var(--text2);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;
   transition:color .15s;
 }
 .tnav.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -67,11 +67,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .page{display:none}.page.active{display:block}
 
 /* buttons */
-.btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
 .btn:active{background:var(--bg4)}
 .btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
 .btn-primary:active{opacity:.8}
-.btn-sm{padding:5px 11px;font-size:12px}
+.btn-sm{padding:6px 13px;font-size:13px}
 .btn-danger{color:var(--red);border-color:rgba(248,81,73,.3)}
 
 /* cards */
@@ -94,7 +94,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .b-nonlivre{background:rgba(255,32,32,.1);color:var(--red)}
 
 /* section title */
-.stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin:18px 0 9px}
+.stitle{font-size:13px;color:var(--accent);letter-spacing:.06em;margin:18px 0 9px;font-weight:500}
 
 /* journal cards */
 .tx-card{
@@ -124,11 +124,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 
 /* filters */
 .filters{display:flex;gap:6px;margin-bottom:12px}
-.fchip{padding:5px 13px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.fchip{padding:5px 13px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
 .fchip.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
 /* wts */
-.wts-box{background:#0d0d0d;border:1px solid var(--border2);border-radius:var(--radius);padding:16px;font-family:monospace;font-size:13px;line-height:1.85;white-space:pre-wrap;color:#b0b0a8;word-break:break-word;min-height:100px}
+.wts-box{background:#0d0d0d;border:1px solid var(--border2);border-radius:var(--radius);padding:16px;font-family:monospace;font-size:15px;line-height:1.85;white-space:pre-wrap;color:#b0b0a8;word-break:break-word;min-height:100px}
 .wts-b{font-weight:700;color:var(--accent)}
 
 /* gmail */
@@ -146,17 +146,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;padding:18px 15px calc(16px + var(--safe-bottom));width:100%;max-height:92vh;overflow-y:auto;border-top:1px solid var(--border2)}
 .modal-handle{width:32px;height:3px;background:var(--bg4);border-radius:2px;margin:0 auto 16px}
-.modal-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:16px}
 .fgroup{margin-bottom:11px}
-.flabel{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
-input,select,textarea{width:100%;padding:9px 11px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+.flabel{font-size:13px;color:var(--text2);letter-spacing:.03em;margin-bottom:5px;display:block;font-weight:500}
+input,select,textarea{width:100%;padding:9px 11px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
 input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-actions{display:flex;gap:8px;margin-top:16px}
 .form-actions .btn{flex:1;justify-content:center}
 
 /* toast */
-.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:8px 16px;font-size:12px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.03em}
+.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:9px 18px;font-size:14px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.03em}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:rgba(63,185,80,.4);color:var(--green)}
 .toast.err{border-color:rgba(248,81,73,.4);color:var(--red)}
@@ -164,7 +164,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
 .chart-wrap{position:relative;width:100%;height:180px}
 .metric-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
-.metric-block-title{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.metric-block-title{font-size:14px;color:#fff;letter-spacing:.03em;margin-bottom:10px;font-weight:500}
 .metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
 .metric-row:last-child{border-bottom:none}
 .metric-row-total{margin-top:4px;padding-top:8px;border-top:1px solid var(--border2)}
@@ -223,7 +223,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     </div>
 
     <div class="page" id="page-wts">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
+      <p style="font-size:15px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
       <div class="wts-box" id="wtsPreview"></div>
       <div style="margin-top:10px">
         <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="copyWTS()">Copier pour Discord</button>
@@ -235,8 +235,8 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div class="sdot" id="gmailDot"></div>
           <div>
-            <div style="font-size:14px;font-weight:500" id="gmailStatusText">Non connecté</div>
-            <div style="font-size:12px;color:var(--text2)" id="gmailEmail"></div>
+            <div style="font-size:16px;font-weight:500" id="gmailStatusText">Non connecté</div>
+            <div style="font-size:14px;color:var(--text2)" id="gmailEmail"></div>
           </div>
         </div>
         <button class="btn btn-primary" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%;justify-content:center">Connecter Gmail + Drive</button>
@@ -256,7 +256,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <div class="sdot" id="driveDot"></div>
           <div>
-            <div style="font-size:14px;font-weight:500" id="driveStatusText">Non activé</div>
+            <div style="font-size:16px;font-weight:500" id="driveStatusText">Non activé</div>
             <div style="font-size:12px;color:var(--text2)" id="driveLastSync"></div>
           </div>
         </div>
@@ -442,17 +442,17 @@ function renderDashboard() {
 
   const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
   document.getElementById('metricsGrid').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div>
-        <div style="font-size:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Flux financiers</div>
-        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
-        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:16px;color:#fff;letter-spacing:.04em;margin-bottom:2px;font-weight:500">Flux financiers</div>
+        <div class="metric-card"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
+        <div class="metric-card"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
         <div class="metric-card"><div class="metric-label">Coûts fixes total</div><div class="metric-value">${fmtFull(totalCosts)}</div></div>
       </div>
-      <div>
-        <div style="font-size:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Résultat</div>
-        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
-        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Coûts fixes payés</div><div class="metric-value mv-warn">−${fmtFull(paidC)}</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:16px;color:#fff;letter-spacing:.04em;margin-bottom:2px;font-weight:500">Résultat</div>
+        <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
+        <div class="metric-card"><div class="metric-label">Coûts fixes payés</div><div class="metric-value mv-warn">−${fmtFull(paidC)}</div></div>
         <div class="metric-card" style="border-color:var(--border2)"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}" style="font-size:26px">${fmtFull(netP)}</div></div>
       </div>
     </div>
@@ -766,11 +766,11 @@ function renderCosts(){
   document.getElementById('costsList').innerHTML=costs.map(c=>`
     <div class="card" style="display:flex;align-items:center;gap:10px;padding:11px 13px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500">${c.type}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
+        <div style="font-size:15px;font-weight:500">${c.type}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:2px">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:14px;font-weight:600">${fmtFull(c.amount)}</div>
+        <div style="font-size:16px;font-weight:600">${fmtFull(c.amount)}</div>
         <span class="badge ${c.status==='Payé'?'b-paye':'b-attente'}" style="margin-top:3px">${c.status}</span>
       </div>
       <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0">×</button>
