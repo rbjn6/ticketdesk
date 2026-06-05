@@ -382,6 +382,8 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
+function _googleLogin(){gmailConnect();}
+function _doLogin(){doLogin();}
 const GOOGLE_CLIENT_ID = '706802447910-8gqvr8oigb36g898hh91jm61f9tppl66.apps.googleusercontent.com';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
 const ALL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata';
@@ -1103,9 +1105,9 @@ window.addEventListener('DOMContentLoaded', function() {
     <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
     <label class="login-field-label">Code PIN</label>
     <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" id="loginPinInput">
-    <button class="login-btn" id="loginSubmitBtn">Accéder</button>
+    <button class="login-btn" onclick="_doLogin()">Accéder</button>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
-    <button class="login-google-btn" id="loginGoogleBtn">
+    <button class="login-google-btn" onclick="_googleLogin()">
       <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
       Connecter Gmail + Drive
     </button>
