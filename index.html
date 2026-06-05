@@ -97,20 +97,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .stitle{font-size:20px;color:#fff;letter-spacing:.01em;margin:18px 0 10px;font-weight:700;text-transform:none}
 
 /* journal cards */
-.tx-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);margin-bottom:6px;overflow:hidden;cursor:pointer;
-}
-.tx-card.is-vendu{border-left:3px solid var(--green)}
-.tx-card.is-stock{border-left:3px solid var(--red)}
-.tx-summary{display:flex;align-items:center;gap:0;padding:12px 14px}
-.tx-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:16px;overflow:hidden}
-.tx-event{font-size:16px;font-weight:600;color:#fff;white-space:nowrap;flex-shrink:0}
-.tx-info{display:flex;align-items:baseline;gap:14px;overflow:hidden;flex:1}
-.tx-info span{font-size:16px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-right{text-align:right;flex-shrink:0;margin-left:16px}
-.tx-profit{font-size:16px;font-weight:700;margin-bottom:5px}
-.tx-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tx-card{background:var(--bg2);border:1px solid var(--border);border-top:none;overflow:hidden;cursor:pointer}
+.tx-card:last-child{border-radius:0 0 var(--radius) var(--radius)}
+.tx-card.is-vendu{border-left:6px solid var(--green)}
+.tx-card.is-stock{border-left:6px solid var(--red)}
+.tx-summary{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1.2fr) 100px 180px;gap:16px;align-items:center;padding:11px 14px}
+.tx-ev-date{display:flex;align-items:baseline;gap:8px;min-width:0;overflow:hidden}
+.tx-event{font-size:20px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:18px;color:var(--accent);white-space:nowrap;flex-shrink:0}
+.tx-info{font-size:17px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:-170px}
+.tx-buyer{font-size:17px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-profit{font-size:20px;font-weight:700;text-align:right;white-space:nowrap;margin-right:50px}
+.tx-badges{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:center}
 /* detail */
 .tx-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}
 .tx-detail.open{display:block}
@@ -118,9 +116,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .tx-detail-col{display:flex;flex-direction:column}
 .tx-drow{padding:5px 0;border-bottom:1px solid var(--border)}
 .tx-drow:last-child{border-bottom:none}
-.tx-drow-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px}
-.tx-drow-val{font-size:13px;color:var(--text);font-weight:500}
-.tx-detail-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.tx-drow-label{font-size:13px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.tx-drow-val{font-size:16px;color:var(--text);font-weight:500}
+.tx-detail-actions{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
 
 /* filters */
 .filters{display:flex;gap:6px;margin-bottom:12px}
@@ -218,7 +216,15 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     </div>
 
     <div class="page" id="page-journal">
-      <div class="filters" id="filterChips"></div>
+      <div id="filterChips"></div>
+      <div id="journalCount" style="font-size:13px;color:var(--text2);margin-bottom:8px;padding:0 2px"></div>
+      <div style="background:var(--bg);padding:7px 14px;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1.2fr) 100px 180px;gap:16px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;margin-top:8px">
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Statut · Événement</span>
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-left:-170px">Infos</span>
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Acheteur</span>
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;text-align:right;margin-right:50px">Bénéfice</span>
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;text-align:right">Payé · Livraison</span>
+      </div>
       <div id="journalList"></div>
     </div>
 
@@ -245,7 +251,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
         </div>
       </div>
       <div id="importResults" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:flex-start;margin-bottom:8px">
           <p class="stitle" style="margin:0">Billets détectés</p>
           <button class="btn btn-primary btn-sm" onclick="importSelected()">Importer</button>
         </div>
@@ -295,9 +301,11 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
       <div class="fgroup"><label class="flabel">Événement *</label><input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off"></div>
       <div class="fgroup"><label class="flabel">Date concert</label><input type="date" id="f-date"></div>
     </div>
-    <div class="frow">
-      <div class="fgroup"><label class="flabel">Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
-      <div class="fgroup"><label class="flabel">Placement</label><input type="text" id="f-place" placeholder="Bloc A Rang 5"></div>
+    <div class="fgroup"><label class="flabel">Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" class="fgroup">
+      <div><label class="flabel">Bloc</label><input type="text" id="f-bloc" placeholder="A, 113…"></div>
+      <div><label class="flabel">Rang</label><input type="text" id="f-rang" placeholder="5, 27…"></div>
+      <div><label class="flabel">Siège</label><input type="text" id="f-siege" placeholder="12, 13…"></div>
     </div>
     <div class="frow">
       <div class="fgroup"><label class="flabel">Site d'achat</label><input type="text" id="f-site" placeholder="Ticketmaster, Fnac…"></div>
@@ -374,6 +382,7 @@ let filterStatut    = '';
 let filterPay       = '';
 let filterLivraison = '';
 let filterSort      = 'event';
+let filterSearch    = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
@@ -1037,45 +1046,72 @@ function renderDashboard() {
 }
 
 // JOURNAL
-function renderJournal() {
+function renderFilters() {
   document.getElementById('filterChips').innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <div style="flex:1;position:relative">
-        <select onchange="setFilter('statut',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
-          <option value="" ${filterStatut===''?'selected':''}>Statut</option>
-          <option value="Vendu" ${filterStatut==='Vendu'?'selected':''}>Vendus</option>
-          <option value="En stock" ${filterStatut==='En stock'?'selected':''}>En stock</option>
-        </select>
-        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+    <div style="display:flex;align-items:center;justify-content:flex-start;margin-bottom:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="position:relative;flex-shrink:0">
+          <select id="sel-statut" onchange="setFilter('statut',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <option value="">Statut</option>
+            <option value="Vendu">Vendus</option>
+            <option value="En stock">En stock</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <select id="sel-pay" onchange="setFilter('pay',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <option value="">Paiement</option>
+            <option value="Payé">Payé</option>
+            <option value="En attente">En attente</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <option value="">Livraison</option>
+            <option value="Livré">Livré</option>
+            <option value="Non livré">Non livré</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <select id="sel-sort" onchange="setFilter('sort',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <option value="event">A – Z</option>
+            <option value="date">Date</option>
+            <option value="profit">Bénéfice</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
       </div>
-      <div style="flex:1;position:relative">
-        <select onchange="setFilter('pay',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
-          <option value="" ${filterPay===''?'selected':''}>Paiement</option>
-          <option value="Payé" ${filterPay==='Payé'?'selected':''}>Payé</option>
-          <option value="En attente" ${filterPay==='En attente'?'selected':''}>En attente</option>
-        </select>
-        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
-      </div>
-      <div style="flex:1;position:relative">
-        <select onchange="setFilter('livraison',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
-          <option value="" ${filterLivraison===''?'selected':''}>Livraison</option>
-          <option value="Livré" ${filterLivraison==='Livré'?'selected':''}>Livré</option>
-          <option value="Non livré" ${filterLivraison==='Non livré'?'selected':''}>Non livré</option>
-        </select>
-        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
-      </div>
-      <div style="flex:1;position:relative">
-        <select onchange="setFilter('sort',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
-          <option value="event" ${filterSort==='event'?'selected':''}>A – Z</option>
-          <option value="date" ${filterSort==='date'?'selected':''}>Date</option>
-          <option value="profit" ${filterSort==='profit'?'selected':''}>Bénéfice</option>
-        </select>
-        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0"></div>
+        <div style="position:relative;flex-shrink:0">
+          <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:16px;pointer-events:none">⌕</span>
+          <input id="search-input" type="text" placeholder="Rechercher…"
+            oninput="setFilter('search',this.value)"
+            style="width:250px;padding:10px 12px 10px 34px;font-size:15px;border-radius:6px">
+        </div>
       </div>
     </div>
   `;
+}
 
+function syncFilterUI() {
+  const ss = document.getElementById('sel-statut'); if(ss) ss.value = filterStatut;
+  const sp = document.getElementById('sel-pay'); if(sp) sp.value = filterPay;
+  const sl = document.getElementById('sel-livraison'); if(sl) sl.value = filterLivraison;
+  const so = document.getElementById('sel-sort'); if(so) so.value = filterSort;
+}
+
+function renderJournal() {
+  if(!document.getElementById('search-input')) renderFilters();
+
+  renderJournalList();
+}
+
+function renderJournalList() {
   let list=[...transactions];
+  if(filterSearch)    list=list.filter(t=>t.event.toLowerCase().includes(filterSearch.toLowerCase()));
   if(filterStatut)    list=list.filter(t=>t.statut===filterStatut);
   if(filterPay)       list=list.filter(t=>t.pay===filterPay);
   if(filterLivraison) list=list.filter(t=>t.livraison===filterLivraison);
@@ -1094,16 +1130,38 @@ function renderJournal() {
     list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
   }
 
+  // Compteur — toujours visible si filtre actif
+  const totalPlaces = list.reduce((s,t)=>s+t.qty, 0);
+  const countEl = document.getElementById('journalCount');
+  const hasFilter = filterSearch||filterStatut||filterPay||filterLivraison;
+  if(countEl) {
+    if(hasFilter) {
+      const events = [...new Set(list.map(t=>t.event))];
+      const parts = [];
+      if(filterSearch) parts.push(`"${filterSearch}"`);
+      countEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;background:var(--bg3);border-radius:6px;font-size:13px">
+        ${parts.length?`<span style="color:var(--text2)">${parts.join(' · ')}</span><span style="color:var(--text3)">·</span>`:''}
+        <span><span style="color:var(--text);font-weight:600">${events.length}</span> événement${events.length>1?'s':''}</span>
+        <span style="color:var(--text3)">·</span>
+        <span><span style="color:var(--accent);font-weight:600">${totalPlaces}</span> place${totalPlaces>1?'s':''}</span>
+        ${hasFilter?`<button onclick="resetFilters()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;margin-left:4px">Réinitialiser</button>`:''}
+      </span>`;
+    } else {
+      countEl.innerHTML = '';
+    }
+  }
+
   if(!list.length){
     document.getElementById('journalList').innerHTML='<div class="empty">Aucune transaction</div>';
     return;
   }
 
+  document.getElementById('journalList').style.cssText='border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);overflow:hidden';
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = t.sell ? (t.sell - t.buy) : -t.buy;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
     const isPos  = profit >= 0;
-    const pc     = isPos ? 'var(--green)' : 'var(--red)';
+    const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
     // Colonne gauche (top-down): Placement, Site achat, Compte, Mot de passe, Prix achat, Prix revente
@@ -1137,24 +1195,19 @@ function renderJournal() {
 
     return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}">
       <div class="tx-summary" onclick="toggleDetail('${did}')">
-        <div class="tx-main">
-          <div class="tx-event">${t.event}</div>
-          <div class="tx-info">
-            <span>${fmtDate(t.date)}</span>
-            ${t.cat?`<span>${t.cat}</span>`:''}
-            <span>${t.qty}x</span>
-            ${t.place?`<span>${t.place}</span>`:''}
-          </div>
+        <div class="tx-ev-date">
+          <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}" style="font-size:13px;padding:3px 9px;flex-shrink:0">${t.statut==='Vendu'?'Vendu':'Stock'}</span>
+          <span class="tx-event">${t.event}</span>
+          <span class="tx-date">${fmtDate(t.date)}</span>
         </div>
-        <div class="tx-right">
-          <div class="tx-profit" style="color:${pc}">${fmt(profit)}</div>
-          <div class="tx-badges">
-            <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}">${t.statut}</span>
-            ${t.pay==='Payé'?'<span class="badge b-paye">Payé</span>':''}
-            ${t.pay==='En attente'?'<span class="badge b-attente">En attente</span>':''}
-            ${t.livraison==='Livré'?'<span class="badge b-livre">Livré</span>':''}
-            ${t.livraison==='Non livré'?'<span class="badge b-nonlivre">Non livré</span>':''}
-          </div>
+        <span class="tx-info">${t.qty}x${t.cat?' · '+t.cat:''}${t.place?' · '+t.place:''}</span>
+        <span class="tx-buyer">${t.buyer||''}</span>
+        <span class="tx-profit" style="color:${pc}">${fmt(profit)}</span>
+        <div class="tx-badges">
+          ${t.pay==='Payé'?'<span class="badge b-paye">Payé</span>':''}
+          ${t.pay==='En attente'?'<span class="badge b-attente">En attente</span>':''}
+          ${t.livraison==='Livré'?'<span class="badge b-livre">Livré</span>':''}
+          ${t.livraison==='Non livré'?'<span class="badge b-nonlivre">Non livré</span>':''}
         </div>
       </div>
       <div class="tx-detail" id="${did}">
@@ -1173,7 +1226,15 @@ function setFilter(type,v){
   if(type==='pay')       filterPay=v;
   if(type==='livraison') filterLivraison=v;
   if(type==='sort')      filterSort=v;
-  renderJournal();
+  if(type==='search')    filterSearch=v;
+  syncFilterUI();
+  renderJournalList();
+}
+function resetFilters(){
+  filterStatut='';filterPay='';filterLivraison='';filterSearch='';filterSort='event';
+  syncFilterUI();
+  const si = document.getElementById('search-input'); if(si) si.value='';
+  renderJournalList();
 }
 function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
 function deleteTransaction(id){
@@ -1404,7 +1465,11 @@ function openAddModal(id){
     document.getElementById('f-event').value=t.event;
     document.getElementById('f-date').value=t.date;
     document.getElementById('f-cat').value=t.cat;
-    document.getElementById('f-place').value=t.place;
+    // Split place "Bloc X, Rang Y, Siège Z" back into fields
+    const placeParts = (t.place||'').split(',').map(s=>s.trim());
+    document.getElementById('f-bloc').value = (placeParts[0]||'').replace(/bloc\s*/i,'').trim();
+    document.getElementById('f-rang').value = (placeParts[1]||'').replace(/rang\s*/i,'').trim();
+    document.getElementById('f-siege').value= (placeParts[2]||'').replace(/si[eè]ge\s*/i,'').trim();
     document.getElementById('f-site').value=t.site||'';
     document.getElementById('f-compte').value=t.compte||'';
     document.getElementById('f-mdp').value=t.mdp||'';
@@ -1418,7 +1483,7 @@ function openAddModal(id){
     document.getElementById('f-wanted').value=t.wanted||'';
   }else{
     document.getElementById('addModalTitle').textContent='Nouvelle transaction';
-    ['f-event','f-date','f-cat','f-place','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
+    ['f-event','f-date','f-cat','f-bloc','f-rang','f-siege','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-statut').value='En stock';
     document.getElementById('f-qty').value=1;
     ['f-buy','f-sell','f-wanted'].forEach(f=>document.getElementById(f).value='');
@@ -1435,7 +1500,16 @@ function saveTransaction(){
     statut:document.getElementById('f-statut').value,event:ev,
     date:document.getElementById('f-date').value,
     cat:document.getElementById('f-cat').value.trim(),
-    place:document.getElementById('f-place').value.trim(),
+    place:(()=>{
+      const b=document.getElementById('f-bloc').value.trim();
+      const r=document.getElementById('f-rang').value.trim();
+      const s=document.getElementById('f-siege').value.trim();
+      const parts=[];
+      if(b) parts.push('Bloc '+b);
+      if(r) parts.push('Rang '+r);
+      if(s) parts.push('Siège '+s);
+      return parts.join(', ');
+    })(),
     site:document.getElementById('f-site').value.trim(),
     compte:document.getElementById('f-compte').value.trim(),
     mdp:document.getElementById('f-mdp').value,
