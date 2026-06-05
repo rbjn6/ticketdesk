@@ -986,7 +986,7 @@ function renderDashboard() {
   const tSell = sold.reduce((s,t)=>s+t.sell,0);
 
   const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
-  const profitWithStock = transactions.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0);
+  const profitWithStock = transactions.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0) - paidC;
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -1186,7 +1186,10 @@ function deleteTransaction(id){
 // WTS
 function renderWTS(){
   const stock=transactions.filter(t=>t.statut==='En stock')
-    .sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
+    .sort((a,b)=>{
+      const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
+      return da.localeCompare(db)||a.event.localeCompare(b.event);
+    });
   if(!stock.length){document.getElementById('wtsPreview').innerHTML='<span style="color:var(--text3)">Aucun billet en stock.</span>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
