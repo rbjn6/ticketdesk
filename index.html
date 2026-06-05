@@ -54,21 +54,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 #syncIndicator{font-size:11px;color:var(--text2);white-space:nowrap}
 
-/* tab nav — HAUT */
+/* tab nav — HAUT pleine largeur */
 .topnav{
   display:flex;background:var(--bg2);border-bottom:1px solid var(--border);
-  overflow-x:auto;flex-shrink:0;scrollbar-width:none;
+  flex-shrink:0;
 }
-.topnav::-webkit-scrollbar{display:none}
 .tnav{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:8px 14px 7px;cursor:pointer;background:none;border:none;
-  color:var(--text2);font-size:10px;font-family:'DM Sans',sans-serif;
-  border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;
-  transition:color .2s;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:9px 2px 8px;cursor:pointer;background:none;border:none;
+  color:var(--text2);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;
+  border-bottom:2px solid transparent;
+  transition:color .2s,background .2s;
 }
-.tnav.active{color:var(--accent2);border-bottom-color:var(--accent)}
-.tnav-icon{font-size:18px}
+.tnav.active{color:var(--accent2);border-bottom-color:var(--accent);background:var(--accent-dim2)}
+.tnav-icon{font-size:19px;line-height:1}
 
 /* content */
 .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
@@ -108,23 +107,29 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 /* ── SECTION TITLE ── */
 .stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px}
 
-/* ── JOURNAL — cards mobile ── */
+/* ── JOURNAL — cards compactes ── */
 .tx-card{
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:13px;margin-bottom:8px;cursor:pointer;
+  padding:0;margin-bottom:8px;cursor:pointer;overflow:hidden;
   transition:border-color .15s;
 }
 .tx-card:active{border-color:var(--accent)}
 .tx-card.is-vendu{border-left:3px solid var(--green)}
 .tx-card.is-stock{border-left:3px solid var(--red)}
-.tx-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.tx-event{font-size:15px;font-weight:600;line-height:1.2}
-.tx-date{font-size:12px;color:var(--text2);margin-top:2px}
-.tx-profit{font-size:16px;font-weight:700;text-align:right;flex-shrink:0}
-.tx-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
-.tx-field{font-size:11px;color:var(--text2)}
+/* ligne principale toujours visible */
+.tx-summary{display:flex;align-items:center;gap:10px;padding:12px 13px}
+.tx-main{flex:1;min-width:0}
+.tx-event{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-right{text-align:right;flex-shrink:0}
+.tx-profit{font-size:15px;font-weight:700}
+.tx-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;justify-content:flex-end}
+/* détail dépliable */
+.tx-detail{display:none;padding:0 13px 12px;border-top:1px solid var(--border)}
+.tx-detail.open{display:block}
+.tx-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;padding-top:10px}
+.tx-field{font-size:12px;color:var(--text2)}
 .tx-field span{color:var(--text);font-weight:500}
-.tx-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
 
 /* ── FILTERS ── */
 .filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
@@ -498,7 +503,7 @@ function renderDashboard() {
 
 // ── JOURNAL ──
 function renderJournal() {
-  const chips=[{l:'Tous',v:''},{l:'Vendus ✓',v:'Vendu'},{l:'En stock',v:'En stock'}];
+  const chips=[{l:'Tous',v:''},{l:'Vendus',v:'Vendu'},{l:'En stock',v:'En stock'}];
   document.getElementById('filterChips').innerHTML=chips.map(c=>
     `<button class="fchip ${filterStatut===c.v?'active':''}" onclick="setFilter('${c.v}')">${c.l}</button>`
   ).join('');
@@ -517,44 +522,65 @@ function renderJournal() {
     const margin=t.buy&&t.sell?Math.round((t.sell-t.buy)/t.buy*100):null;
     const isPos=t.sell>0&&profit>=0;
     const profitColor=isPos?'var(--green)':t.sell?'var(--red)':'var(--text2)';
+    const id='tx-'+t.id;
 
-    // Champs colonnes A→S
+    // Ligne résumé : Nom · Date · Cat · Qté
+    const metaParts=[fmtDate(t.date), t.cat||null, t.qty+'x'].filter(Boolean);
+
+    // Détail complet (tous champs, sans lettres)
     const fields=[
-      {l:'Catégorie',v:t.cat||'—'},
       {l:'Placement',v:t.place||'—'},
       {l:'Site achat',v:t.site||'—'},
       {l:'Compte',v:t.compte||'—'},
       {l:'Mot de passe',v:t.mdp?'••••••':'—'},
-      {l:'Quantité',v:t.qty+'x'},
-      {l:'Achat',v:t.buy?fmtFull(t.buy):'—'},
-      {l:'Revente',v:t.sell?fmtFull(t.sell):'—'},
+      {l:'Prix achat',v:t.buy?fmtFull(t.buy):'—'},
+      {l:'Prix revente',v:t.sell?fmtFull(t.sell):'—'},
       {l:'Acheteur',v:t.buyer||'—'},
       {l:'Plateforme',v:t.platform||'—'},
       {l:'Marge',v:margin!==null?(margin>=0?'+':'')+margin+'%':'—'},
       {l:'Prix voulu',v:t.wanted?fmtFull(t.wanted):'—'},
     ];
 
-    return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}" onclick="editTransaction(${t.id})">
-      <div class="tx-top">
-        <div>
+    return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}">
+      <div class="tx-summary" onclick="toggleDetail('${id}')">
+        <div class="tx-main">
           <div class="tx-event">${t.event}</div>
-          <div class="tx-date">${fmtDate(t.date)}</div>
+          <div class="tx-meta">${metaParts.join(' · ')}</div>
         </div>
-        <div>
+        <div class="tx-right">
           <div class="tx-profit" style="color:${profitColor}">${fmt(profit)}</div>
-          ${margin!==null?`<div style="font-size:11px;text-align:right;color:${isPos?'var(--green)':'var(--red)'}">${margin>=0?'+':''}${margin}%</div>`:''}
+          <div class="tx-badges">
+            <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}">${t.statut}</span>
+            ${t.pay==='Payé'?`<span class="badge b-paye">Payé</span>`:''}
+            ${t.pay==='En attente'?`<span class="badge b-attente">En attente</span>`:''}
+            ${t.livraison==='Livré'?`<span class="badge b-livre">Livré</span>`:''}
+            ${t.livraison==='Non livré'?`<span class="badge b-nonlivre">Non livré</span>`:''}
+          </div>
         </div>
       </div>
-      <div class="tx-grid">
-        ${fields.map(f=>`<div class="tx-field">${f.l} <span>${f.v}</span></div>`).join('')}
-      </div>
-      <div class="tx-badges">
-        <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}">${t.statut}</span>
-        ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}">${t.pay}</span>`:''}
-        ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}">${t.livraison}</span>`:''}
+      <div class="tx-detail" id="${id}">
+        <div class="tx-grid">
+          ${fields.map(f=>`<div class="tx-field">${f.l} <span>${f.v}</span></div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-accent btn-sm" onclick="editTransaction(${t.id})">✏️ Modifier</button>
+          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red)" onclick="deleteTransaction(${t.id})">🗑 Supprimer</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleDetail(id) {
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+function deleteTransaction(id) {
+  if(!confirm('Supprimer cette ligne ?')) return;
+  transactions=transactions.filter(t=>t.id!==id);
+  saveTx(); renderJournal(); renderDashboard(); renderWTS();
+  showToast('Supprimé');
 }
 
 function setFilter(v){filterStatut=v;renderJournal()}
