@@ -156,14 +156,23 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 /* toast */
 /* login screen */
 .login-screen{position:fixed;inset:0;background:#0c0c0c;display:flex;align-items:center;justify-content:center;z-index:500}
-.login-card{background:#161616;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:48px 40px;width:380px;text-align:center}
-.login-logo{font-family:'FreeSerif Bold',Georgia,serif;font-size:52px;font-weight:700;margin-bottom:8px}
+.login-card{background:#161616;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:40px 36px;width:360px;text-align:center}
+.login-logo{font-family:'FreeSerif Bold',Georgia,serif;font-size:44px;font-weight:700;margin-bottom:6px}
 .login-logo-t{color:#4d9fff}
 .login-logo-d{color:#f0f0f0}
-.login-tagline{font-size:14px;color:#555;margin-bottom:36px}
-.login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.login-tagline{font-size:13px;color:#555;margin-bottom:28px}
+.login-field-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;text-align:left;margin-bottom:6px;display:block}
+.login-field{width:100%;padding:11px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#1e1e1e;color:#f0f0f0;font-size:14px;margin-bottom:14px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+.login-field:focus{outline:none;border-color:#4d9fff}
+.login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 20px;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
 .login-btn:active{opacity:.85}
-.login-note{font-size:12px;color:#444;margin-top:16px;line-height:1.6}
+.login-divider{display:flex;align-items:center;gap:10px;margin:18px 0}
+.login-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.07)}
+.login-divider-text{font-size:12px;color:#444}
+.login-google-btn{width:100%;padding:11px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#aaa;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.login-google-btn:active{opacity:.7}
+.login-note{font-size:11px;color:#3a3a3a;margin-top:16px;line-height:1.6}
+.login-error{font-size:13px;color:var(--red);margin-bottom:10px;min-height:18px}
 .toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:9px 18px;font-size:14px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.03em}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:rgba(63,185,80,.4);color:var(--green)}
@@ -185,11 +194,18 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
   <div class="login-card">
     <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">D</span></div>
     <div class="login-tagline">Gestionnaire de revente de billets</div>
-    <button class="login-btn" onclick="gmailConnect()">
-      <div style="width:20px;height:20px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
+    <div class="login-error" id="loginError"></div>
+    <label class="login-field-label">Identifiant</label>
+    <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
+    <label class="login-field-label">Code PIN</label>
+    <input class="login-field" type="password" id="loginPin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Accéder</button>
+    <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
+    <button class="login-google-btn" onclick="gmailConnect()">
+      <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
       Connecter Gmail + Drive
     </button>
-    <p class="login-note">Tes données sont stockées dans ton Google Drive.<br>Connexion requise pour accéder à l'app.</p>
+    <p class="login-note">Première connexion ? Utilise le bouton Google.<br>Ensuite crée ton identifiant + PIN dans Paramètres.</p>
   </div>
 </div>
 
@@ -408,563 +424,57 @@ let filterSearch    = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
+const CREDS_KEY = 'ticketdesk_creds';
 
-// Données réelles chargées depuis le localStorage ou initialisées ci-dessous
-if (!transactions.length) {
-  transactions = [
-  {
-    "id": 1,
-    "statut": "Vendu",
-    "event": "JUL",
-    "date": "2026-06-25",
-    "cat": "fosse sud",
-    "place": "",
-    "site": "Sade DF",
-    "compte": "raphaelboujnah6@gmail.com",
-    "mdp": "Poulet11!",
-    "qty": 2,
-    "buy": 180.0,
-    "sell": 240.0,
-    "buyer": "charlotte.ldc",
-    "platform": "insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 2,
-    "statut": "Vendu",
-    "event": "JUL",
-    "date": "2026-06-26",
-    "cat": "fosse sud",
-    "place": "",
-    "site": "Stade DF",
-    "compte": "raphaelboujnah9@gmail.com",
-    "mdp": "Jul2026!",
-    "qty": 2,
-    "buy": 180.0,
-    "sell": 220.0,
-    "buyer": "dsicord kai",
-    "platform": "",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 3,
-    "statut": "Vendu",
-    "event": "JUL",
-    "date": "2026-06-26",
-    "cat": "fosse sud",
-    "place": "",
-    "site": "Ticketmaster",
-    "compte": "raphaelboujnah6@gmail.com",
-    "mdp": "",
-    "qty": 2,
-    "buy": 180.0,
-    "sell": 210.0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 4,
-    "statut": "Vendu",
-    "event": "Bruno Mars",
-    "date": "2026-08-01",
-    "cat": "fosse",
-    "place": "",
-    "site": "Ticketmaster",
-    "compte": "rungs-41-rebar@icloud.com",
-    "mdp": "Bruno2026!",
-    "qty": 2,
-    "buy": 280.0,
-    "sell": 340.0,
-    "buyer": "tllhs_",
-    "platform": "insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 5,
-    "statut": "Vendu",
-    "event": "David Guetta",
-    "date": "2026-07-24",
-    "cat": "Fosse",
-    "place": "",
-    "site": "SDF",
-    "compte": "linens.marking2f@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 3,
-    "buy": 227.25,
-    "sell": 285.0,
-    "buyer": "laziz5152",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 6,
-    "statut": "Vendu",
-    "event": "David Guetta",
-    "date": "2026-07-24",
-    "cat": "Fosse",
-    "place": "",
-    "site": "SDF",
-    "compte": "linens.marking2f@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 1,
-    "buy": 75.75,
-    "sell": 90.0,
-    "buyer": "serya6",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 100.0
-  },
-  {
-    "id": 7,
-    "statut": "Vendu",
-    "event": "David Guetta",
-    "date": "2026-07-24",
-    "cat": "Carré Or",
-    "place": "",
-    "site": "SDF",
-    "compte": "71-stabler.shield@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 213.0,
-    "sell": 300.0,
-    "buyer": "ld.zqsd",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 8,
-    "statut": "En stock",
-    "event": "David Guetta",
-    "date": "2026-07-24",
-    "cat": "Carré Or",
-    "place": "",
-    "site": "SDF",
-    "compte": "71-stabler.shield@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 213.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 300.0
-  },
-  {
-    "id": 9,
-    "statut": "Vendu",
-    "event": "Bad Bunny",
-    "date": "2026-02-01",
-    "cat": "cat 3 VR",
-    "place": "",
-    "site": "Fanc",
-    "compte": "raphaelboujnah6@gmail.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 160.0,
-    "sell": 200.0,
-    "buyer": ".joumel",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 10,
-    "statut": "Vendu",
-    "event": "Bad Bunny",
-    "date": "2026-02-01",
-    "cat": "Cat 2 VR",
-    "place": "",
-    "site": "Fnac",
-    "compte": "raphaelboujnah9@gmail.com",
-    "mdp": "Poulet11!",
-    "qty": 2,
-    "buy": 200.0,
-    "sell": 240.0,
-    "buyer": "ethan08s",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 11,
-    "statut": "Vendu",
-    "event": "Bad Bunny",
-    "date": "2026-02-01",
-    "cat": "Cat 2 VR",
-    "place": "",
-    "site": "Fnac",
-    "compte": "raphaelboujnah9@gmail.com",
-    "mdp": "Poulet11!",
-    "qty": 2,
-    "buy": 200.0,
-    "sell": 260.0,
-    "buyer": "kiliangiraud66",
-    "platform": "discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 12,
-    "statut": "Vendu",
-    "event": "Rolland garros",
-    "date": "2026-07-05",
-    "cat": "Annexe up",
-    "place": "",
-    "site": "Discord : Rb2",
-    "compte": "",
-    "mdp": "",
-    "qty": 1,
-    "buy": 150.0,
-    "sell": 180.0,
-    "buyer": "Lolatubiana",
-    "platform": "Insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 13,
-    "statut": "Vendu",
-    "event": "Jul",
-    "date": "2026-07-09",
-    "cat": "Fosse early",
-    "place": "",
-    "site": "Ticketmaster",
-    "compte": "linens.marking2f@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 284.0,
-    "sell": 290.0,
-    "buyer": "Global_amin",
-    "platform": "Discord",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 14,
-    "statut": "Vendu",
-    "event": "Roland garros",
-    "date": "2026-07-11",
-    "cat": "Annexe up",
-    "place": "",
-    "site": "Discord : .22math",
-    "compte": "",
-    "mdp": "",
-    "qty": 2,
-    "buy": 150.0,
-    "sell": 180.0,
-    "buyer": "josh_goz",
-    "platform": "insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 15,
-    "statut": "Vendu",
-    "event": "Roland garros",
-    "date": "2026-07-11",
-    "cat": "Annexes up",
-    "place": "",
-    "site": "Discord : valoushka_76",
-    "compte": "",
-    "mdp": "",
-    "qty": 2,
-    "buy": 140.0,
-    "sell": 190.0,
-    "buyer": "Lolatubiana",
-    "platform": "Insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 16,
-    "statut": "Vendu",
-    "event": "Roland garros",
-    "date": "2026-07-11",
-    "cat": "Annexe",
-    "place": "",
-    "site": "Discord : marvv4667",
-    "compte": "",
-    "mdp": "",
-    "qty": 1,
-    "buy": 60.0,
-    "sell": 75.0,
-    "buyer": "Lolatubiana",
-    "platform": "Insta",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 17,
-    "statut": "Vendu",
-    "event": "Gracie abraams",
-    "date": "",
-    "cat": "Fosse",
-    "place": "",
-    "site": "Ticketmaster",
-    "compte": "Sur le compte de talilah",
-    "mdp": "",
-    "qty": 3,
-    "buy": 270.0,
-    "sell": 300.0,
-    "buyer": "Talilah",
-    "platform": "Snap",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 18,
-    "statut": "En stock",
-    "event": "Niska",
-    "date": "2027-04-10",
-    "cat": "Prelouse",
-    "place": "",
-    "site": "Nonstop",
-    "compte": "barge.plushy.3g@icloud.com",
-    "mdp": "Sdfniska2026!",
-    "qty": 8,
-    "buy": 520.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 720.0
-  },
-  {
-    "id": 19,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-14",
-    "cat": "Cat 1 Parterre Allée",
-    "place": "Bloc P, Rang 65, Siège 187,188",
-    "site": "Fnac",
-    "compte": "pouter_surges.4a@icloud.com",
-    "mdp": "Celineraphael2026!",
-    "qty": 2,
-    "buy": 424.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 820.0
-  },
-  {
-    "id": 20,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-15",
-    "cat": "Cat Or Tribune Basse",
-    "place": "Bloc 113, Rang 9, Siège 36,37",
-    "site": "Fnac",
-    "compte": "oblong_raffish_6d@icloud.com",
-    "mdp": "Celineraphael2026!",
-    "qty": 2,
-    "buy": 468.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 1050.0
-  },
-  {
-    "id": 21,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-15",
-    "cat": "Cat Or",
-    "place": "Bloc 111, Rang 27, Siège 8,9,10,11",
-    "site": "Ticketmaster",
-    "compte": "goodly-68junkier@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 4,
-    "buy": 933.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 2100.0
-  },
-  {
-    "id": 22,
-    "statut": "Vendu",
-    "event": "Celine Dion",
-    "date": "2027-05-21",
-    "cat": "Cat 1",
-    "place": "Bloc 412, Rang 48, Siège 5,6,7,8",
-    "site": "Ticketmaster",
-    "compte": "humours.pumpkin0k@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 4,
-    "buy": 801.0,
-    "sell": 1360.0,
-    "buyer": "oceane.seydoux",
-    "platform": "insta",
-    "pay": "En attente",
-    "livraison": "Non livré",
-    "wanted": 0
-  },
-  {
-    "id": 23,
-    "statut": "Vendu",
-    "event": "Celine Dion",
-    "date": "2027-05-29",
-    "cat": "Cat 1",
-    "place": "Bloc 112, Rang 25, Siège 39,40,41,42,43,44",
-    "site": "Ticketmaster",
-    "compte": "lad-sabot.4o@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 6,
-    "buy": 1200.0,
-    "sell": 2700.0,
-    "buyer": "Louis Parenton",
-    "platform": "Message",
-    "pay": "En attente",
-    "livraison": "Non livré",
-    "wanted": 2700.0
-  },
-  {
-    "id": 24,
-    "statut": "Vendu",
-    "event": "Celine Dion",
-    "date": "2027-05-21",
-    "cat": "Cat 1 Parterre",
-    "place": "Bloc P, Rang 72, Siège 211,212",
-    "site": "Ticketmaster",
-    "compte": "muggy_indigo.3i@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 402.0,
-    "sell": 820.0,
-    "buyer": "Louis Parenton",
-    "platform": "Message",
-    "pay": "En attente",
-    "livraison": "Non livré",
-    "wanted": 820.0
-  },
-  {
-    "id": 25,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-22",
-    "cat": "Cat Or Allée",
-    "place": "Bloc 111, Rang 29, Siège 19,20",
-    "site": "Ticketmaster",
-    "compte": "natural.ankle-0f@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 490.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 1050.0
-  },
-  {
-    "id": 26,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-29",
-    "cat": "Cat 1 Allée",
-    "place": "Bloc 108, Rang 26, Siège 16,17",
-    "site": "Ticketmaster",
-    "compte": "banjo-gargle-30@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 424.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 850.0
-  },
-  {
-    "id": 27,
-    "statut": "En stock",
-    "event": "Celine Dion",
-    "date": "2027-05-21",
-    "cat": "Parterre Diamant Allée",
-    "place": "Bloc M, Rang 21, Siège 201,202",
-    "site": "Ticketmaster",
-    "compte": "inch.acrylic89@icloud.com",
-    "mdp": "Rbjn2026!",
-    "qty": 2,
-    "buy": 578.0,
-    "sell": 0,
-    "buyer": "",
-    "platform": "",
-    "pay": "",
-    "livraison": "Non livré",
-    "wanted": 1200.0
-  },
-  {
-    "id": 28,
-    "statut": "Vendu",
-    "event": "Celine dion",
-    "date": "",
-    "cat": "",
-    "place": "",
-    "site": "",
-    "compte": "",
-    "mdp": "",
-    "qty": 1,
-    "buy": 0.0,
-    "sell": 80.0,
-    "buyer": "",
-    "platform": "",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
-  },
-  {
-    "id": 29,
-    "statut": "Vendu",
-    "event": "Roland Garros",
-    "date": "2026-07-16",
-    "cat": "Annexe",
-    "place": "",
-    "site": "Discord : Benoit.vtr",
-    "compte": "",
-    "mdp": "",
-    "qty": 1,
-    "buy": 65.0,
-    "sell": 75.0,
-    "buyer": "",
-    "platform": "",
-    "pay": "Payé",
-    "livraison": "Livré",
-    "wanted": 0
+function getStoredCreds() {
+  try { return JSON.parse(localStorage.getItem(CREDS_KEY)) || null; } catch { return null; }
+}
+function saveLocalCreds(user, pin) {
+  localStorage.setItem(CREDS_KEY, JSON.stringify({user: user.trim().toLowerCase(), pin}));
+}
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pin  = document.getElementById('loginPin').value.trim();
+  const err  = document.getElementById('loginError');
+  
+  if (!user || !pin) { err.textContent = 'Remplis les deux champs.'; return; }
+  
+  const creds = getStoredCreds();
+  
+  if (!creds) {
+    // Première fois — pas de Google connecté non plus
+    if (!gmailToken) { err.textContent = 'Connecte d'abord Gmail + Drive.'; return; }
+    // Crée les credentials
+    saveLocalCreds(user, pin);
+    unlockApp();
+    showToast('Identifiant et PIN créés');
+  } else {
+    if (user !== creds.user || pin !== creds.pin) {
+      err.textContent = 'Identifiant ou PIN incorrect.';
+      document.getElementById('loginPin').value = '';
+      return;
+    }
+    unlockApp();
   }
-];
-  saveTx();
+}
+
+function unlockApp() {
+  sessionStorage.setItem('td_unlocked', '1');
+  document.getElementById('loginScreen').style.display = 'none';
+  if (gmailToken) {
+    driveLoad().then(loaded => {
+      if (loaded) { renderDashboard(); renderJournal(); renderWTS(); renderCosts(); }
+      else { driveSync(); renderDashboard(); }
+    });
+  } else {
+    renderDashboard();
+  }
+}
+
+// Données chargées depuis Drive uniquement
+if (!transactions.length) {
+  transactions = [];
 }
 // Coûts fixes — à remplir
 if (!costs.length) {
@@ -1547,20 +1057,22 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 
 function checkAuth() {
   const loginScreen = document.getElementById('loginScreen');
-  if (gmailToken) {
+  // Toujours afficher l'écran de login — sauf si session active (flag sessionStorage)
+  if (sessionStorage.getItem('td_unlocked')) {
     loginScreen.style.display = 'none';
-    driveLoad().then(loaded => {
-      if (loaded) {
-        renderDashboard(); renderJournal(); renderWTS(); renderCosts();
-      } else {
-        driveSync();
-        renderDashboard();
-      }
-    });
+    if (gmailToken) {
+      driveLoad().then(loaded => {
+        if (loaded) { renderDashboard(); renderJournal(); renderWTS(); renderCosts(); }
+        else { driveSync(); renderDashboard(); }
+      });
+    } else {
+      renderDashboard();
+    }
   } else {
     loginScreen.style.display = 'flex';
   }
 }
+
 
 // Après OAuth redirect — vérifier le token
 const _hash = window.location.hash;
