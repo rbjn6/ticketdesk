@@ -6,342 +6,318 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TicketDesk">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#080808">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>TicketDesk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --accent: #7c6ff7;
-  --accent2: #a78bfa;
-  --accent-dim: rgba(124,111,247,0.15);
-  --accent-dim2: rgba(124,111,247,0.08);
-  --bg:   #0a0a0f;
-  --bg2:  #12121a;
-  --bg3:  #1a1a26;
-  --bg4:  #22223a;
-  --text:  #eeeef5;
-  --text2: #7878a0;
-  --text3: #3d3d5c;
-  --border:  rgba(124,111,247,0.1);
-  --border2: rgba(124,111,247,0.2);
-  --green: #34d399;
-  --red:   #f87171;
-  --yellow:#fbbf24;
-  --radius: 14px;
-  --radius-sm: 9px;
+  --bg:    #080808;
+  --bg2:   #111111;
+  --bg3:   #1a1a1a;
+  --bg4:   #222222;
+  --text:  #e8e8e0;
+  --text2: #666660;
+  --text3: #333330;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --green: #3fb950;
+  --red:   #f85149;
+  --yellow:#e3b341;
+  --radius: 10px;
+  --radius-sm: 7px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
 
-/* ── LAYOUT ── */
 .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
 
 /* topbar */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(var(--safe-top) + 10px) 16px 10px;
-  background:var(--bg);border-bottom:1px solid var(--border);
-  flex-shrink:0;gap:10px;
-}
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--accent2);white-space:nowrap}
-.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-#syncIndicator{font-size:11px;color:var(--text2);white-space:nowrap}
-
-/* tab nav — HAUT pleine largeur */
-.topnav{
-  display:flex;background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-top) + 11px) 16px 11px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
   flex-shrink:0;
 }
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+#syncIndicator{font-size:11px;color:var(--text2)}
+
+/* top nav */
+.topnav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
 .tnav{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  padding:9px 2px 8px;cursor:pointer;background:none;border:none;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 2px 7px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;
   color:var(--text2);font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;
-  border-bottom:2px solid transparent;
-  transition:color .2s,background .2s;
+  transition:color .15s;
 }
-.tnav.active{color:var(--accent2);border-bottom-color:var(--accent);background:var(--accent-dim2)}
-.tnav-icon{font-size:19px;line-height:1}
+.tnav.active{color:var(--text);border-bottom-color:var(--text)}
+.tnav-icon{font-size:16px;margin-bottom:2px;opacity:.6}
+.tnav.active .tnav-icon{opacity:1}
 
 /* content */
 .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
 .page{display:none}.page.active{display:block}
 
-/* ── BUTTONS ── */
-.btn{padding:8px 15px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s,background .15s}
-.btn:active{opacity:.7}
-.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
-.btn-accent:hover{background:var(--accent2);border-color:var(--accent2)}
+/* buttons */
+.btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.btn:active{background:var(--bg4)}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600}
+.btn-primary:active{opacity:.85}
 .btn-sm{padding:5px 11px;font-size:12px}
-.btn-icon{width:34px;height:34px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
+.btn-danger{color:var(--red);border-color:rgba(248,81,73,.3)}
 
-/* ── CARDS ── */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+/* cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px}
 
-/* ── METRICS ── */
+/* metrics */
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
-.metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
+.metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
 .metric-value{font-size:22px;font-weight:600}
-.mv-accent{color:var(--accent2)}
-.mv-pos{color:var(--green)}
-.mv-neg{color:var(--red)}
-.mv-warn{color:var(--yellow)}
+.mv-pos{color:var(--green)}.mv-neg{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-hi{color:var(--text)}
 
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;white-space:nowrap}
-.b-vendu{background:rgba(52,211,153,.13);color:var(--green)}
-.b-stock{background:rgba(248,113,113,.13);color:var(--red)}
-.b-attente{background:rgba(251,191,36,.13);color:var(--yellow)}
-.b-paye{background:rgba(52,211,153,.13);color:var(--green)}
-.b-apayer{background:rgba(251,191,36,.13);color:var(--yellow)}
-.b-livre{background:rgba(52,211,153,.13);color:var(--green)}
-.b-nonlivre{background:rgba(248,113,113,.13);color:var(--red)}
+/* badges */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.b-vendu{background:rgba(63,185,80,.1);color:var(--green)}
+.b-stock{background:rgba(248,81,73,.1);color:var(--red)}
+.b-paye{background:rgba(63,185,80,.1);color:var(--green)}
+.b-attente{background:rgba(227,179,65,.1);color:var(--yellow)}
+.b-livre{background:rgba(63,185,80,.1);color:var(--green)}
+.b-nonlivre{background:rgba(248,81,73,.1);color:var(--red)}
 
-/* ── SECTION TITLE ── */
-.stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px}
+/* section title */
+.stitle{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin:18px 0 9px}
 
-/* ── JOURNAL — cards compactes ── */
+/* journal cards */
 .tx-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:0;margin-bottom:8px;cursor:pointer;overflow:hidden;
-  transition:border-color .15s;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:6px;overflow:hidden;cursor:pointer;
 }
-.tx-card:active{border-color:var(--accent)}
-.tx-card.is-vendu{border-left:3px solid var(--green)}
-.tx-card.is-stock{border-left:3px solid var(--red)}
-/* ligne principale toujours visible */
-.tx-summary{display:flex;align-items:center;gap:10px;padding:12px 13px}
+.tx-card.is-vendu{border-left:2px solid var(--green)}
+.tx-card.is-stock{border-left:2px solid var(--red)}
+.tx-summary{display:flex;align-items:center;gap:12px;padding:13px 14px}
 .tx-main{flex:1;min-width:0}
-.tx-event{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-meta{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-event{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.tx-meta{font-size:12px;color:var(--text2)}
 .tx-right{text-align:right;flex-shrink:0}
-.tx-profit{font-size:15px;font-weight:700}
-.tx-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;justify-content:flex-end}
-/* détail dépliable */
-.tx-detail{display:none;padding:0 13px 12px;border-top:1px solid var(--border)}
+.tx-profit{font-size:15px;font-weight:700;margin-bottom:5px}
+.tx-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+/* detail */
+.tx-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}
 .tx-detail.open{display:block}
-.tx-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;padding-top:10px}
-.tx-field{font-size:12px;color:var(--text2)}
-.tx-field span{color:var(--text);font-weight:500}
+.tx-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.tx-detail-col{display:flex;flex-direction:column}
+.tx-drow{padding:5px 0;border-bottom:1px solid var(--border)}
+.tx-drow:last-child{border-bottom:none}
+.tx-drow-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px}
+.tx-drow-val{font-size:13px;color:var(--text);font-weight:500}
+.tx-detail-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 
-/* ── FILTERS ── */
-.filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.fchip{padding:5px 13px;border-radius:99px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s}
-.fchip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent2)}
+/* filters */
+.filters{display:flex;gap:6px;margin-bottom:12px}
+.fchip{padding:5px 13px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.fchip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
 
-/* ── WTS ── */
-.wts-box{background:#1a1625;border:1px solid rgba(124,111,247,.25);border-radius:var(--radius);padding:15px;font-family:monospace;font-size:13px;line-height:1.8;white-space:pre-wrap;color:#c9c7e8;word-break:break-word;min-height:100px}
-.wts-b{font-weight:700;color:#fff}
+/* wts */
+.wts-box{background:#0d0d0d;border:1px solid var(--border2);border-radius:var(--radius);padding:16px;font-family:monospace;font-size:13px;line-height:1.85;white-space:pre-wrap;color:#b0b0a8;word-break:break-word;min-height:100px}
+.wts-b{font-weight:700;color:var(--text)}
 
-/* ── GMAIL/DRIVE ── */
+/* gmail */
 .gmail-card{border:1px solid var(--border2);background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:10px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0}
-.status-dot.on{background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.sdot.on{background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .import-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .import-item:last-child{border:none;padding-bottom:0}
-.icheck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;font-size:11px}
-.icheck.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.icheck{width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;font-size:11px}
+.icheck.on{background:var(--text);border-color:var(--text);color:var(--bg)}
 
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end}
+/* modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end}
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;padding:18px 15px calc(16px + var(--safe-bottom));width:100%;max-height:92vh;overflow-y:auto;border-top:1px solid var(--border2)}
-.modal-handle{width:36px;height:4px;background:var(--bg4);border-radius:2px;margin:0 auto 15px}
-.modal-title{font-size:16px;font-weight:600;margin-bottom:16px}
-.fgroup{margin-bottom:12px}
-.flabel{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block}
-input,select,textarea{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
-input:focus,select:focus{outline:none;border-color:var(--accent)}
+.modal-handle{width:32px;height:3px;background:var(--bg4);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.fgroup{margin-bottom:11px}
+.flabel{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
+input,select,textarea{width:100%;padding:9px 11px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-actions{display:flex;gap:10px;margin-top:18px}
+.form-actions{display:flex;gap:8px;margin-top:16px}
 .form-actions .btn{flex:1;justify-content:center}
 
-/* ── TOAST ── */
-.toast{position:fixed;top:calc(var(--safe-top) + 56px);left:50%;transform:translateX(-50%) translateY(-12px);background:var(--bg3);border:1px solid var(--border2);border-radius:99px;padding:9px 18px;font-size:13px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+/* toast */
+.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:8px 16px;font-size:12px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.03em}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:var(--green);color:var(--green)}
-.toast.err{border-color:var(--red);color:var(--red)}
+.toast.ok{border-color:rgba(63,185,80,.4);color:var(--green)}
+.toast.err{border-color:rgba(248,81,73,.4);color:var(--red)}
 
-/* ── EMPTY ── */
 .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
-.ei{font-size:32px;margin-bottom:8px;opacity:.35}
-
-/* ── CHART ── */
 .chart-wrap{position:relative;width:100%;height:180px}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- TOPBAR -->
   <div class="topbar">
-    <span class="topbar-title">TicketDesk</span>
+    <span class="topbar-title">TICKETDESK</span>
     <div class="topbar-right">
       <span id="syncIndicator"></span>
-      <button class="btn btn-accent btn-sm" onclick="openAddModal()">＋ Ajouter</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
     </div>
   </div>
 
-  <!-- NAV HAUT -->
   <nav class="topnav">
-    <button class="tnav active" onclick="showPage('dashboard')"><span class="tnav-icon">📊</span>Dashboard</button>
-    <button class="tnav" onclick="showPage('journal')"><span class="tnav-icon">📋</span>Journal</button>
-    <button class="tnav" onclick="showPage('wts')"><span class="tnav-icon">💬</span>WTS</button>
-    <button class="tnav" onclick="showPage('gmail')"><span class="tnav-icon">📧</span>Gmail</button>
-    <button class="tnav" onclick="showPage('costs')"><span class="tnav-icon">💸</span>Coûts</button>
+    <button class="tnav active" onclick="showPage('dashboard')">
+      <span class="tnav-icon">▪</span>Dashboard
+    </button>
+    <button class="tnav" onclick="showPage('journal')">
+      <span class="tnav-icon">▪</span>Journal
+    </button>
+    <button class="tnav" onclick="showPage('wts')">
+      <span class="tnav-icon">▪</span>WTS
+    </button>
+    <button class="tnav" onclick="showPage('gmail')">
+      <span class="tnav-icon">▪</span>Gmail
+    </button>
+    <button class="tnav" onclick="showPage('costs')">
+      <span class="tnav-icon">▪</span>Coûts
+    </button>
   </nav>
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="metrics-grid" id="metricsGrid"></div>
       <p class="stitle">Bénéfice par événement</p>
       <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
       <p class="stitle">Répartition</p>
-      <div class="card" style="padding:12px;display:flex;align-items:center;gap:16px">
-        <div style="position:relative;width:110px;height:110px;flex-shrink:0">
-          <canvas id="chartPie" role="img" aria-label="Stock vs Vendu"></canvas>
+      <div class="card" style="padding:12px;display:flex;align-items:center;gap:20px">
+        <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+          <canvas id="chartPie" role="img" aria-label="Vendus vs stock"></canvas>
           <div id="pieCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"></div>
         </div>
-        <div id="pieLegend" style="flex:1;font-size:12px;line-height:2"></div>
+        <div id="pieLegend" style="flex:1;font-size:12px;line-height:2;color:var(--text2)"></div>
       </div>
     </div>
 
-    <!-- JOURNAL -->
     <div class="page" id="page-journal">
       <div class="filters" id="filterChips"></div>
       <div id="journalList"></div>
     </div>
 
-    <!-- WTS -->
     <div class="page" id="page-wts">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> → message Discord prêt à coller.</p>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
       <div class="wts-box" id="wtsPreview"></div>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button class="btn btn-accent" style="flex:1;justify-content:center" onclick="copyWTS()">📋 Copier pour Discord</button>
+      <div style="margin-top:10px">
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="copyWTS()">Copier pour Discord</button>
       </div>
     </div>
 
-    <!-- GMAIL -->
     <div class="page" id="page-gmail">
       <div class="gmail-card">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div class="status-dot" id="gmailDot"></div>
+          <div class="sdot" id="gmailDot"></div>
           <div>
             <div style="font-size:14px;font-weight:500" id="gmailStatusText">Non connecté</div>
             <div style="font-size:12px;color:var(--text2)" id="gmailEmail"></div>
           </div>
         </div>
-        <button class="btn btn-accent" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%;justify-content:center">🔐 Connecter Gmail + Drive</button>
+        <button class="btn btn-primary" id="gmailConnectBtn" onclick="gmailConnect()" style="width:100%;justify-content:center">Connecter Gmail + Drive</button>
         <div style="margin-top:8px;display:none" id="gmailScanRow">
-          <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center">🔍 Scanner les billets</button>
+          <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center">Scanner les billets</button>
         </div>
       </div>
       <div id="importResults" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <p class="stitle" style="margin:0">Billets détectés</p>
-          <button class="btn btn-accent btn-sm" onclick="importSelected()">Importer sélection</button>
+          <button class="btn btn-primary btn-sm" onclick="importSelected()">Importer</button>
         </div>
         <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:0 12px" id="importList"></div>
       </div>
       <p class="stitle">Sync Google Drive</p>
       <div class="gmail-card">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div class="status-dot" id="driveDot"></div>
+          <div class="sdot" id="driveDot"></div>
           <div>
             <div style="font-size:14px;font-weight:500" id="driveStatusText">Non activé</div>
             <div style="font-size:12px;color:var(--text2)" id="driveLastSync"></div>
           </div>
         </div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px" id="driveDesc">Connecte Google pour activer la sync automatique iPhone ↔ PC.</div>
-        <button class="btn" onclick="driveManualSync()" id="driveSyncBtn" style="width:100%;justify-content:center;display:none;margin-bottom:8px">☁ Forcer la sync</button>
-        <button class="btn" onclick="driveManualLoad()" id="driveLoadBtn" style="width:100%;justify-content:center;display:none">⬇ Récupérer depuis Drive</button>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px" id="driveDesc">Connecte Google pour activer la sync automatique iPhone &harr; PC.</div>
+        <button class="btn" onclick="driveManualSync()" id="driveSyncBtn" style="width:100%;justify-content:center;display:none;margin-bottom:8px">Forcer la sync</button>
+        <button class="btn" onclick="driveManualLoad()" id="driveLoadBtn" style="width:100%;justify-content:center;display:none">Récupérer depuis Drive</button>
       </div>
       <p class="stitle">Comment ça marche</p>
       <div class="card" style="font-size:13px;color:var(--text2);line-height:1.7">
-        TicketDesk lit tes mails <strong style="color:var(--text)">Ticketmaster</strong>, <strong style="color:var(--text)">Fnac Spectacles</strong> et <strong style="color:var(--text)">Stade de France</strong>.<br>
-        <span style="color:var(--yellow)">⚠️</span> Accès lecture seule. Aucun mail modifié.
+        Lecture des mails de confirmation <strong style="color:var(--text)">Ticketmaster</strong>, <strong style="color:var(--text)">Fnac Spectacles</strong> et <strong style="color:var(--text)">Stade de France</strong>. Accès lecture seule, aucun mail modifié.
       </div>
     </div>
 
-    <!-- COSTS -->
     <div class="page" id="page-costs">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <span style="font-size:15px;font-weight:600">Coûts fixes</span>
-        <button class="btn btn-sm" onclick="openCostModal()">＋ Ajouter</button>
+        <button class="btn btn-sm" onclick="openCostModal()">+ Ajouter</button>
       </div>
       <div id="costsList"></div>
       <div id="costsTotal"></div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <!-- MODAL TRANSACTION -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="addModalTitle">Nouvelle transaction</div>
-    <!-- A: Statut -->
     <div class="fgroup">
-      <label class="flabel">A · Statut</label>
+      <label class="flabel">Statut</label>
       <select id="f-statut"><option value="En stock">En stock</option><option value="Vendu">Vendu</option></select>
     </div>
-    <!-- B+C -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">B · Événement *</label><input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off"></div>
-      <div class="fgroup"><label class="flabel">C · Date concert</label><input type="date" id="f-date"></div>
+      <div class="fgroup"><label class="flabel">Événement *</label><input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off"></div>
+      <div class="fgroup"><label class="flabel">Date concert</label><input type="date" id="f-date"></div>
     </div>
-    <!-- D+E -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">D · Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
-      <div class="fgroup"><label class="flabel">E · Placement</label><input type="text" id="f-place" placeholder="Bloc A Rang 5"></div>
+      <div class="fgroup"><label class="flabel">Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
+      <div class="fgroup"><label class="flabel">Placement</label><input type="text" id="f-place" placeholder="Bloc A Rang 5"></div>
     </div>
-    <!-- F+G -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">F · Site d'achat</label><input type="text" id="f-site" placeholder="Ticketmaster, Fnac…"></div>
-      <div class="fgroup"><label class="flabel">G · Compte email</label><input type="email" id="f-compte" placeholder="email@…" autocomplete="off"></div>
+      <div class="fgroup"><label class="flabel">Site d'achat</label><input type="text" id="f-site" placeholder="Ticketmaster, Fnac…"></div>
+      <div class="fgroup"><label class="flabel">Compte email</label><input type="email" id="f-compte" placeholder="email@…" autocomplete="off"></div>
     </div>
-    <!-- H+I -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">H · Mot de passe</label><input type="text" id="f-mdp" autocomplete="new-password" placeholder="••••••"></div>
-      <div class="fgroup"><label class="flabel">I · Quantité</label><input type="number" id="f-qty" min="1" value="1"></div>
+      <div class="fgroup"><label class="flabel">Mot de passe</label><input type="text" id="f-mdp" autocomplete="new-password" placeholder="••••••"></div>
+      <div class="fgroup"><label class="flabel">Quantité</label><input type="number" id="f-qty" min="1" value="1"></div>
     </div>
-    <!-- J+K -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">J · Prix achat total (€)</label><input type="number" id="f-buy" min="0" step="0.01" placeholder="0"></div>
-      <div class="fgroup"><label class="flabel">K · Prix revente total (€)</label><input type="number" id="f-sell" min="0" step="0.01" placeholder="0"></div>
+      <div class="fgroup"><label class="flabel">Prix achat total (€)</label><input type="number" id="f-buy" min="0" step="0.01" placeholder="0"></div>
+      <div class="fgroup"><label class="flabel">Prix revente total (€)</label><input type="number" id="f-sell" min="0" step="0.01" placeholder="0"></div>
     </div>
-    <!-- L+M -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">L · Acheteur</label><input type="text" id="f-buyer" placeholder="Pseudo client"></div>
-      <div class="fgroup"><label class="flabel">M · Plateforme revente</label><input type="text" id="f-platform" placeholder="Discord, Insta…"></div>
+      <div class="fgroup"><label class="flabel">Acheteur</label><input type="text" id="f-buyer" placeholder="Pseudo client"></div>
+      <div class="fgroup"><label class="flabel">Plateforme revente</label><input type="text" id="f-platform" placeholder="Discord, Insta…"></div>
     </div>
-    <!-- P+Q -->
     <div class="frow">
-      <div class="fgroup"><label class="flabel">P · Paiement</label>
+      <div class="fgroup"><label class="flabel">Paiement</label>
         <select id="f-pay"><option value="">—</option><option value="Payé">Payé</option><option value="En attente">En attente</option></select>
       </div>
-      <div class="fgroup"><label class="flabel">Q · Livraison</label>
+      <div class="fgroup"><label class="flabel">Livraison</label>
         <select id="f-livraison"><option value="">—</option><option value="Livré">Livré</option><option value="Non livré">Non livré</option></select>
       </div>
     </div>
-    <!-- R: Prix voulu -->
-    <div class="fgroup"><label class="flabel">R · Prix voulu (€/total invendus)</label><input type="number" id="f-wanted" min="0" step="0.01" placeholder="0"></div>
+    <div class="fgroup"><label class="flabel">Prix voulu (€ total — invendus)</label><input type="number" id="f-wanted" min="0" step="0.01" placeholder="0"></div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('addModal')">Annuler</button>
-      <button class="btn btn-accent" onclick="saveTransaction()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveTransaction()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -358,11 +334,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
     <div class="fgroup"><label class="flabel">Type</label><input type="text" id="fc-type" placeholder="Abonnement, Frais…"></div>
     <div class="frow">
       <div class="fgroup"><label class="flabel">Statut</label><select id="fc-status"><option value="Payé">Payé</option><option value="À payer">À payer</option></select></div>
-      <div class="fgroup"><label class="flabel">Notes</label><input type="text" id="fc-notes" placeholder=""></div>
+      <div class="fgroup"><label class="flabel">Notes</label><input type="text" id="fc-notes"></div>
     </div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('costModal')">Annuler</button>
-      <button class="btn btn-accent" onclick="saveCost()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveCost()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -370,13 +346,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ──
 const GOOGLE_CLIENT_ID = 'VOTRE_CLIENT_ID_ICI';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
 const ALL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'ticketdesk-data.json';
 
-// ── STATE ──
 const TX_KEY   = 'ticketdesk_tx';
 const COST_KEY = 'ticketdesk_costs';
 const GMAIL_KEY= 'ticketdesk_gmail';
@@ -392,7 +366,6 @@ let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
 
-// ── DÉMO ──
 if (!transactions.length) {
   transactions = [
     {id:1,statut:'Vendu',event:'David Guetta',date:'2026-06-13',cat:'Carré Or',place:'Bloc A',site:'Ticketmaster',compte:'monmail@gmail.com',mdp:'pass123',qty:2,buy:200,sell:300,buyer:'user123',platform:'Discord',pay:'Payé',livraison:'Livré',wanted:0},
@@ -413,29 +386,26 @@ if (!costs.length) {
   saveCosts();
 }
 
-// ── SAVE ──
-function saveTx()    { localStorage.setItem(TX_KEY,   JSON.stringify(transactions)); driveSyncDebounced(); }
-function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs));        driveSyncDebounced(); }
+function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); }
+function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs)); driveSyncDebounced(); }
 function driveSyncDebounced() {
   if (!gmailToken) return;
   clearTimeout(_driveTimer);
   _driveTimer = setTimeout(driveSync, 1500);
 }
 
-// ── UTILS ──
 function fmt(n) {
   const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
-  return (n<0?'−':'')+s+' €';
+  return (n<0?'−':n>0?'+':'')+s+' €';
 }
 function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n); }
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 function showToast(msg,type='ok') {
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+type;
-  setTimeout(()=>t.className='toast',2600);
+  setTimeout(()=>t.className='toast',2500);
 }
 
-// ── NAV ──
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tnav').forEach(n=>n.classList.remove('active'));
@@ -450,7 +420,7 @@ function showPage(name) {
   if(name==='costs')     renderCosts();
 }
 
-// ── DASHBOARD ──
+// DASHBOARD
 function renderDashboard() {
   const sold  = transactions.filter(t=>t.statut==='Vendu');
   const stock = transactions.filter(t=>t.statut==='En stock');
@@ -464,8 +434,8 @@ function renderDashboard() {
   document.getElementById('metricsGrid').innerHTML=`
     <div class="metric-card"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}">${fmt(netP)}</div></div>
     <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmt(grossP)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total achats</div><div class="metric-value mv-warn">${fmt(tBuy)}</div></div>
-    <div class="metric-card"><div class="metric-label">Total ventes</div><div class="metric-value mv-accent">${fmt(tSell)}</div></div>
+    <div class="metric-card"><div class="metric-label">Total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
+    <div class="metric-card"><div class="metric-label">Total ventes</div><div class="metric-value mv-hi">${fmtFull(tSell)}</div></div>
     <div class="metric-card"><div class="metric-label">Vendus</div><div class="metric-value mv-pos">${sold.length} lignes</div></div>
     <div class="metric-card"><div class="metric-label">En stock</div><div class="metric-value mv-neg">${sQty} places</div></div>
   `;
@@ -480,28 +450,29 @@ function renderDashboard() {
   if(chartEvents)chartEvents.destroy();
   chartEvents=new Chart(document.getElementById('chartEvents'),{
     type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'#34d399':'#f87171'),borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(63,185,80,.7)':'rgba(248,81,73,.7)'),borderRadius:3,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
       scales:{
-        x:{ticks:{color:'#7878a0',font:{size:10},maxRotation:35,autoSkip:false},grid:{display:false}},
-        y:{ticks:{color:'#7878a0',font:{size:10},callback:v=>fmt(v)},grid:{color:'rgba(124,111,247,0.08)'}}
+        x:{ticks:{color:'#555',font:{size:10},maxRotation:30,autoSkip:false},grid:{display:false}},
+        y:{ticks:{color:'#555',font:{size:10},callback:v=>fmtFull(v)},grid:{color:'rgba(255,255,255,0.04)'}}
       }}
   });
 
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['#34d399','#f87171'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}
+    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['rgba(63,185,80,.7)','rgba(248,81,73,.7)'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
-  document.getElementById('pieCenter').innerHTML=`<span style="font-size:17px;font-weight:700;color:var(--text)">${transactions.length}</span><span style="font-size:10px;color:var(--text2)">total</span>`;
+  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${transactions.length}</span>`;
   document.getElementById('pieLegend').innerHTML=`
-    <div style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#34d399"></span><span style="color:var(--text2)">Vendus — ${sold.length}</span></div>
-    <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="width:9px;height:9px;border-radius:2px;background:#f87171"></span><span style="color:var(--text2)">En stock — ${stock.length} (${sQty} places)</span></div>
+    <div><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(63,185,80,.7);margin-right:6px"></span>Vendus — ${sold.length}</div>
+    <div style="margin-top:2px"><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(248,81,73,.7);margin-right:6px"></span>En stock — ${stock.length} (${sQty} places)</div>
   `;
 }
 
-// ── JOURNAL ──
+// JOURNAL
 function renderJournal() {
   const chips=[{l:'Tous',v:''},{l:'Vendus',v:'Vendu'},{l:'En stock',v:'En stock'}];
   document.getElementById('filterChips').innerHTML=chips.map(c=>
@@ -513,95 +484,95 @@ function renderJournal() {
   list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
 
   if(!list.length){
-    document.getElementById('journalList').innerHTML='<div class="empty"><div class="ei">📋</div>Aucune transaction</div>';
+    document.getElementById('journalList').innerHTML='<div class="empty">Aucune transaction</div>';
     return;
   }
 
   document.getElementById('journalList').innerHTML=list.map(t=>{
-    const profit=t.sell?(t.sell-t.buy):-t.buy;
-    const margin=t.buy&&t.sell?Math.round((t.sell-t.buy)/t.buy*100):null;
-    const isPos=t.sell>0&&profit>=0;
-    const profitColor=isPos?'var(--green)':t.sell?'var(--red)':'var(--text2)';
-    const id='tx-'+t.id;
+    const profit = t.sell ? (t.sell - t.buy) : -t.buy;
+    const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
+    const isPos  = t.sell > 0 && profit >= 0;
+    const pc     = isPos ? 'var(--green)' : t.sell ? 'var(--red)' : 'var(--text2)';
+    const did    = 'td-'+t.id;
 
-    // Ligne résumé : Nom · Date · Cat · Qté
-    const metaParts=[fmtDate(t.date), t.cat||null, t.qty+'x'].filter(Boolean);
-
-    // Détail complet (tous champs, sans lettres)
-    const fields=[
-      {l:'Placement',v:t.place||'—'},
-      {l:'Site achat',v:t.site||'—'},
-      {l:'Compte',v:t.compte||'—'},
-      {l:'Mot de passe',v:t.mdp?'••••••':'—'},
-      {l:'Prix achat',v:t.buy?fmtFull(t.buy):'—'},
-      {l:'Prix revente',v:t.sell?fmtFull(t.sell):'—'},
-      {l:'Acheteur',v:t.buyer||'—'},
-      {l:'Plateforme',v:t.platform||'—'},
-      {l:'Marge',v:margin!==null?(margin>=0?'+':'')+margin+'%':'—'},
-      {l:'Prix voulu',v:t.wanted?fmtFull(t.wanted):'—'},
+    // Colonne gauche (top-down): Placement, Site achat, Compte, Mot de passe, Prix achat, Prix revente
+    const colL = [
+      {l:'Placement',    v: t.place   || '—'},
+      {l:'Site achat',   v: t.site    || '—'},
+      {l:'Compte',       v: t.compte  || '—'},
+      {l:'Mot de passe', v: t.mdp ? '••••••' : '—'},
+      {l:'Prix achat',   v: t.buy  ? fmtFull(t.buy)  : '—'},
+      {l:'Prix revente', v: t.sell ? fmtFull(t.sell) : '—'},
+    ];
+    // Colonne droite: Acheteur, Plateforme, Bénéfice, Marge, Prix voulu, Quantité
+    const colR = [
+      {l:'Acheteur',    v: t.buyer    || '—'},
+      {l:'Plateforme',  v: t.platform || '—'},
+      {l:'Bénéfice',    v: fmt(profit)},
+      {l:'Marge',       v: margin !== null ? (margin>=0?'+':'')+margin+'%' : '—'},
+      {l:'Prix voulu',  v: t.wanted ? fmtFull(t.wanted) : '—'},
+      {l:'Quantité',    v: t.qty+'x'},
     ];
 
+    const maxRows = Math.max(colL.length, colR.length);
+    let rows = '';
+    for(let i=0;i<maxRows;i++){
+      const l = colL[i]||null, r = colR[i]||null;
+      rows += `<div style="display:contents">
+        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val">${l.v}</div>`:''}</div>
+        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val">${r.v}</div>`:''}</div>
+      </div>`;
+    }
+
     return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}">
-      <div class="tx-summary" onclick="toggleDetail('${id}')">
+      <div class="tx-summary" onclick="toggleDetail('${did}')">
         <div class="tx-main">
           <div class="tx-event">${t.event}</div>
-          <div class="tx-meta">${metaParts.join(' · ')}</div>
+          <div class="tx-meta">${fmtDate(t.date)} &nbsp;·&nbsp; ${t.cat||'—'} &nbsp;·&nbsp; ${t.qty}x</div>
         </div>
         <div class="tx-right">
-          <div class="tx-profit" style="color:${profitColor}">${fmt(profit)}</div>
+          <div class="tx-profit" style="color:${pc}">${fmt(profit)}</div>
           <div class="tx-badges">
             <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}">${t.statut}</span>
-            ${t.pay==='Payé'?`<span class="badge b-paye">Payé</span>`:''}
-            ${t.pay==='En attente'?`<span class="badge b-attente">En attente</span>`:''}
-            ${t.livraison==='Livré'?`<span class="badge b-livre">Livré</span>`:''}
-            ${t.livraison==='Non livré'?`<span class="badge b-nonlivre">Non livré</span>`:''}
+            ${t.pay==='Payé'?'<span class="badge b-paye">Payé</span>':''}
+            ${t.pay==='En attente'?'<span class="badge b-attente">En attente</span>':''}
+            ${t.livraison==='Livré'?'<span class="badge b-livre">Livré</span>':''}
+            ${t.livraison==='Non livré'?'<span class="badge b-nonlivre">Non livré</span>':''}
           </div>
         </div>
       </div>
-      <div class="tx-detail" id="${id}">
-        <div class="tx-grid">
-          ${fields.map(f=>`<div class="tx-field">${f.l} <span>${f.v}</span></div>`).join('')}
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-accent btn-sm" onclick="editTransaction(${t.id})">✏️ Modifier</button>
-          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red)" onclick="deleteTransaction(${t.id})">🗑 Supprimer</button>
+      <div class="tx-detail" id="${did}">
+        <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
+        <div class="tx-detail-actions">
+          <button class="btn btn-sm" onclick="editTransaction(${t.id})">Modifier</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function toggleDetail(id) {
-  const el=document.getElementById(id);
-  if(el) el.classList.toggle('open');
-}
-
-function deleteTransaction(id) {
-  if(!confirm('Supprimer cette ligne ?')) return;
+function setFilter(v){filterStatut=v;renderJournal()}
+function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
+function deleteTransaction(id){
+  if(!confirm('Supprimer ?'))return;
   transactions=transactions.filter(t=>t.id!==id);
-  saveTx(); renderJournal(); renderDashboard(); renderWTS();
+  saveTx();renderJournal();renderDashboard();renderWTS();
   showToast('Supprimé');
 }
 
-function setFilter(v){filterStatut=v;renderJournal()}
-
-// ── WTS ──
+// WTS
 function renderWTS(){
   const stock=transactions.filter(t=>t.statut==='En stock')
     .sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
-  if(!stock.length){
-    document.getElementById('wtsPreview').innerHTML='<span style="color:#4a4870">Aucun billet en stock.</span>';
-    return;
-  }
-  let lines=['**WTS**'], lastEv=null, lastDt=null;
+  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<span style="color:var(--text3)">Aucun billet en stock.</span>';return;}
+  let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null}
     const ds=fmtDate(t.date);
     if(ds!==lastDt){lines.push(`**${ds}**`);lastDt=ds}
     const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
-    const ps=price?` - ${price}€ each`:'';
-    const pl=t.place?` (${t.place})`:'';
-    lines.push(`${t.qty}x ${t.cat}${pl}${ps}`);
+    lines.push(`${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' - '+price+'€ each':''}`);
   });
   const raw=lines.join('\n');
   document.getElementById('wtsPreview').innerHTML=lines.map(l=>l.replace(/\*\*(.+?)\*\*/g,'<span class="wts-b">$1</span>')).join('\n');
@@ -612,27 +583,23 @@ function copyWTS(){
   const raw=document.getElementById('wtsPreview').dataset.raw||'';
   if(!raw)return;
   navigator.clipboard.writeText(raw)
-    .then(()=>showToast('✅ Copié ! Colle sur Discord.'))
-    .catch(()=>{
-      const ta=document.createElement('textarea');
-      ta.value=raw;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-      showToast('✅ Copié !');
-    });
+    .then(()=>showToast('Copié — colle sur Discord'))
+    .catch(()=>{const ta=document.createElement('textarea');ta.value=raw;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copié');});
 }
 
-// ── GMAIL OAUTH ──
+// GMAIL
 function renderGmail(){
   if(gmailToken){
     document.getElementById('gmailDot').classList.add('on');
     document.getElementById('gmailStatusText').textContent='Gmail connecté';
     document.getElementById('gmailEmail').textContent=localStorage.getItem('ticketdesk_gmail_email')||'';
-    document.getElementById('gmailConnectBtn').innerHTML='🔄 Reconnecter';
+    document.getElementById('gmailConnectBtn').textContent='Reconnecter';
     document.getElementById('gmailScanRow').style.display='block';
     const ls=localStorage.getItem('ticketdesk_last_sync');
     document.getElementById('driveDot').classList[ls?'add':'remove']('on');
-    document.getElementById('driveStatusText').textContent=ls?'Sync active ☁':'Connecté, première sync en attente';
+    document.getElementById('driveStatusText').textContent=ls?'Sync active':'Connecté, première sync en attente';
     document.getElementById('driveLastSync').textContent=ls?'Dernière sync : '+new Date(ls).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-    document.getElementById('driveDesc').innerHTML='Tes données se sauvegardent <strong style="color:var(--text)">automatiquement</strong> à chaque modification.';
+    document.getElementById('driveDesc').innerHTML='Données sauvegardées automatiquement à chaque modification.';
     document.getElementById('driveSyncBtn').style.display='flex';
     document.getElementById('driveLoadBtn').style.display='flex';
     updateSyncIndicator(ls?'ok':'syncing');
@@ -640,25 +607,23 @@ function renderGmail(){
     document.getElementById('gmailDot').classList.remove('on');
     document.getElementById('gmailStatusText').textContent='Non connecté';
     document.getElementById('gmailEmail').textContent='';
-    document.getElementById('gmailConnectBtn').innerHTML='🔐 Connecter Gmail + Drive';
+    document.getElementById('gmailConnectBtn').textContent='Connecter Gmail + Drive';
     document.getElementById('gmailScanRow').style.display='none';
     document.getElementById('driveDot').classList.remove('on');
     document.getElementById('driveSyncBtn').style.display='none';
     document.getElementById('driveLoadBtn').style.display='none';
   }
-  // Retour OAuth
   const hash=window.location.hash;
   if(hash.includes('access_token')){
     const p=new URLSearchParams(hash.substring(1));
     const token=p.get('access_token');
     if(token){
-      gmailToken=token;
-      localStorage.setItem(GMAIL_KEY,token);
+      gmailToken=token;localStorage.setItem(GMAIL_KEY,token);
       window.location.hash='';
       fetchGmailProfile(token);
       driveLoad().then(loaded=>{
-        if(loaded){showToast('✅ Données récupérées depuis Drive !');renderDashboard();renderJournal();renderWTS();}
-        else{driveSync();showToast('✅ Gmail + Drive connectés !');}
+        if(loaded){showToast('Données récupérées depuis Drive');renderDashboard();renderJournal();renderWTS();}
+        else{driveSync();showToast('Gmail + Drive connectés');}
         renderGmail();
       });
     }
@@ -666,90 +631,41 @@ function renderGmail(){
 }
 
 function gmailConnect(){
-  if(GOOGLE_CLIENT_ID==='VOTRE_CLIENT_ID_ICI'){showToast('⚠️ Configure ton Client ID Google','err');return;}
+  if(GOOGLE_CLIENT_ID==='VOTRE_CLIENT_ID_ICI'){showToast('Configure ton Client ID Google','err');return;}
   window.location.href=`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(ALL_SCOPES)}&prompt=consent`;
 }
-
 async function fetchGmailProfile(token){
-  try{
-    const r=await fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+token}});
-    const d=await r.json();
-    if(d.emailAddress)localStorage.setItem('ticketdesk_gmail_email',d.emailAddress);
-    document.getElementById('gmailEmail').textContent=d.emailAddress||'';
-  }catch(e){}
+  try{const r=await fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+token}});const d=await r.json();if(d.emailAddress)localStorage.setItem('ticketdesk_gmail_email',d.emailAddress);document.getElementById('gmailEmail').textContent=d.emailAddress||'';}catch(e){}
 }
-
-// ── GMAIL SCAN ──
 async function gmailScan(){
-  if(!gmailToken)return;
-  showToast('🔍 Scan en cours…');
-  const queries=[
-    'from:noreply@ticketmaster.fr subject:confirmation',
-    'from:noreply@fnacspectacles.com subject:confirmation',
-    'from:noreply@stadefrance.com subject:confirmation',
-    'from:billets@ticketmaster.fr',
-    'from:confirmation@fnacspectacles.com',
-  ];
+  if(!gmailToken)return;showToast('Scan en cours…');
+  const queries=['from:noreply@ticketmaster.fr subject:confirmation','from:noreply@fnacspectacles.com subject:confirmation','from:noreply@stadefrance.com subject:confirmation','from:billets@ticketmaster.fr'];
   const allMsgs=[];
-  for(const q of queries){
-    try{
-      const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});
-      if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}
-      const d=await r.json();
-      if(d.messages)allMsgs.push(...d.messages);
-    }catch(e){}
-  }
-  if(!allMsgs.length){showToast('Aucun mail de billet trouvé','err');return;}
-  const ids=[...new Set(allMsgs.map(m=>m.id))];
-  importCandidates=[];
-  for(const id of ids.slice(0,15)){
-    try{
-      const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});
-      const msg=await r.json();
-      const parsed=parseTicketMail(msg);
-      if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});
-    }catch(e){}
-  }
+  for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
+  if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
+  const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
+  for(const id of ids.slice(0,15)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
   renderImportResults();
 }
-
 function parseTicketMail(msg){
   try{
-    const hdrs={};
-    msg.payload.headers.forEach(h=>hdrs[h.name.toLowerCase()]=h.value);
-    const subject=hdrs['subject']||'', from=hdrs['from']||'';
-    let body='';
-    function xb(part){if(part.body&&part.body.data)body+=atob(part.body.data.replace(/-/g,'+').replace(/_/g,'/'));if(part.parts)part.parts.forEach(xb);}
-    xb(msg.payload);
+    const hdrs={};msg.payload.headers.forEach(h=>hdrs[h.name.toLowerCase()]=h.value);
+    const subject=hdrs['subject']||'',from=hdrs['from']||'';
+    let body='';function xb(p){if(p.body&&p.body.data)body+=atob(p.body.data.replace(/-/g,'+').replace(/_/g,'/'));if(p.parts)p.parts.forEach(xb);}xb(msg.payload);
     const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:'',mdp:'',buyer:'',platform:'',livraison:''};
-    if(from.includes('ticketmaster'))res.site='Ticketmaster';
-    else if(from.includes('fnac'))res.site='Fnac Spectacles';
-    else if(from.includes('stadefrance'))res.site='Stade de France';
+    if(from.includes('ticketmaster'))res.site='Ticketmaster';else if(from.includes('fnac'))res.site='Fnac Spectacles';else if(from.includes('stadefrance'))res.site='Stade de France';
     const sps=[/vos? billets? (?:pour |[-:]\s*)(.+?)(?:\s*[-|]|\s*le\s|\s*du\s|$)/i,/confirmation[^:]*:\s*(.+?)(?:\s*[-|]|$)/i];
     for(const p of sps){const m=subject.match(p);if(m){res.event=m[1].trim().substring(0,50);break;}}
     if(!res.event)res.event=subject.replace(/re:|fw:|confirmation|billet|commande/gi,'').trim().substring(0,50);
     const months={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12};
     const dps=[/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i,/(\d{2})\/(\d{2})\/(\d{4})/];
-    for(const p of dps){
-      const m=(body+subject).match(p);
-      if(m){
-        if(months[m[2]?.toLowerCase()])res.date=`${m[3]}-${String(months[m[2].toLowerCase()]).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-        else res.date=`${m[3]}-${m[2]}-${m[1]}`;
-        break;
-      }
-    }
-    const pm=(body+subject).match(/(\d[\d\s]*[,.]?\d*)\s*€/);
-    if(pm)res.buy=parseFloat(pm[1].replace(/\s/g,'').replace(',','.'))||0;
-    const qm=(body+subject).match(/(\d+)\s*(?:billet|place|ticket)/i);
-    if(qm)res.qty=parseInt(qm[1])||1;
-    for(const p of ['fosse','carré or','pelouse','cat\\s*\\d','tribune','vip']){
-      const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}
-    }
-    if(!res.event&&!res.date)return null;
-    return res;
+    for(const p of dps){const m=(body+subject).match(p);if(m){if(months[m[2]?.toLowerCase()])res.date=`${m[3]}-${String(months[m[2].toLowerCase()]).padStart(2,'0')}-${m[1].padStart(2,'0')}`;else res.date=`${m[3]}-${m[2]}-${m[1]}`;break;}}
+    const pm=(body+subject).match(/(\d[\d\s]*[,.]?\d*)\s*€/);if(pm)res.buy=parseFloat(pm[1].replace(/\s/g,'').replace(',','.'))||0;
+    const qm=(body+subject).match(/(\d+)\s*(?:billet|place|ticket)/i);if(qm)res.qty=parseInt(qm[1])||1;
+    for(const p of['fosse','carré or','pelouse','cat\\s*\\d','tribune','vip']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}
+    if(!res.event&&!res.date)return null;return res;
   }catch(e){return null;}
 }
-
 function renderImportResults(){
   if(!importCandidates.length){showToast('Aucun billet parsé','err');document.getElementById('importResults').style.display='none';return;}
   document.getElementById('importResults').style.display='block';
@@ -761,36 +677,28 @@ function renderImportResults(){
         <div style="font-size:11px;color:var(--text2)">${c.site} · ${c.date?fmtDate(c.date):'date inconnue'} · ${c.qty}x${c.cat?' · '+c.cat:''} · ${c.buy?fmtFull(c.buy):'prix inconnu'}</div>
       </div>
     </div>`).join('');
-  showToast(`${importCandidates.length} billet(s) détecté(s)`);
+  showToast(importCandidates.length+' billet(s) détecté(s)');
 }
-
 function toggleImport(i){importCandidates[i].checked=!importCandidates[i].checked;renderImportResults();}
-
 function importSelected(){
   const sel=importCandidates.filter(c=>c.checked);
   if(!sel.length){showToast('Aucun billet sélectionné','err');return;}
-  sel.forEach(c=>{
-    if(transactions.find(t=>t.mailId===c.mailId))return;
-    transactions.push({id:Date.now()+Math.random(),...c});
-  });
-  saveTx();
-  document.getElementById('importResults').style.display='none';
-  importCandidates=[];
-  showToast(`✅ ${sel.length} billet(s) importé(s) !`);
-  renderDashboard();
+  sel.forEach(c=>{if(!transactions.find(t=>t.mailId===c.mailId))transactions.push({id:Date.now()+Math.random(),...c});});
+  saveTx();document.getElementById('importResults').style.display='none';importCandidates=[];
+  showToast(sel.length+' billet(s) importé(s)');renderDashboard();
 }
 
-// ── GOOGLE DRIVE ──
+// DRIVE
 async function driveSync(){
   if(!gmailToken||driveSyncing)return;
-  driveSyncing=true; updateSyncIndicator('syncing');
+  driveSyncing=true;updateSyncIndicator('syncing');
   try{
     const payload=JSON.stringify({transactions,costs,updatedAt:new Date().toISOString()});
     if(driveFileId){
       await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
-    } else {
+    }else{
       const meta=await(await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:JSON.stringify({name:DRIVE_FILE_NAME,parents:['appDataFolder']})})).json();
-      driveFileId=meta.id; localStorage.setItem('ticketdesk_drive_fid',driveFileId);
+      driveFileId=meta.id;localStorage.setItem('ticketdesk_drive_fid',driveFileId);
       await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
     }
     localStorage.setItem('ticketdesk_last_sync',new Date().toISOString());
@@ -798,14 +706,12 @@ async function driveSync(){
   }catch(e){updateSyncIndicator('err');}
   driveSyncing=false;
 }
-
 async function driveLoad(){
   if(!gmailToken)return false;
   try{
     const r=await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`,{headers:{Authorization:'Bearer '+gmailToken}});
-    const d=await r.json();
-    if(!d.files||!d.files.length)return false;
-    driveFileId=d.files[0].id; localStorage.setItem('ticketdesk_drive_fid',driveFileId);
+    const d=await r.json();if(!d.files||!d.files.length)return false;
+    driveFileId=d.files[0].id;localStorage.setItem('ticketdesk_drive_fid',driveFileId);
     const c=await(await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:'Bearer '+gmailToken}})).json();
     if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
     if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
@@ -813,55 +719,46 @@ async function driveLoad(){
     return true;
   }catch(e){return false;}
 }
-
-async function driveManualSync(){showToast('☁ Sync…');await driveSync();showToast('✅ Données sauvegardées');renderGmail();}
-async function driveManualLoad(){
-  showToast('⬇ Récupération…');
-  const ok=await driveLoad();
-  if(ok){showToast('✅ Données récupérées !');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}
-  else showToast('Aucune donnée Drive','err');
-}
-
+async function driveManualSync(){showToast('Sync…');await driveSync();showToast('Données sauvegardées');renderGmail();}
+async function driveManualLoad(){showToast('Récupération…');const ok=await driveLoad();if(ok){showToast('Données récupérées');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}else showToast('Aucune donnée Drive','err');}
 function updateSyncIndicator(state){
-  const el=document.getElementById('syncIndicator');
-  if(!el)return;
+  const el=document.getElementById('syncIndicator');if(!el)return;
   const ls=localStorage.getItem('ticketdesk_last_sync');
   const t=ls?new Date(ls).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'—';
-  el.innerHTML=state==='syncing'?`<span style="color:var(--yellow)">⟳</span>`:state==='ok'?`<span style="color:var(--green)">☁ ${t}</span>`:`<span style="color:var(--red)">⚠</span>`;
+  el.textContent=state==='syncing'?'sync…':state==='ok'?'sync '+t:'sync err';
+  el.style.color=state==='ok'?'var(--green)':state==='err'?'var(--red)':'var(--yellow)';
 }
 
-// ── COSTS ──
+// COSTS
 function renderCosts(){
-  if(!costs.length){document.getElementById('costsList').innerHTML='<div class="empty"><div class="ei">💸</div>Aucun coût fixe</div>';document.getElementById('costsTotal').innerHTML='';return;}
+  if(!costs.length){document.getElementById('costsList').innerHTML='<div class="empty">Aucun coût fixe</div>';document.getElementById('costsTotal').innerHTML='';return;}
   document.getElementById('costsList').innerHTML=costs.map(c=>`
-    <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+    <div class="card" style="display:flex;align-items:center;gap:10px;padding:11px 13px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:500">${c.type}</div>
-        <div style="font-size:12px;color:var(--text2)">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
+        <div style="font-size:13px;font-weight:500">${c.type}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:15px;font-weight:600">${fmtFull(c.amount)}</div>
-        <span class="badge ${c.status==='Payé'?'b-paye':'b-apayer'}">${c.status}</span>
+        <div style="font-size:14px;font-weight:600">${fmtFull(c.amount)}</div>
+        <span class="badge ${c.status==='Payé'?'b-paye':'b-attente'}" style="margin-top:3px">${c.status}</span>
       </div>
-      <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
+      <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0">×</button>
     </div>`).join('');
   const total=costs.reduce((s,c)=>s+c.amount,0);
   const paid=costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
   document.getElementById('costsTotal').innerHTML=`
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;border-color:var(--border2)">
-      <span style="color:var(--text2);font-size:13px">Total période</span>
-      <span style="font-size:15px;font-weight:600">${fmtFull(total)} <span style="font-size:12px;color:var(--text2);font-weight:400">(dont ${fmtFull(paid)} payé)</span></span>
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;border-color:var(--border2);padding:11px 13px">
+      <span style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em">Total période</span>
+      <span style="font-size:14px;font-weight:600">${fmtFull(total)} <span style="font-size:11px;color:var(--text2);font-weight:400">dont ${fmtFull(paid)} payé</span></span>
     </div>`;
 }
-
 function deleteCost(id){costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
 
-// ── MODALS ──
-function openAddModal(id) {
+// MODALS
+function openAddModal(id){
   editingId=id||null;
-  const fields=['f-statut','f-event','f-date','f-cat','f-place','f-site','f-compte','f-mdp','f-qty','f-buy','f-sell','f-buyer','f-platform','f-pay','f-livraison','f-wanted'];
   if(id){
-    const t=transactions.find(x=>x.id===id); if(!t)return;
+    const t=transactions.find(x=>x.id===id);if(!t)return;
     document.getElementById('addModalTitle').textContent='Modifier';
     document.getElementById('f-statut').value=t.statut;
     document.getElementById('f-event').value=t.event;
@@ -879,27 +776,23 @@ function openAddModal(id) {
     document.getElementById('f-pay').value=t.pay||'';
     document.getElementById('f-livraison').value=t.livraison||'';
     document.getElementById('f-wanted').value=t.wanted||'';
-  } else {
+  }else{
     document.getElementById('addModalTitle').textContent='Nouvelle transaction';
     ['f-event','f-date','f-cat','f-place','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-statut').value='En stock';
     document.getElementById('f-qty').value=1;
     ['f-buy','f-sell','f-wanted'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('f-pay').value='';
-    document.getElementById('f-livraison').value='';
+    document.getElementById('f-pay').value='';document.getElementById('f-livraison').value='';
   }
   document.getElementById('addModal').classList.add('open');
 }
-
 function editTransaction(id){openAddModal(id);}
-
 function saveTransaction(){
   const ev=document.getElementById('f-event').value.trim();
   if(!ev){showToast("Renseigne l'événement",'err');return;}
   const t={
     id:editingId||Date.now(),
-    statut:document.getElementById('f-statut').value,
-    event:ev,
+    statut:document.getElementById('f-statut').value,event:ev,
     date:document.getElementById('f-date').value,
     cat:document.getElementById('f-cat').value.trim(),
     place:document.getElementById('f-place').value.trim(),
@@ -917,28 +810,19 @@ function saveTransaction(){
   };
   if(editingId){const i=transactions.findIndex(x=>x.id===editingId);if(i!==-1)transactions[i]=t;}
   else transactions.push(t);
-  saveTx();
-  closeModal('addModal');
-  showToast(editingId?'✅ Modifié':'✅ Ajouté');
+  saveTx();closeModal('addModal');showToast(editingId?'Modifié':'Ajouté');
   renderDashboard();renderJournal();renderWTS();
 }
-
 function openCostModal(){document.getElementById('costModal').classList.add('open');}
-
 function saveCost(){
   const type=document.getElementById('fc-type').value.trim();
   if(!type){showToast('Renseigne le type','err');return;}
   costs.push({id:Date.now(),date:document.getElementById('fc-date').value,type,amount:parseFloat(document.getElementById('fc-amount').value)||0,status:document.getElementById('fc-status').value,notes:document.getElementById('fc-notes').value.trim()});
-  saveCosts();closeModal('costModal');showToast('✅ Coût ajouté');renderCosts();renderDashboard();
+  saveCosts();closeModal('costModal');showToast('Coût ajouté');renderCosts();renderDashboard();
 }
-
 function closeModal(id){document.getElementById(id).classList.remove('open');editingId=null;}
+document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
 
-document.querySelectorAll('.modal-overlay').forEach(el=>{
-  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
-});
-
-// ── INIT ──
 renderDashboard();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
