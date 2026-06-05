@@ -371,6 +371,9 @@ let driveFileId     = localStorage.getItem('ticketdesk_drive_fid') || null;
 let driveSyncing    = false;
 let editingId       = null;
 let filterStatut    = '';
+let filterPay       = '';
+let filterLivraison = '';
+let filterSort      = 'event';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
@@ -983,13 +986,14 @@ function renderDashboard() {
   const tSell = sold.reduce((s,t)=>s+t.sell,0);
 
   const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
+  const profitWithStock = transactions.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0);
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="font-size:20px;color:#fff;letter-spacing:.01em;margin-bottom:4px;font-weight:700">Flux financiers</div>
         <div class="metric-card"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
         <div class="metric-card"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
-        <div class="metric-card"><div class="metric-label">Coûts fixes total</div><div class="metric-value">${fmtFull(totalCosts)}</div></div>
+        <div class="metric-card"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${profitWithStock>=0?'mv-pos':'mv-neg'}">${fmtFull(profitWithStock)}</div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="font-size:20px;color:#fff;letter-spacing:.01em;margin-bottom:4px;font-weight:700">Résultat</div>
@@ -1034,14 +1038,61 @@ function renderDashboard() {
 
 // JOURNAL
 function renderJournal() {
-  const chips=[{l:'Tous',v:''},{l:'Vendus',v:'Vendu'},{l:'En stock',v:'En stock'}];
-  document.getElementById('filterChips').innerHTML=chips.map(c=>
-    `<button class="fchip ${filterStatut===c.v?'active':''}" onclick="setFilter('${c.v}')">${c.l}</button>`
-  ).join('');
+  document.getElementById('filterChips').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1;position:relative">
+        <select onchange="setFilter('statut',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
+          <option value="" ${filterStatut===''?'selected':''}>Statut</option>
+          <option value="Vendu" ${filterStatut==='Vendu'?'selected':''}>Vendus</option>
+          <option value="En stock" ${filterStatut==='En stock'?'selected':''}>En stock</option>
+        </select>
+        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+      </div>
+      <div style="flex:1;position:relative">
+        <select onchange="setFilter('pay',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
+          <option value="" ${filterPay===''?'selected':''}>Paiement</option>
+          <option value="Payé" ${filterPay==='Payé'?'selected':''}>Payé</option>
+          <option value="En attente" ${filterPay==='En attente'?'selected':''}>En attente</option>
+        </select>
+        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+      </div>
+      <div style="flex:1;position:relative">
+        <select onchange="setFilter('livraison',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
+          <option value="" ${filterLivraison===''?'selected':''}>Livraison</option>
+          <option value="Livré" ${filterLivraison==='Livré'?'selected':''}>Livré</option>
+          <option value="Non livré" ${filterLivraison==='Non livré'?'selected':''}>Non livré</option>
+        </select>
+        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+      </div>
+      <div style="flex:1;position:relative">
+        <select onchange="setFilter('sort',this.value)" style="width:100%;appearance:none;-webkit-appearance:none;padding-right:28px">
+          <option value="event" ${filterSort==='event'?'selected':''}>A – Z</option>
+          <option value="date" ${filterSort==='date'?'selected':''}>Date</option>
+          <option value="profit" ${filterSort==='profit'?'selected':''}>Bénéfice</option>
+        </select>
+        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:10px">▼</span>
+      </div>
+    </div>
+  `;
 
   let list=[...transactions];
-  if(filterStatut) list=list.filter(t=>t.statut===filterStatut);
-  list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
+  if(filterStatut)    list=list.filter(t=>t.statut===filterStatut);
+  if(filterPay)       list=list.filter(t=>t.pay===filterPay);
+  if(filterLivraison) list=list.filter(t=>t.livraison===filterLivraison);
+  if(filterSort==='date') {
+    list.sort((a,b)=>{
+      const da=a.date||'9999', db=b.date||'9999';
+      return da.localeCompare(db);
+    });
+  } else if(filterSort==='profit') {
+    list.sort((a,b)=>{
+      const pa=a.sell?(a.sell-a.buy):-a.buy;
+      const pb=b.sell?(b.sell-b.buy):-b.buy;
+      return pb-pa;
+    });
+  } else {
+    list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
+  }
 
   if(!list.length){
     document.getElementById('journalList').innerHTML='<div class="empty">Aucune transaction</div>';
@@ -1117,7 +1168,13 @@ function renderJournal() {
   }).join('');
 }
 
-function setFilter(v){filterStatut=v;renderJournal()}
+function setFilter(type,v){
+  if(type==='statut')    filterStatut=v;
+  if(type==='pay')       filterPay=v;
+  if(type==='livraison') filterLivraison=v;
+  if(type==='sort')      filterSort=v;
+  renderJournal();
+}
 function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
 function deleteTransaction(id){
   if(!confirm('Supprimer ?'))return;
