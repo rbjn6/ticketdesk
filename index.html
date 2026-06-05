@@ -85,7 +85,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .mv-pos{color:var(--green)}.mv-neg{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-hi{color:var(--accent)}
 
 /* badges */
-.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:3px;font-size:13px;font-weight:500;letter-spacing:.02em}
 .b-vendu{background:rgba(0,224,0,.1);color:var(--green)}
 .b-stock{background:rgba(255,32,32,.1);color:var(--red)}
 .b-paye{background:rgba(0,224,0,.1);color:var(--green)}
@@ -105,11 +105,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .tx-card.is-stock{border-left:3px solid var(--red)}
 .tx-summary{display:flex;align-items:center;gap:0;padding:12px 14px}
 .tx-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:16px;overflow:hidden}
-.tx-event{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;flex-shrink:0}
+.tx-event{font-size:16px;font-weight:600;color:#fff;white-space:nowrap;flex-shrink:0}
 .tx-info{display:flex;align-items:baseline;gap:14px;overflow:hidden;flex:1}
-.tx-info span{font-size:14px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-info span{font-size:16px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-right{text-align:right;flex-shrink:0;margin-left:16px}
-.tx-profit{font-size:14px;font-weight:700;margin-bottom:4px}
+.tx-profit{font-size:16px;font-weight:700;margin-bottom:5px}
 .tx-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 /* detail */
 .tx-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}
@@ -443,17 +443,17 @@ function renderDashboard() {
   const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="metric-block">
-        <div class="metric-block-title">Flux financiers</div>
-        <div class="metric-row"><span class="metric-row-label">Coût total achats</span><span class="metric-row-val mv-warn">${fmtFull(tBuy)}</span></div>
-        <div class="metric-row"><span class="metric-row-label">Revenu total ventes</span><span class="metric-row-val">${fmtFull(tSell)}</span></div>
-        <div class="metric-row"><span class="metric-row-label">Coûts fixes (total)</span><span class="metric-row-val">${fmtFull(totalCosts)}</span></div>
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Flux financiers</div>
+        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
+        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
+        <div class="metric-card"><div class="metric-label">Coûts fixes total</div><div class="metric-value">${fmtFull(totalCosts)}</div></div>
       </div>
-      <div class="metric-block">
-        <div class="metric-block-title">Résultat</div>
-        <div class="metric-row"><span class="metric-row-label">Bénéfice brut</span><span class="metric-row-val ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</span></div>
-        <div class="metric-row"><span class="metric-row-label">Coûts fixes payés</span><span class="metric-row-val mv-warn">−${fmtFull(paidC)}</span></div>
-        <div class="metric-row metric-row-total"><span class="metric-row-label">Bénéfice net</span><span class="metric-row-val ${netP>=0?'mv-pos':'mv-neg'}">${fmtFull(netP)}</span></div>
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Résultat</div>
+        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
+        <div class="metric-card" style="margin-bottom:8px"><div class="metric-label">Coûts fixes payés</div><div class="metric-value mv-warn">−${fmtFull(paidC)}</div></div>
+        <div class="metric-card" style="border-color:var(--border2)"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}" style="font-size:26px">${fmtFull(netP)}</div></div>
       </div>
     </div>
   `;
@@ -592,13 +592,13 @@ function renderWTS(){
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){
-      if(lastEv!==null) lines.push('');
+      lines.push('');
       lines.push(`**${t.event}**`);
       lastEv=t.event;lastDt=null;
     }
     const ds=fmtDate(t.date);
     if(ds!==lastDt){
-      if(lastDt!==null) lines.push('');
+      lines.push('');
       lines.push(`**${ds}**`);
       lastDt=ds;
     }
