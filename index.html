@@ -190,25 +190,6 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 </style>
 </head>
 <body>
-<div class="login-screen" id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">D</span></div>
-    <div class="login-tagline">Gestionnaire de revente de billets</div>
-    <div class="login-error" id="loginError"></div>
-    <label class="login-field-label">Identifiant</label>
-    <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
-    <label class="login-field-label">Code PIN</label>
-    <input class="login-field" type="password" id="loginPin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Accéder</button>
-    <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
-    <button class="login-google-btn" onclick="gmailConnect()">
-      <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
-      Connecter Gmail + Drive
-    </button>
-    <p class="login-note">Première connexion ? Utilise le bouton Google.<br>Ensuite crée ton identifiant + PIN dans Paramètres.</p>
-  </div>
-</div>
-
 <div class="app">
 
   <div class="topbar">
@@ -1103,5 +1084,24 @@ checkAuth();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">D</span></div>
+    <div class="login-tagline">Gestionnaire de revente de billets</div>
+    <div class="login-error" id="loginError"></div>
+    <label class="login-field-label">Identifiant</label>
+    <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
+    <label class="login-field-label">Code PIN</label>
+    <input class="login-field" type="password" id="loginPin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Accéder</button>
+    <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
+    <button class="login-google-btn" onclick="gmailConnect()">
+      <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
+      Connecter Gmail + Drive
+    </button>
+    <p class="login-note">Première connexion ? Utilise le bouton Google.<br>Ensuite crée ton identifiant + PIN dans Paramètres.</p>
+  </div>
+</div>
+
 </body>
 </html>
