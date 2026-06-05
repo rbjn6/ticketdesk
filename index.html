@@ -216,6 +216,9 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <button class="tnav" onclick="showPage('costs')">
       <span class="tnav-icon">▪</span>Coûts
     </button>
+    <button class="tnav" onclick="showPage('settings')">
+      <span class="tnav-icon">▪</span>Paramètres
+    </button>
   </nav>
 
   <div class="content">
@@ -292,6 +295,24 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
       <p class="stitle">Comment ça marche</p>
       <div class="card" style="font-size:13px;color:var(--text2);line-height:1.7">
         Lecture des mails de confirmation <strong style="color:var(--text)">Ticketmaster</strong>, <strong style="color:var(--text)">Fnac Spectacles</strong> et <strong style="color:var(--text)">Stade de France</strong>. Accès lecture seule, aucun mail modifié.
+      </div>
+    </div>
+
+    <div class="page" id="page-settings">
+      <p class="stitle">Sécurité</p>
+      <div class="card" style="padding:16px">
+        <div id="settings-creds-status" style="font-size:14px;color:var(--text2);margin-bottom:16px"></div>
+        <div class="fgroup"><label class="flabel">Identifiant</label><input type="text" id="s-user" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off"></div>
+        <div class="fgroup"><label class="flabel">Code PIN</label><input type="password" id="s-pin" placeholder="••••" maxlength="6"></div>
+        <div class="fgroup"><label class="flabel">Confirmer le PIN</label><input type="password" id="s-pin2" placeholder="••••" maxlength="6"></div>
+        <div id="settings-error" style="font-size:13px;color:var(--red);margin-bottom:8px;min-height:18px"></div>
+        <button class="btn btn-primary" onclick="_saveSettings()" style="width:100%;justify-content:center">Enregistrer</button>
+      </div>
+      <p class="stitle">Compte Google</p>
+      <div class="card" style="padding:16px">
+        <div style="font-size:14px;color:var(--text2);margin-bottom:12px" id="settings-gmail-info"></div>
+        <button class="btn" onclick="gmailConnect()" style="width:100%;justify-content:center">Reconnecter Gmail + Drive</button>
+        <button class="btn btn-danger" onclick="_logout()" style="width:100%;justify-content:center;margin-top:8px;color:var(--red);border-color:rgba(248,81,73,.3)">Se déconnecter</button>
       </div>
     </div>
 
@@ -488,7 +509,7 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tnav').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const pages=['dashboard','journal','wts','gmail','costs'];
+  const pages=['dashboard','journal','wts','gmail','costs','settings'];
   const idx=pages.indexOf(name);
   if(idx!==-1) document.querySelectorAll('.tnav')[idx].classList.add('active');
   if(name==='dashboard') renderDashboard();
@@ -496,6 +517,7 @@ function showPage(name) {
   if(name==='wts')       renderWTS();
   if(name==='gmail')     renderGmail();
   if(name==='costs')     renderCosts();
+  if(name==='settings')  renderSettings();
 }
 
 // DASHBOARD
@@ -948,6 +970,44 @@ function renderCosts(){
     </div>`;
 }
 function deleteCost(id){costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
+
+function renderSettings(){
+  const creds = getStoredCreds();
+  const el = document.getElementById('settings-creds-status');
+  if(el) el.textContent = creds ? 'Identifiant actuel : ' + creds.user : 'Aucun identifiant défini — crée-en un ci-dessous.';
+  const gi = document.getElementById('settings-gmail-info');
+  if(gi) gi.textContent = gmailToken ? 'Connecté : ' + (localStorage.getItem('ticketdesk_gmail_email')||'') : 'Non connecté';
+  if(creds) {
+    document.getElementById('s-user').value = creds.user;
+  }
+}
+
+function _saveSettings(){
+  const user = document.getElementById('s-user').value.trim().toLowerCase();
+  const pin  = document.getElementById('s-pin').value.trim();
+  const pin2 = document.getElementById('s-pin2').value.trim();
+  const err  = document.getElementById('settings-error');
+  if(!user){err.textContent='Renseigne un identifiant.';return;}
+  if(!pin){err.textContent='Renseigne un PIN.';return;}
+  if(pin !== pin2){err.textContent='Les deux PINs ne correspondent pas.';return;}
+  saveLocalCreds(user, pin);
+  err.textContent='';
+  document.getElementById('s-pin').value='';
+  document.getElementById('s-pin2').value='';
+  showToast('Identifiant + PIN sauvegardés');
+  renderSettings();
+}
+
+function _logout(){
+  if(!confirm('Se déconnecter ? Tu devras reconnecter Gmail au prochain accès.'))return;
+  gmailToken=null;
+  localStorage.removeItem('ticketdesk_gmail');
+  localStorage.removeItem('ticketdesk_gmail_email');
+  localStorage.removeItem('ticketdesk_drive_fid');
+  localStorage.removeItem('ticketdesk_last_sync');
+  sessionStorage.removeItem('td_unlocked');
+  location.reload();
+}
 function toggleCostStatus(id){
   const c=costs.find(x=>x.id===id);
   if(!c)return;
