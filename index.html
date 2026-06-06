@@ -889,13 +889,22 @@ function parseTicketMail(msg){
     else res.site='Stade de France';
 
     // Nom event
-    // TM: "CELINE DION 29 May 2027" → extraire uniquement le nom
-    const evTM = body.match(/([A-Z][A-Z '\-]{3,40?})\s+\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
-    if(evTM) res.event = evTM[1].trim().replace(/\s+/g,' ').substring(0,50);
-    // Fnac: nom en gras avant la date "CÉLINE DION PARIS 2027 Date: ven., 14/05/2027"
-    if(!res.event){const evF=body.match(/([A-ZÀ-ÿ][A-ZÀ-ÿ '0-9\-]{3,50})\s+Date\s*:/i);if(evF)res.event=evF[1].trim().replace(/\s+/g,' ').substring(0,50);}
-    // Fallback sujet Fnac
-    if(!res.event){const m=subject.match(/confirmation de votre commande sur (.+?)(?:,|\s*n[°o]|$)/i);if(m)res.event=m[1].trim().substring(0,50);}
+    // TM: "tail de votre commande CELINE DION 29 May 2027"
+    // → prendre uniquement les mots tout-majuscules juste avant la date
+    let evRaw = body.match(/([A-Z ]{3,60})\s+\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}/i);
+    if(evRaw){
+      const parts = evRaw[1].trim().split(' ');
+      const upper = [];
+      for(let i=parts.length-1;i>=0;i--){
+        if(parts[i].length>1&&parts[i]===parts[i].toUpperCase()) upper.unshift(parts[i]);
+        else break;
+      }
+      if(upper.length>0) res.event = upper.join(' ').substring(0,50);
+    }
+    // Fnac: "CÉLINE DION PARIS 2027 Date :"
+    if(!res.event){const evF=body.match(/([A-ZÀ-ÿ][A-ZÀ-ÿ 0-9]{3,50})\s+Date\s*:/i);if(evF)res.event=evF[1].trim().replace(/\s+/g,' ').substring(0,50);}
+    // Fallback sujet
+    if(!res.event){const m=subject.match(/confirmation de votre commande sur (.+?)(?:,|\s*n[°o]|$)/i);if(m&&!m[1].toLowerCase().includes('fnac'))res.event=m[1].trim().substring(0,50);}
     if(!res.event) res.event=subject.replace(/confirmation|de votre commande|\d{6,}|votre|numéro/gi,'').trim().replace(/\s+/g,' ').substring(0,50);
 
     // Date
