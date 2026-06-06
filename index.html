@@ -856,7 +856,7 @@ async function fetchGmailProfile(token){
 }
 async function gmailScan(){
   if(!gmailToken)return;showToast('Scan en cours…');
-  const queries=['from:noreply@ticketmaster.fr subject:confirmation','from:noreply@fnacspectacles.com subject:confirmation','from:noreply@stadefrance.com subject:confirmation','from:billets@ticketmaster.fr'];
+  const queries=['subject:confirmation+commande','subject:Fnac+Spectacles','subject:Stade+de+France+commande'];
   const allMsgs=[];
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
