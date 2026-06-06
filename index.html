@@ -901,8 +901,8 @@ function parseTicketMail(msg){
       }
       if(upper.length>0) res.event = upper.join(' ').substring(0,50);
     }
-    // Fnac: "CÉLINE DION PARIS 2027 Date :"
-    if(!res.event){const evF=body.match(/([A-ZÀ-ÿ][A-ZÀ-ÿ 0-9]{3,50})\s+Date\s*:/i);if(evF)res.event=evF[1].trim().replace(/\s+/g,' ').substring(0,50);}
+    // Fnac: ancré sur "DÉTAILS DE LA COMMANDE ... Date:"
+    if(!res.event){const evF=body.match(/D\u00C9TAILS DE LA COMMANDE\s+(.+?)\s+Date\s*:/i)||body.match(/([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF 0-9]{3,50})\s+Date\s*:/i);if(evF)res.event=(evF[1]||evF[2]).trim().replace(/\s+/g,' ').substring(0,50);}
     // Fallback sujet
     if(!res.event){const m=subject.match(/confirmation de votre commande sur (.+?)(?:,|\s*n[°o]|$)/i);if(m&&!m[1].toLowerCase().includes('fnac'))res.event=m[1].trim().substring(0,50);}
     if(!res.event) res.event=subject.replace(/confirmation|de votre commande|\d{6,}|votre|numéro/gi,'').trim().replace(/\s+/g,' ').substring(0,50);
