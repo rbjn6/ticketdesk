@@ -868,51 +868,84 @@ function parseTicketMail(msg){
   try{
     const hdrs={};msg.payload.headers.forEach(h=>hdrs[h.name.toLowerCase()]=h.value);
     const subject=hdrs['subject']||'',from=hdrs['from']||'';
+
+    // Filtrer uniquement les mails de billetterie
+    const fromLow=from.toLowerCase(), subjLow=subject.toLowerCase();
+    const isTM = fromLow.includes('ticketmaster') || subjLow.includes('ticketmaster');
+    const isFnac = fromLow.includes('fnac') || subjLow.includes('fnac spectacles');
+    const isSDF = fromLow.includes('stade') || subjLow.includes('stade de france');
+    if(!isTM && !isFnac && !isSDF) return null; // Ignorer les autres mails
+
     // Extraire body HTML et stripper les balises
     let rawBody='';
     function xb(p){try{if(p.body&&p.body.data)rawBody+=atob(p.body.data.replace(/-/g,'+').replace(/_/g,'/'))}catch(e){}if(p.parts)p.parts.forEach(xb);}
     xb(msg.payload);
-    let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+    let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     if(!body) body=msg.snippet||'';
 
     const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:'',mdp:'',buyer:'',platform:'',livraison:''};
+    if(isTM) res.site='Ticketmaster';
+    else if(isFnac) res.site='Fnac Spectacles';
+    else res.site='Stade de France';
 
-    // Site
-    const fromLow=from.toLowerCase(), subjLow=subject.toLowerCase();
-    if(fromLow.includes('ticketmaster')||subjLow.includes('ticketmaster'))res.site='Ticketmaster';
-    else if(fromLow.includes('fnac')||subjLow.includes('fnac'))res.site='Fnac Spectacles';
-    else if(fromLow.includes('stade')||subjLow.includes('stade de france'))res.site='Stade de France';
-
-    // Nom event — format TM: "CELINE DION 29 May"
-    const evM=body.match(/([A-Z][A-Z ]{3,40})\s+\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
-    if(evM) res.event=evM[1].trim().replace(/\s+/g,' ').substring(0,50);
-    // Format Fnac: "Confirmation de votre commande sur X"
-    if(!res.event){const m=subject.match(/confirmation de votre commande sur (.+?)(?:,|\s*n|$)/i);if(m)res.event=m[1].trim().substring(0,50);}
+    // Nom event
+    // TM: "CELINE DION 29 May 2027" → extraire uniquement le nom
+    const evTM = body.match(/([A-Z][A-Z '\-]{3,40?})\s+\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
+    if(evTM) res.event = evTM[1].trim().replace(/\s+/g,' ').substring(0,50);
+    // Fnac: nom en gras avant la date "CÉLINE DION PARIS 2027 Date: ven., 14/05/2027"
+    if(!res.event){const evF=body.match(/([A-ZÀ-ÿ][A-ZÀ-ÿ '0-9\-]{3,50})\s+Date\s*:/i);if(evF)res.event=evF[1].trim().replace(/\s+/g,' ').substring(0,50);}
+    // Fallback sujet Fnac
+    if(!res.event){const m=subject.match(/confirmation de votre commande sur (.+?)(?:,|\s*n[°o]|$)/i);if(m)res.event=m[1].trim().substring(0,50);}
     if(!res.event) res.event=subject.replace(/confirmation|de votre commande|\d{6,}|votre|numéro/gi,'').trim().replace(/\s+/g,' ').substring(0,50);
 
-    // Date — anglais "29 May 2027" et français
-    const mo={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+    // Date
+    const mo={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,ven:null,lun:null,mar:null,mer:null,jeu:null,sam:null,dim:null};
     const dtM=(body+' '+subject).match(/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
-    if(dtM&&mo[dtM[2].toLowerCase()])res.date=dtM[3]+'-'+String(mo[dtM[2].toLowerCase()]).padStart(2,'0')+'-'+dtM[1].padStart(2,'0');
+    if(dtM&&mo[dtM[2].toLowerCase()]!=null)res.date=dtM[3]+'-'+String(mo[dtM[2].toLowerCase()]).padStart(2,'0')+'-'+dtM[1].padStart(2,'0');
+    // Fnac format: "14/05/2027"
     if(!res.date){const d2=(body+' '+subject).match(/(\d{2})\/(\d{2})\/(\d{4})/);if(d2)res.date=d2[3]+'-'+d2[2]+'-'+d2[1];}
 
-    // Prix — "Total de la commande 423.99" ou "carte bancaire : 423.99"
-    const prM=body.match(/Total de la commande\s+([\d]+[.,]\d{2})/i)||body.match(/carte bancaire\s*:\s*([\d]+[.,]\d{2})/i)||(body+subject).match(/([\d]+[.,]\d{2})\s*€/);
-    if(prM)res.buy=parseFloat(prM[1].replace(',','.'))||0;
+    // Prix
+    // TM: "Total de la commande 423.99" / Fnac: "Total incl. T.V.A. 423,99 €"
+    const prM = body.match(/Total(?:\s+incl\.?\s+T\.?V\.?A\.?)?\s+([\d]+[.,]\d{2})\s*€/i)
+              || body.match(/Total de la commande\s+([\d]+[.,]\d{2})/i)
+              || body.match(/carte bancaire\s*:\s*([\d ]+[.,]\d{2})/i);
+    if(prM) res.buy = parseFloat(prM[1].replace(/\s/g,'').replace(',','.'))||0;
 
-    // Quantité
-    const qm=(body+subject).match(/(\d+)\s*(?:billet|place|ticket|article)/i);if(qm)res.qty=parseInt(qm[1])||1;
+    // Quantité — "2 x 210,50 €" ou "2 billets" ou "6 billets"
+    const qm = body.match(/(\d+)\s*x\s*[\d.,]+\s*€/i) || (body+subject).match(/(\d+)\s*(?:billet|place|ticket|article)/i);
+    if(qm) res.qty=parseInt(qm[1])||1;
 
-    // Catégorie — "CATEGORIE 1" ou "TARIF NORMAL CATEGORIE 1"
-    const catM=body.match(/CATEGORIE\s+(\w+)/i);
-    if(catM)res.cat='Cat '+catM[1];
-    if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
+    // Catégorie
+    // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre"
+    // TM: "TARIF NORMAL CATEGORIE 1" → "Cat 1"
+    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)?)/i);
+    const catTM   = body.match(/CATEGORIE\s+(\w+)/i);
+    const catTarif= body.match(/TARIF\s+(?:NORMAL\s+)?(?:CATEGORIE\s+)?(\d+|OR|VIP|FAN\s*CLUB)/i);
+    if(catFnac)     res.cat = 'Cat '+catFnac[1]+' '+catFnac[2].trim();
+    else if(catTM)  res.cat = 'Cat '+catTM[1];
+    else if(catTarif) res.cat = 'Cat '+catTarif[1];
+    if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre','diamant']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
 
-    // Placement — "ALLEE 108 - Rang 26 - Place 16"
-    const plM=body.match(/(?:ALLEE|Allée|BLOC|Bloc)?\s*(\w+)\s*[-–]\s*Rang\s*(\d+)\s*[-–]\s*(?:Place|PLACE)\s*(\d+)/i);
-    if(plM)res.place='Bloc '+plM[1]+', Rang '+plM[2]+', Siège '+plM[3];
+    // Placement — extraire tous les sièges
+    // Fnac: "Bloc PA, Rang 65, Siège 187" + "Bloc PA, Rang 65, Siège 188"
+    const plFAll = [...body.matchAll(/Bloc\s+(\w+)\s*,\s*Rang\s*(\d+)\s*,\s*Si[eè]ge\s*(\d+)/gi)];
+    if(plFAll.length>0){
+      const first=plFAll[0];
+      const sieges=plFAll.map(m=>m[3]).join(',');
+      res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
+    } else {
+      // TM: "ALLEE 108 - Rang 26 - Place 16 - COQUE" + "108 - Rang 26 - Place 17"
+      const plTMAll = [...body.matchAll(/(?:ALLEE\s+)?(\w+)\s*[-–]\s*Rang\s*(\d+)\s*[-–]\s*(?:Place|PLACE)\s*(\d+)/gi)];
+      if(plTMAll.length>0){
+        const first=plTMAll[0];
+        const sieges=plTMAll.map(m=>m[3]).join(',');
+        res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
+      }
+    }
 
-    if(!res.event&&!res.date)return null;
+    // Validation — doit avoir au moins une date ET un prix valide
+    if(!res.date || res.buy<=0) return null;
     return res;
   }catch(e){return null;}
 }
