@@ -911,18 +911,23 @@ function parseTicketMail(msg){
     if(!res.event) res.event=subject.replace(/confirmation|de votre commande|\d{6,}|votre|numéro/gi,'').trim().replace(/\s+/g,' ').substring(0,50);
 
     // Date
-    const mo={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,ven:null,lun:null,mar:null,mer:null,jeu:null,sam:null,dim:null};
+    const mo={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
     const dtM=(body+' '+subject).match(/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
-    if(dtM&&mo[dtM[2].toLowerCase()]!=null)res.date=dtM[3]+'-'+String(mo[dtM[2].toLowerCase()]).padStart(2,'0')+'-'+dtM[1].padStart(2,'0');
-    // Fnac format: "14/05/2027"
-    if(!res.date){const d2=(body+' '+subject).match(/(\d{2})\/(\d{2})\/(\d{4})/);if(d2)res.date=d2[3]+'-'+d2[2]+'-'+d2[1];}
+    if(dtM&&mo[dtM[2].toLowerCase()])res.date=dtM[3]+'-'+String(mo[dtM[2].toLowerCase()]).padStart(2,'0')+'-'+dtM[1].padStart(2,'0');
+    // Fnac: plusieurs dates DD/MM/YYYY → prendre la plus lointaine (date du concert, pas d'achat)
+    if(!res.date){
+      const allDates=[...(body+' '+subject).matchAll(/(\d{2})\/(\d{2})\/(\d{4})/g)];
+      if(allDates.length>0){
+        const sorted=allDates.map(m=>({iso:m[3]+'-'+m[2]+'-'+m[1]})).sort((a,b)=>b.iso.localeCompare(a.iso));
+        res.date=sorted[0].iso;
+      }
+    }
 
-    // Prix
-    // TM: "Total de la commande 423.99" / Fnac: "Total incl. T.V.A. 423,99 €"
-    const prM = body.match(/Total(?:\s+incl\.?\s+T\.?V\.?A\.?)?\s+([\d]+[.,]\d{2})\s*€/i)
-              || body.match(/Total de la commande\s+([\d]+[.,]\d{2})/i)
+    // Prix — TM: "Total de la commande 423.99" / Fnac: "Total de la commande: 423,99 €"
+    const prM = body.match(/Total de la commande\s*:?\s*([\d ]+[.,]\d{2})\s*€/i)
+              || body.match(/Total(?:\s+incl\.?\s+T\.?V\.?A\.?)?\s*:?\s*([\d]+[.,]\d{2})\s*€/i)
               || body.match(/carte bancaire\s*:\s*([\d ]+[.,]\d{2})/i);
-    if(prM) res.buy = parseFloat(prM[1].replace(/\s/g,'').replace(',','.'))||0;
+    if(prM) res.buy = parseFloat((prM[1]||prM[2]||'').replace(/\s/g,'').replace(',','.'))||0;
 
     // Quantité — "2 x 210,50 €" ou "2 billets" ou "6 billets"
     const qm = body.match(/(\d+)\s*x\s*[\d.,]+\s*€/i) || (body+subject).match(/(\d+)\s*(?:billet|place|ticket|article)/i);
