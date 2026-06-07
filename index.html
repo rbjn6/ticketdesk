@@ -872,7 +872,7 @@ function parseTicketMail(msg){
     // Filtrer uniquement les mails de billetterie
     const fromLow=from.toLowerCase(), subjLow=subject.toLowerCase();
     const isTM = fromLow.includes('ticketmaster') || subjLow.includes('ticketmaster');
-    const isFnac = fromLow.includes('fnac') || subjLow.includes('fnac spectacles');
+    const isFnac = fromLow.includes('fnac') || subjLow.includes('fnac spectacles') || subjLow.includes('fnac');
     const isSDF = fromLow.includes('stade') || subjLow.includes('stade de france');
     if(!isTM && !isFnac && !isSDF) return null; // Ignorer les autres mails
 
@@ -883,7 +883,10 @@ function parseTicketMail(msg){
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     if(!body) body=msg.snippet||'';
 
-    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:'',mdp:'',buyer:'',platform:'',livraison:''};
+    // Email destinataire (compte iCloud Hide My Email)
+    const toHeader = hdrs['to']||hdrs['delivered-to']||'';
+    const toEmail = (toHeader.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)||[])[0]||'';
+    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:''};
     if(isTM) res.site='Ticketmaster';
     else if(isFnac) res.site='Fnac Spectacles';
     else res.site='Stade de France';
@@ -928,11 +931,13 @@ function parseTicketMail(msg){
     // Catégorie
     // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre"
     // TM: "TARIF NORMAL CATEGORIE 1" → "Cat 1"
-    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)?)/i);
-    const catTM   = body.match(/CATEGORIE\s+(\w+)/i);
+    // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre Allée"
+    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+((?:[A-Za-zÀ-ÿ]+\s*){1,4})/i);
+    // TM: "TARIF NORMAL CATEGORIE 1 ALLEE 108" → "Cat 1 Allée 108"
+    const catTM   = body.match(/CATEGORIE\s+(\w+)(?:\s+ALLEE\s+(\w+))?/i);
     const catTarif= body.match(/TARIF\s+(?:NORMAL\s+)?(?:CATEGORIE\s+)?(\d+|OR|VIP|FAN\s*CLUB)/i);
-    if(catFnac)     res.cat = 'Cat '+catFnac[1]+' '+catFnac[2].trim();
-    else if(catTM)  res.cat = 'Cat '+catTM[1];
+    if(catFnac)     res.cat = ('Cat '+catFnac[1]+' '+catFnac[2]).trim();
+    else if(catTM)  res.cat = ('Cat '+catTM[1]+(catTM[2]?' Allée '+catTM[2]:'')).trim();
     else if(catTarif) res.cat = 'Cat '+catTarif[1];
     if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre','diamant']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
 
@@ -945,7 +950,7 @@ function parseTicketMail(msg){
       res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
     } else {
       // TM: "ALLEE 108 - Rang 26 - Place 16 - COQUE" + "108 - Rang 26 - Place 17"
-      const plTMAll = [...body.matchAll(/(?:ALLEE\s+)?(\w+)\s*[-–]\s*Rang\s*(\d+)\s*[-–]\s*(?:Place|PLACE)\s*(\d+)/gi)];
+      const plTMAll = [...body.matchAll(/(\d+)\s*[-–]\s*Rang\s*(\d+)\s*[-–]\s*(?:Place|PLACE)\s*(\d+)/gi)];
       if(plTMAll.length>0){
         const first=plTMAll[0];
         const sieges=plTMAll.map(m=>m[3]).join(',');
