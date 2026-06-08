@@ -856,7 +856,7 @@ async function fetchGmailProfile(token){
 }
 async function gmailScan(){
   if(!gmailToken)return;showToast('Scan en cours…');
-  const queries=['subject:confirmation+commande','subject:Fnac+Spectacles','subject:Stade+de+France+commande'];
+  const queries=['subject:confirmation+commande','subject:confirmation+commande+fnac','subject:Stade+de+France+commande'];
   const allMsgs=[];
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
@@ -872,7 +872,7 @@ function parseTicketMail(msg){
     // Filtrer uniquement les mails de billetterie
     const fromLow=from.toLowerCase(), subjLow=subject.toLowerCase();
     const isTM = fromLow.includes('ticketmaster') || subjLow.includes('ticketmaster');
-    const isFnac = fromLow.includes('fnac') || subjLow.includes('fnac spectacles') || subjLow.includes('fnac');
+    const isFnac = fromLow.includes('fnac') || subjLow.includes('fnac') || subjLow.includes('spectacles');
     const isSDF = fromLow.includes('stade') || subjLow.includes('stade de france');
     if(!isTM && !isFnac && !isSDF) return null; // Ignorer les autres mails
 
@@ -882,7 +882,7 @@ function parseTicketMail(msg){
     xb(msg.payload);
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     // Fix broken UTF-8 euro sign encoding
-    body=body.replace(/Ã¢ÂÂ¬|â¬|Â\s*â¬|â‚¬/g,'€').replace(/Â\s*€/g,'€');
+    body=body.replace(/Ã¢ÂÂ¬|â¬|â‚¬/g,'€').replace(/Â\s*/g,'').replace(/Â\s*/g,'').replace(/\s*€/g,' €');
     if(!body) body=msg.snippet||'';
 
     // Email destinataire (compte iCloud Hide My Email)
@@ -904,7 +904,9 @@ function parseTicketMail(msg){
         if(parts[i].length>1&&parts[i]===parts[i].toUpperCase()) upper.unshift(parts[i]);
         else break;
       }
-      if(upper.length>0) res.event = upper.join(' ').substring(0,50);
+      const NOISE = ['COMMANDE','DETAILS','VOTRE','BILLET','ACHAT','TOTAL','RECAPITULATIF','ORDER','CONFIRMATION','RESUME','DETAIL'];
+      const filtered = upper.filter(w => !NOISE.includes(w));
+      if(filtered.length > 0) res.event = filtered.join(' ').substring(0,50);
     }
     // Fnac: ancré sur "DÉTAILS DE LA COMMANDE ... Date:"
     if(!res.event){const evF=body.match(/D\u00C9TAILS DE LA COMMANDE\s+(.+?)\s+Date\s*:/i)||body.match(/([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF 0-9]{3,50})\s+Date\s*:/i);if(evF)res.event=(evF[1]||evF[2]).trim().replace(/\s+/g,' ').substring(0,50);}
@@ -941,11 +943,11 @@ function parseTicketMail(msg){
     // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre Allée"
     const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+((?:[A-Za-zÀ-ÿ]+\s*){1,4})/i);
     // TM: "TARIF NORMAL CATEGORIE 1 ALLEE 108" → "Cat 1 Allée 108"
-    const catTM   = body.match(/CATEGORIE\s+(\w+)(?:\s+ALLEE\s+(\w+))?/i);
-    const catTarif= body.match(/TARIF\s+(?:NORMAL\s+)?(?:CATEGORIE\s+)?(\d+|OR|VIP|FAN\s*CLUB)/i);
+    const catTM   = body.match(/CATEGORIE\s+(\w+)(?:\s+(PARTERRE|TRIBUNE|FOSSE|PELOUSE|ALLEE|CARRÉ|CARRE|OR|VIP))?/i);
+    const catTarif= body.match(/TARIF\s+(?:NORMAL\s+)?(?:CATEGORIE\s+)?(\d+|OR|VIP|FAN\s*CLUB)(?:\s+(PARTERRE|TRIBUNE|FOSSE|PELOUSE|CARRÉ|CARRE))?/i);
     if(catFnac)     res.cat = ('Cat '+catFnac[1]+' '+catFnac[2]).trim();
-    else if(catTM)  res.cat = ('Cat '+catTM[1]+(catTM[2]?' Allée '+catTM[2]:'')).trim();
-    else if(catTarif) res.cat = 'Cat '+catTarif[1];
+    else if(catTM)  res.cat = ('Cat '+catTM[1]+(catTM[2]?' '+catTM[2]:'')).trim();
+    else if(catTarif) res.cat = 'Cat '+catTarif[1]+(catTarif[2]?' '+catTarif[2]:'');
     if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre','diamant']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
 
     // Placement — extraire tous les sièges
