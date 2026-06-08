@@ -92,6 +92,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .b-attente{background:rgba(255,204,0,.1);color:var(--yellow)}
 .b-livre{background:rgba(0,224,0,.1);color:var(--green)}
 .b-nonlivre{background:rgba(255,32,32,.1);color:var(--red)}
+.b-archive{background:rgba(104,104,104,.15);color:var(--text2)}
 
 /* section title */
 .stitle{font-size:20px;color:#fff;letter-spacing:.01em;margin:18px 0 10px;font-weight:700;text-transform:none}
@@ -101,6 +102,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .tx-card:last-child{border-radius:0 0 var(--radius) var(--radius)}
 .tx-card.is-vendu{border-left:6px solid var(--green)}
 .tx-card.is-stock{border-left:6px solid var(--red)}
+.tx-card.is-archive{border-left:6px solid var(--text3)}
 .tx-summary{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1.2fr) 100px 180px;gap:16px;align-items:center;padding:11px 14px}
 .tx-ev-date{display:flex;align-items:baseline;gap:8px;min-width:0;overflow:hidden}
 .tx-event{font-size:20px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -196,7 +198,6 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <span class="topbar-title">TICKETDESK</span>
     <div class="topbar-right">
       <span id="syncIndicator"></span>
-      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
     </div>
   </div>
 
@@ -335,13 +336,17 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <div class="modal-title" id="addModalTitle">Nouvelle transaction</div>
     <div class="fgroup">
       <label class="flabel">Statut</label>
-      <select id="f-statut"><option value="En stock">En stock</option><option value="Vendu">Vendu</option></select>
+      <select id="f-statut"><option value="En stock">En stock</option><option value="Vendu">Vendu</option><option value="Archivé">Archivé</option></select>
     </div>
     <div class="frow">
       <div class="fgroup"><label class="flabel">Événement *</label><input type="text" id="f-event" placeholder="David Guetta…" autocomplete="off"></div>
       <div class="fgroup"><label class="flabel">Date concert</label><input type="date" id="f-date"></div>
     </div>
     <div class="fgroup"><label class="flabel">Catégorie</label><input type="text" id="f-cat" placeholder="Fosse, Carré Or…"></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Lieu</label><input type="text" id="f-lieu" placeholder="Salle / Stade"></div>
+      <div class="fgroup"><label class="flabel">N° commande</label><input type="text" id="f-ordernum" placeholder="N° de commande" autocomplete="off"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" class="fgroup">
       <div><label class="flabel">Bloc</label><input type="text" id="f-bloc" placeholder="A, 113…"></div>
       <div><label class="flabel">Rang</label><input type="text" id="f-rang" placeholder="5, 27…"></div>
@@ -423,8 +428,9 @@ let editingId       = null;
 let filterStatut    = '';
 let filterPay       = '';
 let filterLivraison = '';
-let filterSort      = 'event';
+let filterSort      = 'date';
 let filterSearch    = '';
+let filterBuyer     = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
@@ -468,10 +474,12 @@ function unlockApp() {
   document.getElementById('loginScreen').style.display = 'none';
   if (gmailToken) {
     driveLoad().then(loaded => {
+      autoArchive();
       if (loaded) { renderDashboard(); renderJournal(); renderWTS(); renderCosts(); }
       else { driveSync(); renderDashboard(); }
     });
   } else {
+    autoArchive();
     renderDashboard();
   }
 }
@@ -487,6 +495,23 @@ if (!costs.length) {
 
 function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); }
 function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs)); driveSyncDebounced(); }
+function autoArchive() {
+  const today = new Date().toISOString().substring(0, 10);
+  let changed = false;
+  transactions.forEach(t => {
+    if (t.date && t.date < today && t.statut !== 'Archivé' && t.statut !== 'Vendu') {
+      t.statut = 'Archivé'; changed = true;
+    }
+  });
+  if (changed) saveTx();
+}
+function archiveTransaction(id) {
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  t.statut = 'Archivé';
+  saveTx(); renderJournal(); renderDashboard(); renderWTS();
+  showToast('Archivé');
+}
 function driveSyncDebounced() {
   if (!gmailToken) return;
   clearTimeout(_driveTimer);
@@ -531,14 +556,14 @@ function renderDashboard() {
   const tBuy  = transactions.reduce((s,t)=>s+t.buy,0);
   const tSell = sold.reduce((s,t)=>s+t.sell,0);
 
-  const totalCosts = costs.reduce((s,c)=>s+c.amount,0);
   const profitWithStock = transactions.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0) - paidC;
+  const soldQty = sold.reduce((s,t)=>s+t.qty, 0);
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="font-size:20px;color:#fff;letter-spacing:.01em;margin-bottom:4px;font-weight:700">Flux financiers</div>
         <div class="metric-card"><div class="metric-label">Coût total achats</div><div class="metric-value mv-warn">${fmtFull(tBuy)}</div></div>
-        <div class="metric-card"><div class="metric-label">Revenu total ventes</div><div class="metric-value">${fmtFull(tSell)}</div></div>
+        <div class="metric-card"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
         <div class="metric-card"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${profitWithStock>=0?'mv-pos':'mv-neg'}">${fmtFull(profitWithStock)}</div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -547,6 +572,10 @@ function renderDashboard() {
         <div class="metric-card"><div class="metric-label">Coûts fixes payés</div><div class="metric-value mv-warn">−${fmtFull(paidC)}</div></div>
         <div class="metric-card" style="border-color:var(--border2)"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}" style="font-size:26px">${fmtFull(netP)}</div></div>
       </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="metric-card"><div class="metric-label">Places vendues</div><div class="metric-value mv-pos">${soldQty}</div></div>
+      <div class="metric-card"><div class="metric-label">Places en stock</div><div class="metric-value mv-warn">${sQty}</div></div>
     </div>
   `;
 
@@ -585,18 +614,19 @@ function renderDashboard() {
 // JOURNAL
 function renderFilters() {
   document.getElementById('filterChips').innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:flex-start;margin-bottom:8px">
-      <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-statut" onchange="setFilter('statut',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-statut" onchange="setFilter('statut',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Statut</option>
             <option value="Vendu">Vendus</option>
             <option value="En stock">En stock</option>
+            <option value="Archivé">Archivés</option>
           </select>
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-pay" onchange="setFilter('pay',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-pay" onchange="setFilter('pay',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Paiement</option>
             <option value="Payé">Payé</option>
             <option value="En attente">En attente</option>
@@ -604,7 +634,7 @@ function renderFilters() {
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Livraison</option>
             <option value="Livré">Livré</option>
             <option value="Non livré">Non livré</option>
@@ -612,23 +642,27 @@ function renderFilters() {
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-sort" onchange="setFilter('sort',this.value)" style="width:200px;appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
-            <option value="event">A – Z</option>
+          <select id="sel-sort" onchange="setFilter('sort',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="date">Date</option>
+            <option value="event">A – Z</option>
             <option value="profit">Bénéfice</option>
           </select>
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:14px">
-        <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0"></div>
         <div style="position:relative;flex-shrink:0">
           <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:16px;pointer-events:none">⌕</span>
-          <input id="search-input" type="text" placeholder="Rechercher…"
+          <input id="search-input" type="text" placeholder="Rechercher événement…"
             oninput="setFilter('search',this.value)"
-            style="width:250px;padding:10px 12px 10px 34px;font-size:15px;border-radius:6px">
+            style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:220px">
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:13px;pointer-events:none">👤</span>
+          <input id="buyer-input" type="text" placeholder="Acheteur…"
+            oninput="setFilter('buyer',this.value)"
+            style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
         </div>
       </div>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()" style="flex-shrink:0">+ Ajouter</button>
     </div>
   `;
 }
@@ -638,6 +672,7 @@ function syncFilterUI() {
   const sp = document.getElementById('sel-pay'); if(sp) sp.value = filterPay;
   const sl = document.getElementById('sel-livraison'); if(sl) sl.value = filterLivraison;
   const so = document.getElementById('sel-sort'); if(so) so.value = filterSort;
+  const sb = document.getElementById('buyer-input'); if(sb) sb.value = filterBuyer;
 }
 
 function renderJournal() {
@@ -648,10 +683,13 @@ function renderJournal() {
 
 function renderJournalList() {
   let list=[...transactions];
+  // Masquer les archivés par défaut sauf si explicitement filtré
+  if(!filterStatut) list=list.filter(t=>t.statut!=='Archivé');
   if(filterSearch)    list=list.filter(t=>t.event.toLowerCase().includes(filterSearch.toLowerCase()));
   if(filterStatut)    list=list.filter(t=>t.statut===filterStatut);
   if(filterPay)       list=list.filter(t=>t.pay===filterPay);
   if(filterLivraison) list=list.filter(t=>t.livraison===filterLivraison);
+  if(filterBuyer)     list=list.filter(t=>(t.buyer||'').toLowerCase().includes(filterBuyer.toLowerCase()));
   if(filterSort==='date') {
     list.sort((a,b)=>{
       const da=a.date||'9999', db=b.date||'9999';
@@ -670,7 +708,7 @@ function renderJournalList() {
   // Compteur — toujours visible si filtre actif
   const totalPlaces = list.reduce((s,t)=>s+t.qty, 0);
   const countEl = document.getElementById('journalCount');
-  const hasFilter = filterSearch||filterStatut||filterPay||filterLivraison;
+  const hasFilter = filterSearch||filterStatut||filterPay||filterLivraison||filterBuyer;
   if(countEl) {
     if(hasFilter) {
       const events = [...new Set(list.map(t=>t.event))];
@@ -701,8 +739,9 @@ function renderJournalList() {
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
-    // Colonne gauche (top-down): Placement, Site achat, Compte, Mot de passe, Prix achat, Prix revente
+    // Colonne gauche: Lieu, Placement, Site achat, Compte, Mot de passe, Prix achat, Prix revente
     const colL = [
+      {l:'Lieu',         v: t.lieu    || '—'},
       {l:'Placement',    v: t.place   || '—'},
       {l:'Site achat',   v: t.site    || '—'},
       {l:'Compte',       v: t.compte  || '—'},
@@ -710,8 +749,9 @@ function renderJournalList() {
       {l:'Prix achat',   v: t.buy  ? fmtFull(t.buy)  : '—'},
       {l:'Prix revente', v: t.sell ? fmtFull(t.sell) : '—'},
     ];
-    // Colonne droite: Acheteur, Plateforme, Bénéfice, Marge, Prix voulu, Quantité
+    // Colonne droite: N° commande, Acheteur, Plateforme, Bénéfice, Marge, Prix voulu, Quantité
     const colR = [
+      {l:'N° commande',  v: t.ordernum || '—'},
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit)},
@@ -730,10 +770,13 @@ function renderJournalList() {
       </div>`;
     }
 
-    return `<div class="tx-card is-${t.statut==='Vendu'?'vendu':'stock'}">
+    const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':'stock';
+    const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':'b-stock';
+    const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':'Stock';
+    return `<div class="tx-card is-${cardClass}">
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <div class="tx-ev-date">
-          <span class="badge ${t.statut==='Vendu'?'b-vendu':'b-stock'}" style="font-size:13px;padding:3px 9px;flex-shrink:0">${t.statut==='Vendu'?'Vendu':'Stock'}</span>
+          <span class="badge ${badgeClass}" style="font-size:13px;padding:3px 9px;flex-shrink:0">${badgeLabel}</span>
           <span class="tx-event">${t.event}</span>
           <span class="tx-date">${fmtDate(t.date)}</span>
         </div>
@@ -751,6 +794,7 @@ function renderJournalList() {
         <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
         <div class="tx-detail-actions">
           <button class="btn btn-sm" onclick="editTransaction(${t.id})">Modifier</button>
+          ${t.statut!=='Archivé'?`<button class="btn btn-sm" onclick="archiveTransaction(${t.id})">Archiver</button>`:''}
           <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
@@ -764,13 +808,15 @@ function setFilter(type,v){
   if(type==='livraison') filterLivraison=v;
   if(type==='sort')      filterSort=v;
   if(type==='search')    filterSearch=v;
+  if(type==='buyer')     filterBuyer=v;
   syncFilterUI();
   renderJournalList();
 }
 function resetFilters(){
-  filterStatut='';filterPay='';filterLivraison='';filterSearch='';filterSort='event';
+  filterStatut='';filterPay='';filterLivraison='';filterSearch='';filterSort='date';filterBuyer='';
   syncFilterUI();
   const si = document.getElementById('search-input'); if(si) si.value='';
+  const bi = document.getElementById('buyer-input'); if(bi) bi.value='';
   renderJournalList();
 }
 function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
@@ -1057,7 +1103,7 @@ async function driveLoad(){
   }catch(e){return false;}
 }
 async function driveManualSync(){showToast('Sync…');await driveSync();showToast('Données sauvegardées');renderGmail();}
-async function driveManualLoad(){showToast('Récupération…');const ok=await driveLoad();if(ok){showToast('Données récupérées');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}else showToast('Aucune donnée Drive','err');}
+async function driveManualLoad(){showToast('Récupération…');const ok=await driveLoad();if(ok){autoArchive();showToast('Données récupérées');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}else showToast('Aucune donnée Drive','err');}
 function updateSyncIndicator(state){
   const el=document.getElementById('syncIndicator');if(!el)return;
   const ls=localStorage.getItem('ticketdesk_last_sync');
@@ -1146,6 +1192,8 @@ function openAddModal(id){
     document.getElementById('f-event').value=t.event;
     document.getElementById('f-date').value=t.date;
     document.getElementById('f-cat').value=t.cat;
+    document.getElementById('f-lieu').value=t.lieu||'';
+    document.getElementById('f-ordernum').value=t.ordernum||'';
     // Split place "Bloc X, Rang Y, Siège Z" back into fields
     const placeParts = (t.place||'').split(',').map(s=>s.trim());
     document.getElementById('f-bloc').value = (placeParts[0]||'').replace(/bloc\s*/i,'').trim();
@@ -1164,7 +1212,7 @@ function openAddModal(id){
     document.getElementById('f-wanted').value=t.wanted||'';
   }else{
     document.getElementById('addModalTitle').textContent='Nouvelle transaction';
-    ['f-event','f-date','f-cat','f-bloc','f-rang','f-siege','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
+    ['f-event','f-date','f-cat','f-lieu','f-ordernum','f-bloc','f-rang','f-siege','f-site','f-compte','f-mdp','f-buyer','f-platform'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-statut').value='En stock';
     document.getElementById('f-qty').value=1;
     ['f-buy','f-sell','f-wanted'].forEach(f=>document.getElementById(f).value='');
@@ -1181,6 +1229,8 @@ function saveTransaction(){
     statut:document.getElementById('f-statut').value,event:ev,
     date:document.getElementById('f-date').value,
     cat:document.getElementById('f-cat').value.trim(),
+    lieu:document.getElementById('f-lieu').value.trim(),
+    ordernum:document.getElementById('f-ordernum').value.trim(),
     place:(()=>{
       const b=document.getElementById('f-bloc').value.trim();
       const r=document.getElementById('f-rang').value.trim();
