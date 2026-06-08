@@ -881,6 +881,8 @@ function parseTicketMail(msg){
     function xb(p){try{if(p.body&&p.body.data)rawBody+=atob(p.body.data.replace(/-/g,'+').replace(/_/g,'/'))}catch(e){}if(p.parts)p.parts.forEach(xb);}
     xb(msg.payload);
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+    // Fix broken UTF-8 euro sign encoding
+    body=body.replace(/Ã¢ÂÂ¬|â¬|Â\s*â¬|â‚¬/g,'€').replace(/Â\s*€/g,'€');
     if(!body) body=msg.snippet||'';
 
     // Email destinataire (compte iCloud Hide My Email)
