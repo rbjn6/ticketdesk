@@ -898,6 +898,8 @@ function parseTicketMail(msg){
     rawBody=decodeQP(rawBody);
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     if(!body) body=msg.snippet||'';
+    const billetIdx = body.indexOf('billets');
+    if(billetIdx > -1) console.log('BILLET ZONE:', JSON.stringify(body.substring(billetIdx-5, billetIdx+200)));
 
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
