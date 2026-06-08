@@ -861,7 +861,7 @@ async function gmailScan(){
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
-  for(const id of ids.slice(0,15)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);console.log('MAIL ID:', id);console.log('SUBJECT:', msg.payload.headers.find(h=>h.name.toLowerCase()==='subject')?.value);console.log('FROM:', msg.payload.headers.find(h=>h.name.toLowerCase()==='from')?.value);console.log('PARSED:', parsed);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
+  for(const id of ids.slice(0,15)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
   renderImportResults();
 }
 function parseTicketMail(msg){
@@ -892,11 +892,12 @@ function parseTicketMail(msg){
       if(p.parts)p.parts.forEach(xb);
     }
     xb(msg.payload);
+    function decodeQP(str){
+      return str.replace(/=\r?\n/g,'').replace(/=([0-9A-F]{2})/gi,(m,h)=>String.fromCharCode(parseInt(h,16)));
+    }
+    rawBody=decodeQP(rawBody);
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     if(!body) body=msg.snippet||'';
-    console.log('BODY SAMPLE:', body.substring(0,500));
-    console.log('isFnac:', isFnac, 'isTM:', isTM);
-    console.log('prix match:', body.match(/Total de la commande\s*:?\s*([\d ]+[.,]\d{2})\s*€/i));
 
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
@@ -940,27 +941,25 @@ function parseTicketMail(msg){
       }
     }
 
-    // Prix — TM: "Total de la commande 423.99" / Fnac: "Total de la commande: 423,99 €"
-    const prM = body.match(/Total de la commande\s*:?\s*([\d ]+[.,]\d{2})\s*€/i)
-              || body.match(/Total(?:\s+incl\.?\s+T\.?V\.?A\.?)?\s*:?\s*([\d]+[.,]\d{2})\s*€/i)
-              || body.match(/carte bancaire\s*:\s*([\d ]+[.,]\d{2})/i);
+    // Prix — TM: "carte bancaire : 1199.99 €" / Fnac: "Total de la commande: 423,99 €"
+    const prM = body.match(/carte bancaire\s*:\s*([\d\s]+[.,]\d{2})\s*€/i)
+              || body.match(/Total de la commande\s*:?\s*([\d ]+[.,]\d{2})\s*€/i)
+              || body.match(/Total(?:\s+incl\.?\s+T\.?V\.?A\.?)?\s*:?\s*([\d]+[.,]\d{2})\s*€/i);
     if(prM) res.buy = parseFloat((prM[1]||prM[2]||'').replace(/\s/g,'').replace(',','.'))||0;
 
-    // Quantité — "2 x 210,50 €" ou "2 billets" ou "6 billets"
-    const qm = body.match(/(\d+)\s*x\s*[\d.,]+\s*€/i) || (body+subject).match(/(\d+)\s*(?:billet|place|ticket|article)/i);
+    // Quantité — "2 x 210,50 €" ou "2 × 210,50 €" ou "2 billets"
+    const qm = body.match(/(\d+)\s*[x×]\s*[\d.,]+\s*€/i) || body.match(/(\d+)\s*(?:billet|place|ticket|article)/i);
     if(qm) res.qty=parseInt(qm[1])||1;
 
     // Catégorie
-    // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre"
-    // TM: "TARIF NORMAL CATEGORIE 1" → "Cat 1"
-    // Fnac: "Catégorie 1 Parterre Allée PARTERRE" → "Cat 1 Parterre Allée"
-    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+((?:[A-Za-zÀ-ÿ]+\s*){1,4})/i);
-    // TM: "TARIF NORMAL CATEGORIE 1 ALLEE 108" → "Cat 1 Allée 108"
-    const catTM   = body.match(/CATEGORIE\s+(\w+)(?:\s+(PARTERRE|TRIBUNE|FOSSE|PELOUSE|ALLEE|CARRÉ|CARRE|OR|VIP))?/i);
-    const catTarif= body.match(/TARIF\s+(?:NORMAL\s+)?(?:CATEGORIE\s+)?(\d+|OR|VIP|FAN\s*CLUB)(?:\s+(PARTERRE|TRIBUNE|FOSSE|PELOUSE|CARRÉ|CARRE))?/i);
-    if(catFnac)     res.cat = ('Cat '+catFnac[1]+' '+catFnac[2]).trim();
-    else if(catTM)  res.cat = ('Cat '+catTM[1]+(catTM[2]?' '+catTM[2]:'')).trim();
-    else if(catTarif) res.cat = 'Cat '+catTarif[1]+(catTarif[2]?' '+catTarif[2]:'');
+    // Fnac: "Catégorie 1 Parterre Allée PARTERRE, Prévente" → "Cat 1 Parterre"
+    // TM: "TARIF FAN CLUB" + "CATEGORIE 1" sur lignes séparées
+    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)\s+((?:[A-Za-zÀ-ÿ]+\s*){1,2})(?:All[eé]e\s+\w+)?/i);
+    const numCat  = body.match(/CATEGORIE\s+(\d+)/i);
+    const zoneCat = body.match(/TARIF\s+(FAN\s*CLUB|NORMAL|VIP|OR)/i);
+    const zonePl  = body.match(/(PARTERRE|TRIBUNE|FOSSE|PELOUSE|DIAMANT|CARRE\s*OR|CARRÉ\s*OR)/i);
+    if(catFnac)                res.cat = ('Cat '+catFnac[1]+' '+catFnac[2]).trim();
+    else if(numCat||zoneCat)   res.cat = ('Cat '+(numCat?numCat[1]:'')+(zoneCat?' '+zoneCat[1]:'')+(zonePl?' '+zonePl[1]:'')).trim();
     if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre','diamant']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
 
     // Placement — extraire tous les sièges
@@ -979,6 +978,13 @@ function parseTicketMail(msg){
         res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
       }
     }
+
+    // Normaliser le nom d'événement — Title Case sans accents
+    function normalizeEvent(s){
+      return s.replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/œ/g,'oe')
+        .toLowerCase().replace(/(?:^|\s)\S/g,c=>c.toUpperCase()).trim();
+    }
+    if(res.event) res.event = normalizeEvent(res.event);
 
     // Validation — doit avoir au moins une date ET un prix valide
     if(!res.date || res.buy<=0) return null;
