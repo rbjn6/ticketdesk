@@ -948,7 +948,7 @@ function parseTicketMail(msg){
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
     const toEmail = (toHeader.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)||[])[0]||'';
-    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:''};
+    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:'',orderNum:''};
     if(isTM) res.site='Ticketmaster';
     else if(isFnac) res.site='Fnac Spectacles';
     else res.site='Stade de France';
@@ -1043,6 +1043,12 @@ function parseTicketMail(msg){
     }
     if(res.event) res.event = normalizeEvent(res.event);
     if(res.cat)   res.cat   = normalizeEvent(res.cat);
+
+    // Numéro de commande
+    const tmOrder = subject.match(/commande\s+(\d{6,})/i) || body.match(/r[eé]f[eé]rence\s+n[°o]?\s*(\d{6,})/i);
+    if(tmOrder) res.orderNum = tmOrder[1];
+    const fnacOrder = body.match(/Num[eé]ro de transaction\s*:\s*(\d{6,})/i);
+    if(fnacOrder) res.orderNum = fnacOrder[1];
 
     // Validation — doit avoir au moins une date ET un prix valide
     if(!res.date || res.buy<=0) return null;
@@ -1193,7 +1199,7 @@ function openAddModal(id){
     document.getElementById('f-date').value=t.date;
     document.getElementById('f-cat').value=t.cat;
     document.getElementById('f-lieu').value=t.lieu||'';
-    document.getElementById('f-ordernum').value=t.ordernum||'';
+    document.getElementById('f-ordernum').value=t.ordernum||t.orderNum||'';
     // Split place "Bloc X, Rang Y, Siège Z" back into fields
     const placeParts = (t.place||'').split(',').map(s=>s.trim());
     document.getElementById('f-bloc').value = (placeParts[0]||'').replace(/bloc\s*/i,'').trim();
