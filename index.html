@@ -898,6 +898,8 @@ function parseTicketMail(msg){
     rawBody=decodeQP(rawBody);
     let body=rawBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
     if(!body) body=msg.snippet||'';
+    const fnacIdx = body.indexOf('article');
+    if(fnacIdx > -1 && isFnac) console.log('FNAC ZONE:', JSON.stringify(body.substring(fnacIdx+50, fnacIdx+400)));
 
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
