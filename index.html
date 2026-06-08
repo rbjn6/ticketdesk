@@ -861,7 +861,7 @@ async function gmailScan(){
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=20`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
-  for(const id of ids.slice(0,15)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
+  for(const id of ids.slice(0,15)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);console.log('MAIL ID:', id);console.log('SUBJECT:', msg.payload.headers.find(h=>h.name.toLowerCase()==='subject')?.value);console.log('FROM:', msg.payload.headers.find(h=>h.name.toLowerCase()==='from')?.value);console.log('PARSED:', parsed);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
   renderImportResults();
 }
 function parseTicketMail(msg){
@@ -884,6 +884,9 @@ function parseTicketMail(msg){
     // Fix broken UTF-8 euro sign encoding
     body=body.replace(/Ã¢ÂÂ¬|â¬|â‚¬/g,'€').replace(/Â\s*/g,'').replace(/Â\s*/g,'').replace(/\s*€/g,' €');
     if(!body) body=msg.snippet||'';
+    console.log('BODY SAMPLE:', body.substring(0,500));
+    console.log('isFnac:', isFnac, 'isTM:', isTM);
+    console.log('prix match:', body.match(/Total de la commande\s*:?\s*([\d ]+[.,]\d{2})\s*€/i));
 
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
