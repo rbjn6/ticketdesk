@@ -952,12 +952,12 @@ function parseTicketMail(msg){
     if(qm) res.qty=parseInt(qm[1])||1;
 
     // Catégorie
-    // Fnac: "Catégorie 1 Parterre Allée PARTERRE, Prévente" → "Cat 1 Parterre"
-    const catFnac = body.match(/Cat[eé]gorie\s+(\d+)/i);
+    // Fnac: "Catégorie X DESCRIPTION, Prévente" ou "Catégorie X DESCRIPTION, Normal"
+    const catFnac = isFnac && body.match(/Cat[eé]gorie\s+(.+?),\s*(?:Pr[eé]vente|Normal)/i);
     // TM: extraire depuis la zone "N billets ... Placement"
     const catBloc = body.match(/\d+\s+billets?\s+([\s\S]+?)(?:\s+(?:[A-Z0-9]{1,3}|[A-Z])\s+-\s+Rang|\s+Placement)/i);
     if(catFnac) {
-      res.cat = 'Cat ' + catFnac[1];
+      res.cat = catFnac[1].trim();
     } else if(catBloc && isTM) {
       let cat = catBloc[1].trim();
       cat = cat.replace(/^TARIF\s+(?:NORMAL|FAN\s*CLUB|VIP|\w+)\s*/i, '').trim();
