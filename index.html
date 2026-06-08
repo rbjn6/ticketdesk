@@ -973,8 +973,7 @@ function parseTicketMail(msg){
 
     // Placement — extraire tous les sièges
     // Fnac: tronquer avant les URLs de calendrier pour éviter les doublons encodés
-    const bodyForSeats = isFnac ? body.split(/https?:\/\/|Ajouter au calendrier/i)[0] : body;
-    if(isFnac) console.log('FNAC SEATS ZONE:', JSON.stringify(bodyForSeats.substring(bodyForSeats.indexOf('Bloc')-20, bodyForSeats.indexOf('Bloc')+100)));
+    const bodyForSeats = isFnac ? (body.split(/Ajouter au calendrier/i)[0] || body) : body;
     // Fnac: "Bloc PA, Rang 65, Siège 187" + "Bloc PA, Rang 65, Siège 188"
     const plFAll = [...bodyForSeats.matchAll(/Bloc\s+(\w+)\s*,\s*Rang\s*(\d+)\s*,\s*Si[eè]ge\s*(\d+)/gi)];
     if(plFAll.length>0){
