@@ -957,7 +957,7 @@ function parseTicketMail(msg){
     // TM: extraire depuis la zone "N billets ... Placement"
     const catBloc = body.match(/\d+\s+billets?\s+([\s\S]+?)(?:\s+(?:[A-Z0-9]{1,3}|[A-Z])\s+-\s+Rang|\s+Placement)/i);
     if(catFnac) {
-      res.cat = catFnac[1].trim();
+      res.cat = ('Catégorie ' + catFnac[1].trim()).replace(/^Catégorie\s+Catégorie/i, 'Catégorie');
     } else if(catBloc && isTM) {
       let cat = catBloc[1].trim();
       cat = cat.replace(/^TARIF\s+(?:NORMAL|FAN\s*CLUB|VIP|\w+)\s*/i, '').trim();
@@ -972,8 +972,10 @@ function parseTicketMail(msg){
     if(!res.cat){for(const p of['fosse','carré or','pelouse','tribune','vip','parterre','diamant']){const m=body.match(new RegExp(p,'i'));if(m){res.cat=m[0].trim();break;}}}
 
     // Placement — extraire tous les sièges
+    // Fnac: tronquer avant les URLs de calendrier pour éviter les doublons encodés
+    const bodyForSeats = isFnac ? body.split(/https?:\/\/|Ajouter au calendrier/i)[0] : body;
     // Fnac: "Bloc PA, Rang 65, Siège 187" + "Bloc PA, Rang 65, Siège 188"
-    const plFAll = [...body.matchAll(/Bloc\s+(\w+)\s*,\s*Rang\s*(\d+)\s*,\s*Si[eè]ge\s*(\d+)/gi)];
+    const plFAll = [...bodyForSeats.matchAll(/Bloc\s+(\w+)\s*,\s*Rang\s*(\d+)\s*,\s*Si[eè]ge\s*(\d+)/gi)];
     if(plFAll.length>0){
       const first=plFAll[0];
       const sieges=plFAll.map(m=>m[3]).join(',');
