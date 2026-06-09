@@ -751,7 +751,7 @@ function renderJournalList() {
     ];
     // Colonne droite: N° commande, Acheteur, Plateforme, Bénéfice, Marge, Prix voulu, Quantité
     const colR = [
-      {l:'N° commande',  v: t.ordernum || '—'},
+      {l:'N° commande',  v: t.ordernum || t.orderNum || '—'},
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit)},
