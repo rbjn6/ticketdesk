@@ -523,7 +523,7 @@ function autoArchive() {
   const today = new Date().toISOString().substring(0, 10);
   let changed = false;
   transactions.forEach(t => {
-    if (t.date && t.date < today && t.statut !== 'Archivé' && t.statut !== 'Vendu') {
+    if (t.date && t.date < today && t.statut !== 'Archivé') {
       t.statut = 'Archivé'; changed = true;
     }
   });
@@ -535,6 +535,13 @@ function archiveTransaction(id) {
   t.statut = 'Archivé';
   saveTx(); renderJournal(); renderDashboard(); renderWTS();
   showToast('Archivé');
+}
+function unarchiveTransaction(id) {
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  t.statut = 'En stock';
+  saveTx(); renderJournal(); renderDashboard(); renderWTS();
+  showToast('Désarchivé');
 }
 
 let sellingId = null;
@@ -932,8 +939,10 @@ function renderJournalList() {
         <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
         <div class="tx-detail-actions">
           <button class="btn btn-sm" onclick="editTransaction(${t.id})">Modifier</button>
-          ${t.statut==='En stock'?`<button class="btn btn-sm btn-primary" onclick="openSellModal(${t.id})">Vendre</button>`:''}
-          ${t.statut!=='Archivé'?`<button class="btn btn-sm" onclick="archiveTransaction(${t.id})">Archiver</button>`:''}
+          ${t.statut==='Archivé'
+            ? `<button class="btn btn-sm" onclick="unarchiveTransaction(${t.id})">Désarchiver</button>`
+            : `${t.statut==='En stock'?`<button class="btn btn-sm btn-primary" onclick="openSellModal(${t.id})">Vendre</button>`:''}
+               <button class="btn btn-sm" onclick="archiveTransaction(${t.id})">Archiver</button>`}
           <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
