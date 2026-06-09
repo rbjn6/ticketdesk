@@ -538,25 +538,31 @@ function archiveTransaction(id) {
 }
 
 let sellingId = null;
+let sellMode  = 'qty'; // 'seats' | 'qty'
 function openSellModal(id) {
   sellingId = id;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
-  // Parse individual seats from place field
-  const seatMatch = (t.place||'').match(/Si[eè]ge\s+([\d,]+)/i);
-  const seats = seatMatch ? seatMatch[1].split(',').map(s=>s.trim()).filter(Boolean) : [];
-  document.getElementById('sellModalSeats').innerHTML = seats.length > 1 ? `
+  const seatMatch = (t.place||'').match(/Si[eè]ge\s*[\d,\s]+/i);
+  const seats = seatMatch ? seatMatch[0].replace(/Si[eè]ge\s*/i,'').split(',').map(s=>s.trim()).filter(Boolean) : [];
+  sellMode = seatMatch ? 'seats' : 'qty';
+  document.getElementById('sellModalSeats').innerHTML = sellMode === 'seats' ? `
     <div class="fgroup">
       <label class="flabel">Sièges vendus (cochez les sièges concernés)</label>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
         ${seats.map((s,i)=>`
-          <div style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border2)">
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border2)">
             <input type="checkbox" id="seat-${i}" class="sell-seat-cb" value="${s}" checked
               style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
             <label for="seat-${i}" style="font-size:14px;cursor:pointer;margin:0;padding:0;color:var(--text)">Siège ${s}</label>
           </div>`).join('')}
       </div>
-    </div>` : '';
+    </div>` : `
+    <div class="fgroup">
+      <label class="flabel">Quantité vendue (sur ${t.qty} disponible${t.qty>1?'s':''})</label>
+      <input type="number" id="sm-qty-sell" min="1" max="${t.qty}" value="${t.qty}"
+        style="width:100px">
+    </div>`;
   document.getElementById('sm-buyer').value = '';
   document.getElementById('sm-platform').value = '';
   document.getElementById('sm-sell').value = '';
@@ -573,29 +579,35 @@ function confirmSale() {
   const paid     = document.getElementById('sm-pay').checked;
   const delivered= document.getElementById('sm-livraison').checked;
 
-  // Parse place
-  const placePrefix = (t.place||'').replace(/,?\s*Si[eè]ge\s+[\d,]+$/i,'').trim();
-  const seatMatch   = (t.place||'').match(/Si[eè]ge\s+([\d,]+)/i);
-  const allSeats    = seatMatch ? seatMatch[1].split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const unitBuy = (t.buy || 0) / (t.qty || 1);
 
-  // Determine sold/remaining seats
-  const cbs = document.querySelectorAll('.sell-seat-cb:checked');
-  const soldSeats = allSeats.length > 1 ? Array.from(cbs).map(cb=>cb.value) : allSeats;
-  const remSeats  = allSeats.filter(s=>!soldSeats.includes(s));
+  let soldQty, remQty, soldPlace, remPlace;
 
-  const soldQty = allSeats.length > 0 ? soldSeats.length : t.qty;
-  const remQty  = allSeats.length > 0 ? remSeats.length  : 0;
-  if (soldQty === 0) { showToast('Sélectionne au moins un siège','err'); return; }
-
-  const unitBuy = t.buy / t.qty;
-  const buildPlace = seats => (placePrefix ? placePrefix + (seats.length?', ':'') : '') + (seats.length ? 'Siège '+seats.join(',') : '');
+  if (sellMode === 'seats') {
+    const placePrefix = (t.place||'').replace(/,?\s*Si[eè]ge\s+[\d,]+$/i,'').trim();
+    const seatMatch   = (t.place||'').match(/Si[eè]ge\s+([\d,]+)/i);
+    const allSeats    = seatMatch ? seatMatch[1].split(',').map(s=>s.trim()).filter(Boolean) : [];
+    const soldSeats   = Array.from(document.querySelectorAll('.sell-seat-cb:checked')).map(cb=>cb.value);
+    const remSeats    = allSeats.filter(s=>!soldSeats.includes(s));
+    if (soldSeats.length === 0) { showToast('Sélectionne au moins un siège','err'); return; }
+    const buildPlace = seats => (placePrefix ? placePrefix + (seats.length?', ':'') : '') + (seats.length ? 'Siège '+seats.join(',') : '');
+    soldQty   = soldSeats.length;
+    remQty    = remSeats.length;
+    soldPlace = buildPlace(soldSeats);
+    remPlace  = buildPlace(remSeats);
+  } else {
+    soldQty   = Math.max(1, Math.min(parseInt(document.getElementById('sm-qty-sell').value)||1, t.qty));
+    remQty    = t.qty - soldQty;
+    soldPlace = t.place || '';
+    remPlace  = t.place || '';
+  }
 
   // Sold ticket
   const soldTicket = {
     ...t,
     id: Date.now() + Math.random(),
     qty: soldQty,
-    place: allSeats.length > 0 ? buildPlace(soldSeats) : t.place,
+    place: soldPlace,
     buy: Math.round(unitBuy * soldQty * 100) / 100,
     sell: sellPrice,
     statut: 'Vendu',
@@ -607,13 +619,12 @@ function confirmSale() {
   transactions = transactions.filter(x => x.id !== sellingId);
   transactions.push(soldTicket);
 
-  // Remaining ticket (only if seats left)
   if (remQty > 0) {
     transactions.push({
       ...t,
       id: Date.now() + Math.random(),
       qty: remQty,
-      place: buildPlace(remSeats),
+      place: remPlace,
       buy: Math.round(unitBuy * remQty * 100) / 100,
       sell: 0, buyer: '', platform: '', pay: '', livraison: '',
       statut: 'En stock',
