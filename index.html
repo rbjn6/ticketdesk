@@ -416,10 +416,10 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <div class="fgroup"><label class="flabel">Prix de vente (€)</label><input type="number" id="sm-sell" min="0" step="0.01" placeholder="0"></div>
     <div class="frow" style="margin-bottom:11px;align-items:center">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--text)">
-        <input type="checkbox" id="sm-pay" style="width:auto;margin:0"> Payé
+        <input type="checkbox" id="sm-pay" style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0"> Payé
       </label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--text)">
-        <input type="checkbox" id="sm-livraison" style="width:auto;margin:0"> Livré
+        <input type="checkbox" id="sm-livraison" style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0"> Livré
       </label>
     </div>
     <div class="form-actions">
@@ -549,11 +549,12 @@ function openSellModal(id) {
     <div class="fgroup">
       <label class="flabel">Sièges vendus (cochez les sièges concernés)</label>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
-        ${seats.map(s=>`
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border2)">
-            <input type="checkbox" class="sell-seat-cb" value="${s}" checked style="width:auto;margin:0">
-            <span style="font-size:14px">Siège ${s}</span>
-          </label>`).join('')}
+        ${seats.map((s,i)=>`
+          <div style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border2)">
+            <input type="checkbox" id="seat-${i}" class="sell-seat-cb" value="${s}" checked
+              style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
+            <label for="seat-${i}" style="font-size:14px;cursor:pointer;margin:0;padding:0;color:var(--text)">Siège ${s}</label>
+          </div>`).join('')}
       </div>
     </div>` : '';
   document.getElementById('sm-buyer').value = '';
