@@ -662,7 +662,10 @@ function renderFilters() {
             style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
         </div>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="openAddModal()" style="flex-shrink:0">+ Ajouter</button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAllTransactions()" style="font-size:13px">🗑️ Tout supprimer</button>
+      </div>
     </div>
   `;
 }
@@ -825,6 +828,12 @@ function deleteTransaction(id){
   transactions=transactions.filter(t=>t.id!==id);
   saveTx();renderJournal();renderDashboard();renderWTS();
   showToast('Supprimé');
+}
+function deleteAllTransactions(){
+  if(!confirm('Supprimer TOUTES les transactions ? Cette action est irréversible.'))return;
+  transactions=[];
+  saveTx();renderJournal();renderDashboard();renderWTS();
+  showToast('Toutes les transactions supprimées');
 }
 
 // WTS
