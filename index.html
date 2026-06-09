@@ -562,6 +562,7 @@ function openSellModal(id) {
       <label class="flabel">Quantité vendue (sur ${t.qty} disponible${t.qty>1?'s':''})</label>
       <input type="number" id="sm-qty-sell" min="1" max="${t.qty}" value="${t.qty}"
         style="width:100px">
+      <span id="sm-qty-sell-err" style="display:none;color:var(--danger,#e55);font-size:13px;margin-top:4px;display:none"></span>
     </div>`;
   document.getElementById('sm-buyer').value = '';
   document.getElementById('sm-platform').value = '';
@@ -596,7 +597,15 @@ function confirmSale() {
     soldPlace = buildPlace(soldSeats);
     remPlace  = buildPlace(remSeats);
   } else {
-    soldQty   = Math.max(1, Math.min(parseInt(document.getElementById('sm-qty-sell').value)||1, t.qty));
+    const qtyInput = document.getElementById('sm-qty-sell');
+    const qtyErr   = document.getElementById('sm-qty-sell-err');
+    const rawVal   = parseInt(qtyInput.value);
+    if (!rawVal || rawVal < 1 || rawVal > t.qty) {
+      if (qtyErr) { qtyErr.style.display = 'block'; qtyErr.textContent = `Quantité invalide. Maximum ${t.qty} place${t.qty>1?'s':''} disponible${t.qty>1?'s':''}.`; }
+      return;
+    }
+    if (qtyErr) qtyErr.style.display = 'none';
+    soldQty   = rawVal;
     remQty    = t.qty - soldQty;
     soldPlace = t.place || '';
     remPlace  = t.place || '';
