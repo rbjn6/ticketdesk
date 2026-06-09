@@ -350,7 +350,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" class="fgroup">
       <div><label class="flabel">Bloc</label><input type="text" id="f-bloc" placeholder="A, 113…"></div>
       <div><label class="flabel">Rang</label><input type="text" id="f-rang" placeholder="5, 27…"></div>
-      <div><label class="flabel">Siège</label><input type="text" id="f-siege" placeholder="12, 13…"></div>
+      <div><label class="flabel">Siège</label><textarea id="f-siege" placeholder="12, 13…" rows="2" style="resize:vertical;line-height:1.4"></textarea></div>
     </div>
     <div class="frow">
       <div class="fgroup"><label class="flabel">Site d'achat</label><input type="text" id="f-site" placeholder="Ticketmaster, Fnac…"></div>
@@ -1033,14 +1033,14 @@ function parseTicketMail(msg){
     const plFAll = [...bodyForSeats.matchAll(/Bloc\s+(\w+)\s*,\s*Rang\s*(\d+)\s*,\s*Si[eè]ge\s*(\d+)/gi)];
     if(plFAll.length>0){
       const first=plFAll[0];
-      const sieges=plFAll.map(m=>m[3]).join(',');
+      const sieges=plFAll.map(m=>m[3]).sort((a,b)=>parseInt(a)-parseInt(b)).join(',');
       res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
     } else {
       // TM: "ALLEE 108 - Rang 26 - Place 16 - COQUE" + "108 - Rang 26 - Place 17"
       const plTMAll = [...body.matchAll(/(\d+)\s*[-–]\s*Rang\s*(\d+)\s*[-–]\s*(?:Place|PLACE)\s*(\d+)/gi)];
       if(plTMAll.length>0){
         const first=plTMAll[0];
-        const sieges=plTMAll.map(m=>m[3]).join(',');
+        const sieges=plTMAll.map(m=>m[3]).sort((a,b)=>parseInt(a)-parseInt(b)).join(',');
         res.place='Bloc '+first[1]+', Rang '+first[2]+', Siège '+sieges;
       }
     }
