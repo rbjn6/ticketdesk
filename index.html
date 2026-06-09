@@ -1209,11 +1209,10 @@ function openAddModal(id){
     document.getElementById('f-cat').value=t.cat;
     document.getElementById('f-lieu').value=t.lieu||'';
     document.getElementById('f-ordernum').value=t.ordernum||t.orderNum||'';
-    // Split place "Bloc X, Rang Y, Siège Z" back into fields
-    const placeParts = (t.place||'').split(',').map(s=>s.trim());
-    document.getElementById('f-bloc').value = (placeParts[0]||'').replace(/bloc\s*/i,'').trim();
-    document.getElementById('f-rang').value = (placeParts[1]||'').replace(/rang\s*/i,'').trim();
-    document.getElementById('f-siege').value= (placeParts[2]||'').replace(/si[eè]ge\s*/i,'').trim();
+    const _pl = t.place||'';
+    document.getElementById('f-bloc').value  = (_pl.match(/Bloc\s+(\S+)/i)||[])[1]||'';
+    document.getElementById('f-rang').value  = (_pl.match(/Rang\s+(\d+)/i)||[])[1]||'';
+    document.getElementById('f-siege').value = (_pl.match(/Si[eè]ge\s+(.+)/i)||[])[1]||'';
     document.getElementById('f-site').value=t.site||'';
     document.getElementById('f-compte').value=t.compte||'';
     document.getElementById('f-mdp').value=t.mdp||'';
