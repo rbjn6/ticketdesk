@@ -182,6 +182,16 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 
 .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
 .chart-wrap{position:relative;width:100%;height:180px}
+/* dashboard filter chips */
+.dash-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.dash-chip{padding:5px 13px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.dash-chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+/* preorder cards */
+.po-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.po-status{display:inline-flex;align-items:center;padding:3px 9px;border-radius:3px;font-size:12px;font-weight:500}
+.po-recherche{background:rgba(77,159,255,.1);color:var(--accent)}
+.po-trouve{background:rgba(0,224,0,.1);color:var(--green)}
+.po-annule{background:rgba(104,104,104,.15);color:var(--text2)}
 .metric-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px}
 .metric-block-title{font-size:14px;color:#fff;letter-spacing:.03em;margin-bottom:10px;font-weight:500}
 .metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
@@ -208,6 +218,9 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <button class="tnav" onclick="showPage('journal')">
       <span class="tnav-icon">▪</span>Journal
     </button>
+    <button class="tnav" onclick="showPage('preorders')">
+      <span class="tnav-icon">▪</span>Précommande
+    </button>
     <button class="tnav" onclick="showPage('wts')">
       <span class="tnav-icon">▪</span>WTS
     </button>
@@ -225,6 +238,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
   <div class="content">
 
     <div class="page active" id="page-dashboard">
+      <div id="dashFilters"></div>
       <div id="metricsGrid"></div>
       <p class="stitle">Bénéfice par événement</p>
       <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
@@ -249,6 +263,14 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
         <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;text-align:right">Payé · Livraison</span>
       </div>
       <div id="journalList"></div>
+    </div>
+
+    <div class="page" id="page-preorders">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:15px;font-weight:600">Précommandes</span>
+        <button class="btn btn-sm btn-primary" onclick="openPreorderModal()">+ Ajouter</button>
+      </div>
+      <div id="preordersList"></div>
     </div>
 
     <div class="page" id="page-wts">
@@ -429,6 +451,38 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
   </div>
 </div>
 
+<!-- MODAL PRÉCOMMANDE -->
+<div class="modal-overlay" id="preorderModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="preorderModalTitle">Nouvelle précommande</div>
+    <div class="fgroup"><label class="flabel">Statut</label>
+      <select id="po-statut">
+        <option value="En recherche">En recherche</option>
+        <option value="Trouvé">Trouvé</option>
+        <option value="Annulé">Annulé</option>
+      </select>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Événement *</label><input type="text" id="po-event" placeholder="Nom du concert…" autocomplete="off"></div>
+      <div class="fgroup"><label class="flabel">Date</label><input type="date" id="po-date"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Lieu</label><input type="text" id="po-lieu" placeholder="Salle / Stade"></div>
+      <div class="fgroup"><label class="flabel">Budget max (€)</label><input type="number" id="po-budget" min="0" step="0.01" placeholder="0"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Acheteur</label><input type="text" id="po-buyer" placeholder="Pseudo"></div>
+      <div class="fgroup"><label class="flabel">Plateforme</label><input type="text" id="po-platform" placeholder="Discord, Insta…"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">Notes</label><textarea id="po-notes" rows="2" style="resize:none"></textarea></div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal('preorderModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="savePreorder()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -439,22 +493,30 @@ const REDIRECT_URI = window.location.origin + window.location.pathname;
 const ALL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'ticketdesk-data.json';
 
-const TX_KEY   = 'ticketdesk_tx';
-const COST_KEY = 'ticketdesk_costs';
-const GMAIL_KEY= 'ticketdesk_gmail';
+const TX_KEY       = 'ticketdesk_tx';
+const COST_KEY     = 'ticketdesk_costs';
+const GMAIL_KEY    = 'ticketdesk_gmail';
+const PREORDER_KEY = 'ticketdesk_preorders';
 
-let transactions    = JSON.parse(localStorage.getItem(TX_KEY)   || '[]');
-let costs           = JSON.parse(localStorage.getItem(COST_KEY) || '[]');
+let transactions    = JSON.parse(localStorage.getItem(TX_KEY)        || '[]');
+let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
+let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let driveFileId     = localStorage.getItem('ticketdesk_drive_fid') || null;
 let driveSyncing    = false;
 let editingId       = null;
+let editingPreorderId = null;
 let filterStatut    = '';
 let filterPay       = '';
 let filterLivraison = '';
 let filterSort      = 'date';
 let filterSearch    = '';
 let filterBuyer     = '';
+let dashPeriod      = 'all';
+let dashDateFrom    = '';
+let dashDateTo      = '';
+let dashEventFilter = '';
+let dashBuyerFilter = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
 let _driveTimer     = null;
@@ -542,6 +604,87 @@ function unarchiveTransaction(id) {
   t.statut = 'En stock';
   saveTx(); renderJournal(); renderDashboard(); renderWTS();
   showToast('Désarchivé');
+}
+
+// PRÉCOMMANDES
+function savePreorders() {
+  localStorage.setItem(PREORDER_KEY, JSON.stringify(preorders));
+  driveSyncDebounced();
+}
+function renderPreorders() {
+  const el = document.getElementById('preordersList');
+  if (!el) return;
+  if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
+  el.innerHTML = preorders.map(p => {
+    const sc = p.statut === 'Trouvé' ? 'po-trouve' : p.statut === 'Annulé' ? 'po-annule' : 'po-recherche';
+    return `
+    <div class="po-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:6px">${p.event||'—'}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <span class="po-status ${sc}">${p.statut||'En recherche'}</span>
+            ${p.date?`<span style="font-size:13px;color:var(--accent)">${fmtDate(p.date)}</span>`:''}
+            ${p.lieu?`<span style="font-size:13px;color:var(--text2)">${p.lieu}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm" onclick="openPreorderModal(${p.id})">Modifier</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePreorder(${p.id})">Supprimer</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--text2)">
+        ${p.budget?`<span>Budget : <strong style="color:var(--text)">${fmtFull(p.budget)}</strong></span>`:''}
+        ${p.buyer?`<span>Acheteur : <strong style="color:var(--text)">${p.buyer}</strong></span>`:''}
+        ${p.platform?`<span>Plateforme : <strong style="color:var(--text)">${p.platform}</strong></span>`:''}
+        ${p.notes?`<div style="width:100%;margin-top:4px;font-style:italic">${p.notes}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openPreorderModal(id) {
+  editingPreorderId = id || null;
+  const p = id ? preorders.find(x => x.id === id) : null;
+  document.getElementById('preorderModalTitle').textContent = p ? 'Modifier précommande' : 'Nouvelle précommande';
+  document.getElementById('po-event').value    = p ? (p.event    || '') : '';
+  document.getElementById('po-date').value     = p ? (p.date     || '') : '';
+  document.getElementById('po-lieu').value     = p ? (p.lieu     || '') : '';
+  document.getElementById('po-budget').value   = p ? (p.budget   || '') : '';
+  document.getElementById('po-buyer').value    = p ? (p.buyer    || '') : '';
+  document.getElementById('po-platform').value = p ? (p.platform || '') : '';
+  document.getElementById('po-notes').value    = p ? (p.notes    || '') : '';
+  document.getElementById('po-statut').value   = p ? (p.statut   || 'En recherche') : 'En recherche';
+  document.getElementById('preorderModal').classList.add('open');
+}
+function savePreorder() {
+  const event = document.getElementById('po-event').value.trim();
+  if (!event) { showToast('Événement obligatoire', 'err'); return; }
+  const data = {
+    event,
+    date:     document.getElementById('po-date').value,
+    lieu:     document.getElementById('po-lieu').value.trim(),
+    budget:   parseFloat(document.getElementById('po-budget').value) || 0,
+    buyer:    document.getElementById('po-buyer').value.trim(),
+    platform: document.getElementById('po-platform').value.trim(),
+    notes:    document.getElementById('po-notes').value.trim(),
+    statut:   document.getElementById('po-statut').value,
+  };
+  if (editingPreorderId) {
+    const idx = preorders.findIndex(x => x.id === editingPreorderId);
+    if (idx !== -1) preorders[idx] = { ...preorders[idx], ...data };
+  } else {
+    preorders.push({ id: Date.now() + Math.random(), ...data });
+  }
+  savePreorders();
+  closeModal('preorderModal');
+  renderPreorders();
+  showToast(editingPreorderId ? 'Précommande modifiée' : 'Précommande ajoutée');
+}
+function deletePreorder(id) {
+  preorders = preorders.filter(x => x.id !== id);
+  savePreorders();
+  renderPreorders();
+  showToast('Supprimé');
 }
 
 let sellingId = null;
@@ -676,11 +819,12 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tnav').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const pages=['dashboard','journal','wts','gmail','costs','settings'];
+  const pages=['dashboard','journal','preorders','wts','gmail','costs','settings'];
   const idx=pages.indexOf(name);
   if(idx!==-1) document.querySelectorAll('.tnav')[idx].classList.add('active');
   if(name==='dashboard') renderDashboard();
   if(name==='journal')   renderJournal();
+  if(name==='preorders') renderPreorders();
   if(name==='wts')       renderWTS();
   if(name==='gmail')     renderGmail();
   if(name==='costs')     renderCosts();
@@ -688,18 +832,110 @@ function showPage(name) {
 }
 
 // DASHBOARD
+function filterDashTx() {
+  const today = new Date().toISOString().substring(0, 10);
+  const now   = new Date();
+  let from = '', to = '';
+  if (dashPeriod === 'today') {
+    from = to = today;
+  } else if (dashPeriod === 'week') {
+    const d = new Date(now);
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1);
+    from = d.toISOString().substring(0, 10);
+    const d2 = new Date(d); d2.setDate(d.getDate() + 6);
+    to = d2.toISOString().substring(0, 10);
+  } else if (dashPeriod === 'month') {
+    from = today.substring(0, 7) + '-01';
+    to   = today.substring(0, 7) + '-31';
+  } else if (dashPeriod === 'year') {
+    from = today.substring(0, 4) + '-01-01';
+    to   = today.substring(0, 4) + '-12-31';
+  } else if (dashPeriod === 'custom') {
+    from = dashDateFrom;
+    to   = dashDateTo;
+  }
+  let list = [...transactions];
+  if (from) list = list.filter(t => t.date && t.date >= from);
+  if (to)   list = list.filter(t => t.date && t.date <= to);
+  if (dashEventFilter) list = list.filter(t => (t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase()));
+  if (dashBuyerFilter) list = list.filter(t => (t.buyer||'').toLowerCase().includes(dashBuyerFilter.toLowerCase()));
+  return list;
+}
+
+function renderDashFilters() {
+  const el = document.getElementById('dashFilters');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="margin-bottom:12px">
+      <div class="dash-chips">
+        ${[['all','Tout'],['today',"Auj."],['week','Semaine'],['month','Mois'],['year','Année']].map(([v,l])=>
+          `<button class="dash-chip${dashPeriod===v?' active':''}" onclick="setDashFilter('period','${v}')">${l}</button>`
+        ).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <div class="flabel" style="margin-bottom:4px">Du</div>
+          <input type="date" value="${dashDateFrom}" onchange="setDashFilter('from',this.value)" style="padding:7px 10px;font-size:13px">
+        </div>
+        <div style="flex:1;min-width:120px">
+          <div class="flabel" style="margin-bottom:4px">Au</div>
+          <input type="date" value="${dashDateTo}" onchange="setDashFilter('to',this.value)" style="padding:7px 10px;font-size:13px">
+        </div>
+        <div style="flex:2;min-width:160px">
+          <div class="flabel" style="margin-bottom:4px">Événement</div>
+          <div style="position:relative">
+            <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:15px;pointer-events:none">⌕</span>
+            <input type="text" placeholder="Filtrer…" value="${dashEventFilter}"
+              oninput="setDashFilter('event',this.value)" style="padding:7px 10px 7px 28px;font-size:13px">
+          </div>
+        </div>
+        <div style="flex:1;min-width:130px">
+          <div class="flabel" style="margin-bottom:4px">Acheteur</div>
+          <input type="text" placeholder="Filtrer…" value="${dashBuyerFilter}"
+            oninput="setDashFilter('buyer',this.value)" style="padding:7px 10px;font-size:13px">
+        </div>
+      </div>
+    </div>`;
+}
+
+function setDashFilter(type, val) {
+  if (type === 'period') {
+    dashPeriod = val; dashDateFrom = ''; dashDateTo = '';
+    renderDashFilters(); renderDashMetrics();
+  } else if (type === 'from') {
+    dashDateFrom = val; dashPeriod = 'custom';
+    document.querySelectorAll('#dashFilters .dash-chip').forEach(c => c.classList.remove('active'));
+    renderDashMetrics();
+  } else if (type === 'to') {
+    dashDateTo = val; dashPeriod = 'custom';
+    document.querySelectorAll('#dashFilters .dash-chip').forEach(c => c.classList.remove('active'));
+    renderDashMetrics();
+  } else if (type === 'event') {
+    dashEventFilter = val; renderDashMetrics();
+  } else if (type === 'buyer') {
+    dashBuyerFilter = val; renderDashMetrics();
+  }
+}
+
 function renderDashboard() {
-  const sold  = transactions.filter(t=>t.statut==='Vendu');
-  const stock = transactions.filter(t=>t.statut==='En stock');
+  renderDashFilters();
+  renderDashMetrics();
+}
+
+function renderDashMetrics() {
+  const tx    = filterDashTx();
+  const sold  = tx.filter(t=>t.statut==='Vendu');
+  const stock = tx.filter(t=>t.statut==='En stock');
   const grossP= sold.reduce((s,t)=>s+(t.sell-t.buy),0);
   const paidC = costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
   const netP  = grossP-paidC;
   const sQty  = stock.reduce((s,t)=>s+t.qty,0);
-  const tBuy  = transactions.reduce((s,t)=>s+t.buy,0);
+  const tBuy  = tx.reduce((s,t)=>s+t.buy,0);
   const tSell = sold.reduce((s,t)=>s+t.sell,0);
-
-  const profitWithStock = transactions.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0) - paidC;
+  const profitWithStock = tx.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0) - paidC;
   const soldQty = sold.reduce((s,t)=>s+t.qty, 0);
+
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -722,7 +958,7 @@ function renderDashboard() {
   `;
 
   const evMap={};
-  transactions.forEach(t=>{
+  tx.forEach(t=>{
     if(!evMap[t.event])evMap[t.event]=0;
     evMap[t.event]+=t.statut==='Vendu'?(t.sell-t.buy):-t.buy;
   });
@@ -746,7 +982,7 @@ function renderDashboard() {
     data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['rgba(0,224,0,.75)','rgba(255,32,32,.75)'],borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
-  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${transactions.length}</span>`;
+  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${tx.length}</span>`;
   document.getElementById('pieLegend').innerHTML=`
     <div><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(63,185,80,.7);margin-right:6px"></span>Vendus — ${sold.length}</div>
     <div style="margin-top:2px"><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(248,81,73,.7);margin-right:6px"></span>En stock — ${stock.length} (${sQty} places)</div>
@@ -1236,7 +1472,7 @@ async function driveSync(){
   if(!gmailToken||driveSyncing)return;
   driveSyncing=true;updateSyncIndicator('syncing');
   try{
-    const payload=JSON.stringify({transactions,costs,updatedAt:new Date().toISOString()});
+    const payload=JSON.stringify({transactions,costs,preorders,updatedAt:new Date().toISOString()});
     if(driveFileId){
       await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
     }else{
@@ -1258,12 +1494,13 @@ async function driveLoad(){
     const c=await(await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:'Bearer '+gmailToken}})).json();
     if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
     if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
+    if(c.preorders){preorders=c.preorders;localStorage.setItem(PREORDER_KEY,JSON.stringify(preorders));}
     localStorage.setItem('ticketdesk_last_sync',c.updatedAt||new Date().toISOString());
     return true;
   }catch(e){return false;}
 }
 async function driveManualSync(){showToast('Sync…');await driveSync();showToast('Données sauvegardées');renderGmail();}
-async function driveManualLoad(){showToast('Récupération…');const ok=await driveLoad();if(ok){autoArchive();showToast('Données récupérées');renderDashboard();renderJournal();renderWTS();renderCosts();renderGmail();}else showToast('Aucune donnée Drive','err');}
+async function driveManualLoad(){showToast('Récupération…');const ok=await driveLoad();if(ok){autoArchive();showToast('Données récupérées');renderDashboard();renderJournal();renderPreorders();renderWTS();renderCosts();renderGmail();}else showToast('Aucune donnée Drive','err');}
 function updateSyncIndicator(state){
   const el=document.getElementById('syncIndicator');if(!el)return;
   const ls=localStorage.getItem('ticketdesk_last_sync');
