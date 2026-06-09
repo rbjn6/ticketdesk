@@ -856,8 +856,8 @@ function filterDashTx() {
     to   = dashDateTo;
   }
   let list = [...transactions];
-  if (from) list = list.filter(t => t.date && t.date >= from);
-  if (to)   list = list.filter(t => t.date && t.date <= to);
+  if (from) list = list.filter(t => { const d = t.purchaseDate || t.date; return d && d >= from; });
+  if (to)   list = list.filter(t => { const d = t.purchaseDate || t.date; return d && d <= to; });
   if (dashEventFilter) list = list.filter(t => (t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase()));
   if (dashBuyerFilter) list = list.filter(t => (t.buyer||'').toLowerCase().includes(dashBuyerFilter.toLowerCase()));
   return list;
@@ -1338,7 +1338,8 @@ function parseTicketMail(msg){
     // Email destinataire (compte iCloud Hide My Email)
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
     const toEmail = (toHeader.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)||[])[0]||'';
-    const res={event:'',date:'',cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:'',orderNum:''};
+    const mailDateRaw = hdrs['date'] ? new Date(hdrs['date']).toISOString().split('T')[0] : '';
+    const res={event:'',date:'',purchaseDate:mailDateRaw,cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:'',orderNum:''};
     if(isTM) res.site='Ticketmaster';
     else if(isFnac) res.site='Fnac Spectacles';
     else res.site='Stade de France';
