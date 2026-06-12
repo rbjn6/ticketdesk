@@ -1021,7 +1021,18 @@ async function generateShareLink() {
   try {
     const response = await fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl));
     const json = await response.json();
-    inp.value = json.shorturl || longUrl;
+    console.log('is.gd response:', json);
+    if (json.shorturl) {
+      inp.value = json.shorturl;
+      return;
+    }
+  } catch(e) {
+    console.log('is.gd error:', e);
+  }
+  try {
+    const tinyResponse = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl));
+    const shortUrl = await tinyResponse.text();
+    inp.value = shortUrl.startsWith('https://tinyurl.com/') ? shortUrl : longUrl;
   } catch(e) {
     inp.value = longUrl;
   }
