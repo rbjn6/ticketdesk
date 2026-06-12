@@ -207,6 +207,14 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .alert-item:hover{background:var(--bg3)}
 /* nav badge */
 .nav-badge{display:none;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle}
+/* share modal */
+.share-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer}
+.share-item:last-child{border-bottom:none}
+.share-item:hover{background:var(--bg3)}
+/* public page */
+#publicPage{display:none;position:fixed;inset:0;background:#0c0c0c;overflow-y:auto;z-index:2000;-webkit-overflow-scrolling:touch}
+.pub-card{background:#161616;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;margin-bottom:10px}
+.pub-tag{display:inline-flex;padding:2px 9px;border-radius:3px;font-size:12px;background:rgba(77,159,255,.12);color:#4d9fff}
 </style>
 </head>
 <body>
@@ -285,8 +293,9 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <div class="page" id="page-wts">
       <p style="font-size:15px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
       <div class="wts-box" id="wtsPreview"></div>
-      <div style="margin-top:10px">
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
         <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="copyWTS()">Copier pour Discord</button>
+        <button class="btn" style="width:100%;justify-content:center" onclick="openShareModal()">🔗 Générer lien client</button>
       </div>
     </div>
 
@@ -492,6 +501,30 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
     <div class="form-actions">
       <button class="btn" onclick="closeModal('preorderModal')">Annuler</button>
       <button class="btn btn-primary" onclick="savePreorder()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SHARE -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Partager votre stock</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-sm" onclick="toggleAllShare(true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllShare(false)">Tout désélectionner</button>
+    </div>
+    <div id="shareTicketList" style="max-height:320px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal('shareModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="generateShareLink()">Générer le lien</button>
+    </div>
+    <div id="shareLinkResult" style="display:none;margin-top:14px">
+      <div class="flabel" style="margin-bottom:6px">Lien à partager</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="shareLinkInput" readonly style="flex:1;font-size:12px;color:var(--text2)">
+        <button class="btn btn-primary btn-sm" style="flex-shrink:0" onclick="copyShareLink()">Copier</button>
+      </div>
     </div>
   </div>
 </div>
@@ -942,6 +975,84 @@ function setDashFilter(type, val) {
   } else if (type === 'buyer') {
     dashBuyerFilter = val; renderDashMetrics();
   }
+}
+
+// SHARE LINK
+function openShareModal() {
+  const stock = transactions.filter(t => t.statut === 'En stock');
+  const el = document.getElementById('shareTicketList');
+  if (!stock.length) {
+    el.innerHTML = '<div class="empty">Aucun billet en stock</div>';
+  } else {
+    el.innerHTML = stock.map(t => `
+      <label class="share-item">
+        <input type="checkbox" class="share-cb" data-id="${t.id}" checked
+          style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">
+            ${t.date ? fmtDate(t.date) : '—'}${t.cat ? ' · ' + t.cat : ''} · ${t.qty}x${t.wanted ? ' · ' + fmtFull(t.wanted) : ''}
+          </div>
+        </div>
+      </label>`).join('');
+  }
+  document.getElementById('shareLinkResult').style.display = 'none';
+  document.getElementById('shareModal').classList.add('open');
+}
+
+function toggleAllShare(v) {
+  document.querySelectorAll('.share-cb').forEach(cb => cb.checked = v);
+}
+
+function generateShareLink() {
+  const checked = Array.from(document.querySelectorAll('.share-cb:checked')).map(cb => cb.dataset.id);
+  if (!checked.length) { showToast('Sélectionne au moins un billet', 'err'); return; }
+  const data = transactions
+    .filter(t => checked.includes(String(t.id)))
+    .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0}));
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url = window.location.origin + window.location.pathname + '?stock=' + b64;
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareLinkResult').style.display = 'block';
+}
+
+function copyShareLink() {
+  const inp = document.getElementById('shareLinkInput');
+  navigator.clipboard.writeText(inp.value)
+    .then(() => showToast('Lien copié'))
+    .catch(() => { inp.select(); document.execCommand('copy'); showToast('Lien copié'); });
+}
+
+function renderPublicStock(data) {
+  const app = document.querySelector('.app');
+  if (app) app.style.display = 'none';
+  const ls = document.getElementById('loginScreen');
+  if (ls) ls.style.display = 'none';
+  const pub = document.getElementById('publicPage');
+  if (!pub) return;
+  pub.style.display = 'block';
+  document.getElementById('publicContent').innerHTML = `
+    <div style="max-width:500px;margin:0 auto;padding:32px 16px 60px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#4d9fff;margin-bottom:2px">TICKETDESK</div>
+      <h1 style="font-size:21px;font-weight:700;color:#f0f0f0;margin:0 0 22px">Billets disponibles</h1>
+      ${!data.length
+        ? '<p style="color:#686868;font-size:14px">Aucun billet disponible pour le moment.</p>'
+        : data.map(t => `
+          <div class="pub-card">
+            <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:8px">${t.event||'—'}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center">
+              ${t.date ? `<span style="color:#4d9fff;font-weight:600;font-size:14px">${fmtDate(t.date)}</span>` : ''}
+              ${t.lieu ? `<span style="color:#686868;font-size:13px">${t.lieu}</span>` : ''}
+              ${t.cat  ? `<span class="pub-tag">${t.cat}</span>` : ''}
+              <span style="color:#f0f0f0;font-weight:600;font-size:14px">${t.qty} place${t.qty>1?'s':''}</span>
+              ${t.wanted ? `<span style="color:#00e000;font-weight:700;font-size:16px">${fmtFull(t.wanted)}</span>` : ''}
+            </div>
+          </div>`).join('')}
+      <div style="margin-top:24px;padding:20px;background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-align:center">
+        <p style="font-size:15px;color:#a0a0a0;margin-bottom:6px">Intéressé(e) par un ou plusieurs billets ?</p>
+        <p style="font-size:13px;color:#505050">Contactez-nous pour plus d'informations.</p>
+      </div>
+    </div>`;
 }
 
 // ALERTS
@@ -1906,8 +2017,18 @@ checkAuth();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
-// Login button listeners — après rendu du DOM
+// Login button listeners + public share page detection
 window.addEventListener('DOMContentLoaded', function() {
+  // Public share page — intercept before anything else
+  const _stockParam = new URLSearchParams(window.location.search).get('stock');
+  if (_stockParam) {
+    try {
+      const stockData = JSON.parse(decodeURIComponent(escape(atob(_stockParam))));
+      renderPublicStock(stockData);
+      return;
+    } catch(e) { /* invalid data — fall through to normal app */ }
+  }
+
   const submitBtn = document.getElementById('loginSubmitBtn');
   const googleBtn = document.getElementById('loginGoogleBtn');
   const pinInput  = document.getElementById('loginPin');
@@ -1933,6 +2054,10 @@ window.addEventListener('DOMContentLoaded', function() {
     </button>
     <p class="login-note">Première connexion ? Utilise le bouton Google.<br>Ensuite crée ton identifiant + PIN dans Paramètres.</p>
   </div>
+</div>
+
+<div id="publicPage">
+  <div id="publicContent"></div>
 </div>
 
 </body>
