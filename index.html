@@ -199,6 +199,14 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 .metric-row-total{margin-top:4px;padding-top:8px;border-top:1px solid var(--border2)}
 .metric-row-label{font-size:12px;color:var(--text2)}
 .metric-row-val{font-size:14px;font-weight:600;color:var(--text)}
+/* alerts */
+.alerts-wrap{background:var(--bg2);border:1px solid rgba(255,80,80,.35);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:14px}
+.alert-header{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:rgba(255,80,80,.07);font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,80,80,.2)}
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 13px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;line-height:1.4;transition:background .1s}
+.alert-item:last-child{border-bottom:none}
+.alert-item:hover{background:var(--bg3)}
+/* nav badge */
+.nav-badge{display:none;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -213,7 +221,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
 
   <nav class="topnav">
     <button class="tnav active" onclick="showPage('dashboard')">
-      <span class="tnav-icon">▪</span>Dashboard
+      <span class="tnav-icon">▪</span>Dashboard<span class="nav-badge" id="dashBadge"></span>
     </button>
     <button class="tnav" onclick="showPage('journal')">
       <span class="tnav-icon">▪</span>Journal
@@ -238,6 +246,7 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
   <div class="content">
 
     <div class="page active" id="page-dashboard">
+      <div id="dashAlerts"></div>
       <div id="dashFilters"></div>
       <div id="metricsGrid"></div>
       <p class="stitle">Bénéfice par événement</p>
@@ -562,6 +571,7 @@ function doLogin() {
 function unlockApp() {
   sessionStorage.setItem('td_unlocked', '1');
   document.getElementById('loginScreen').style.display = 'none';
+  initNotifPermission();
   if (gmailToken) {
     driveLoad().then(loaded => {
       autoArchive();
@@ -934,7 +944,121 @@ function setDashFilter(type, val) {
   }
 }
 
+// ALERTS
+function computeAlerts() {
+  const now = new Date();
+  const alerts = [];
+  transactions.forEach(t => {
+    if (t.statut === 'Archivé' || !t.date) return;
+    const daysUntil = Math.ceil((new Date(t.date) - now) / (1000*60*60*24));
+
+    // Invendu + événement imminent
+    if (t.statut !== 'Vendu') {
+      if (daysUntil <= 1)
+        alerts.push({urgency:0, icon:'🚨', msg:`${t.event} dans moins de 24h — pas encore vendu`,       id:t.id, type:'24h-invendu'});
+      else if (daysUntil <= 3)
+        alerts.push({urgency:1, icon:'🚨', msg:`${t.event} dans moins de 3 jours — pas encore vendu`,   id:t.id, type:'3j-invendu'});
+      else if (daysUntil <= 7)
+        alerts.push({urgency:2, icon:'🔴', msg:`${t.event} dans moins de 7 jours — pas encore vendu`,   id:t.id, type:'7j-invendu'});
+      else if (daysUntil <= 15)
+        alerts.push({urgency:3, icon:'⚠️', msg:`${t.event} dans moins de 15 jours — pas encore vendu`, id:t.id, type:'15j-invendu'});
+    }
+
+    // Vendu mais non livré + événement imminent
+    if (t.statut === 'Vendu' && t.livraison !== 'Livré') {
+      if (daysUntil <= 1)
+        alerts.push({urgency:0, icon:'🚨', msg:`${t.event} dans moins de 24h — transfert en attente`,       id:t.id, type:'24h-nonlivre'});
+      else if (daysUntil <= 3)
+        alerts.push({urgency:1, icon:'🚨', msg:`${t.event} dans moins de 3 jours — transfert en attente`,   id:t.id, type:'3j-nonlivre'});
+      else if (daysUntil <= 7)
+        alerts.push({urgency:2, icon:'🔴', msg:`${t.event} dans moins de 7 jours — transfert en attente`,   id:t.id, type:'7j-nonlivre'});
+    }
+
+    // Paiement en attente
+    if (t.statut === 'Vendu' && t.pay === 'En attente' && t.saleDate) {
+      const daysSinceSale = Math.floor((now - new Date(t.saleDate)) / (1000*60*60*24));
+      if (daysSinceSale >= 7)
+        alerts.push({urgency:4, icon:'🟠', msg:`Paiement en attente depuis 7 jours — ${t.event}`, id:t.id, type:'paiement7j'});
+      else if (daysSinceSale >= 3)
+        alerts.push({urgency:5, icon:'🟡', msg:`Paiement en attente depuis 3 jours — ${t.event}`, id:t.id, type:'paiement3j'});
+    }
+  });
+  alerts.sort((a,b) => a.urgency - b.urgency);
+  return alerts;
+}
+
+function renderDashAlerts() {
+  const alerts = computeAlerts();
+  const el = document.getElementById('dashAlerts');
+  if (el) {
+    if (!alerts.length) {
+      el.innerHTML = '';
+    } else {
+      el.innerHTML = `<div class="alerts-wrap">
+        <div class="alert-header">⚠️ ${alerts.length} alerte${alerts.length>1?'s':''}</div>
+        ${alerts.map(a=>`<div class="alert-item" onclick="openTicketInJournal(${a.id})">${a.icon} ${a.msg}<span style="margin-left:auto;color:var(--text3);font-size:12px">›</span></div>`).join('')}
+      </div>`;
+    }
+  }
+  const badge = document.getElementById('dashBadge');
+  if (badge) {
+    badge.textContent = alerts.length || '';
+    badge.style.display = alerts.length ? 'inline-flex' : 'none';
+  }
+  sendAlertNotifs(alerts);
+}
+
+function openTicketInJournal(id) {
+  showPage('journal');
+  setTimeout(() => {
+    const el = document.getElementById('td-' + id);
+    if (el) {
+      el.classList.add('open');
+      el.closest && el.closest('.tx-card') && el.closest('.tx-card').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }, 120);
+}
+
+function initNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function sendAlertNotifs(alerts) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const today = new Date().toISOString().split('T')[0];
+  const NOTIF_KEY = 'ticketdesk_notifs';
+  let sent;
+  try { sent = JSON.parse(localStorage.getItem(NOTIF_KEY)) || {}; } catch { sent = {}; }
+  // Purger les anciennes clés (jours précédents)
+  const pruned = {};
+  Object.keys(sent).forEach(k => { if (k.endsWith(today)) pruned[k] = 1; });
+  sent = pruned;
+  const msgs = {
+    '15j-invendu':  e => `🎫 ${e} — événement dans moins de 15 jours, pas encore vendu !`,
+    '7j-invendu':   e => `🎫 ${e} — événement dans moins de 7 jours, pas encore vendu !`,
+    '3j-invendu':   e => `🚨 ${e} — événement dans moins de 3 jours, pas encore vendu !`,
+    '24h-invendu':  e => `🚨 ${e} — événement dans moins de 24h, pas encore vendu !`,
+    '7j-nonlivre':  e => `📦 ${e} — dans moins de 7 jours, transfert en attente !`,
+    '3j-nonlivre':  e => `🚨 ${e} — dans moins de 3 jours, transfert en attente !`,
+    '24h-nonlivre': e => `🚨 ${e} — dans moins de 24h, transfert en attente !`,
+    'paiement3j':   e => `💰 ${e} — paiement en attente depuis 3 jours`,
+    'paiement7j':   e => `💰 ${e} — paiement en attente depuis 7 jours`,
+  };
+  let changed = false;
+  alerts.forEach(a => {
+    const key = `${a.id}-${a.type}-${today}`;
+    if (sent[key]) return;
+    const tx = transactions.find(t => t.id === a.id);
+    if (!tx || !msgs[a.type]) return;
+    try { new Notification('TicketDesk', {body: msgs[a.type](tx.event), icon: 'icons/icon-192.png'}); sent[key] = 1; changed = true; } catch(e) {}
+  });
+  if (changed) localStorage.setItem(NOTIF_KEY, JSON.stringify(sent));
+}
+
 function renderDashboard() {
+  renderDashAlerts();
   renderDashFilters();
   renderDashMetrics();
 }
