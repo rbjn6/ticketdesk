@@ -968,7 +968,9 @@ function renderDashMetrics() {
     : stockBase.filter(t => { const bd = t.buyDate || t.purchaseDate; return !to || !bd || bd <= to; });
   const sQty = stockInPeriod.reduce((s,t) => s + (t.qty||0), 0);
 
-  const paidC = costs.filter(c => c.status === 'Payé').reduce((s,c) => s + c.amount, 0);
+  const paidC = costs
+    .filter(c => c.status === 'Payé' && (isAll ? true : filterByPeriod(c.date, from, to)))
+    .reduce((s,c) => s + c.amount, 0);
   const netP  = grossP - paidC;
 
   // BÉNÉFICE AVEC INVENDUS — grossP - buy des tickets en stock achetés dans la période
