@@ -1646,6 +1646,8 @@ function importSelected(){
 async function driveSync(){
   if(!gmailToken||driveSyncing)return;
   driveSyncing=true;updateSyncIndicator('syncing');
+  console.log('SAVING TO DRIVE:', transactions.length, 'transactions');
+  console.log('DRIVE SAVE DATA:', JSON.stringify({transactions: transactions.length, preorders: preorders?.length}));
   try{
     const payload=JSON.stringify({transactions,costs,preorders,updatedAt:new Date().toISOString()});
     if(driveFileId){
@@ -1662,14 +1664,17 @@ async function driveSync(){
 }
 async function driveLoad(){
   if(!gmailToken)return false;
+  console.log('LOADING FROM DRIVE...');
   try{
     const r=await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`,{headers:{Authorization:'Bearer '+gmailToken}});
     const d=await r.json();if(!d.files||!d.files.length)return false;
     driveFileId=d.files[0].id;localStorage.setItem('ticketdesk_drive_fid',driveFileId);
     const c=await(await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:'Bearer '+gmailToken}})).json();
+    console.log('DRIVE LOAD RESULT:', c);
     if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
     if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
     if(c.preorders){preorders=c.preorders;localStorage.setItem(PREORDER_KEY,JSON.stringify(preorders));}
+    console.log('TRANSACTIONS LOADED:', transactions.length);
     localStorage.setItem('ticketdesk_last_sync',c.updatedAt||new Date().toISOString());
     return true;
   }catch(e){return false;}
