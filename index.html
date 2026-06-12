@@ -1004,38 +1004,16 @@ function toggleAllShare(v) {
   document.querySelectorAll('.share-cb').forEach(cb => cb.checked = v);
 }
 
-async function generateShareLink() {
+function generateShareLink() {
   const checked = Array.from(document.querySelectorAll('.share-cb:checked')).map(cb => cb.dataset.id);
   if (!checked.length) { showToast('Sélectionne au moins un billet', 'err'); return; }
   const data = transactions
     .filter(t => checked.includes(String(t.id)))
     .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0}));
   const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const longUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
-
-  const inp = document.getElementById('shareLinkInput');
-  const result = document.getElementById('shareLinkResult');
-  inp.value = 'Génération du lien…';
-  result.style.display = 'block';
-
-  try {
-    const response = await fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl));
-    const json = await response.json();
-    console.log('is.gd response:', json);
-    if (json.shorturl) {
-      inp.value = json.shorturl;
-      return;
-    }
-  } catch(e) {
-    console.log('is.gd error:', e);
-  }
-  try {
-    const tinyResponse = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl));
-    const shortUrl = await tinyResponse.text();
-    inp.value = shortUrl.startsWith('https://tinyurl.com/') ? shortUrl : longUrl;
-  } catch(e) {
-    inp.value = longUrl;
-  }
+  const url = window.location.origin + window.location.pathname + '?stock=' + b64;
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareLinkResult').style.display = 'block';
 }
 
 function copyShareLink() {
