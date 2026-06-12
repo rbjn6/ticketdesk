@@ -398,6 +398,10 @@ input:focus,select:focus{outline:none;border-color:rgba(255,255,255,.35)}
         <select id="f-livraison"><option value="">—</option><option value="Livré">Livré</option><option value="Non livré">Non livré</option></select>
       </div>
     </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Date d'achat</label><input type="date" id="f-buydate"></div>
+      <div class="fgroup"><label class="flabel">Date de vente</label><input type="date" id="f-saledate"></div>
+    </div>
     <div class="fgroup"><label class="flabel">Prix voulu (€ total — invendus)</label><input type="number" id="f-wanted" min="0" step="0.01" placeholder="0"></div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('addModal')">Annuler</button>
@@ -770,6 +774,7 @@ function confirmSale() {
     buy: Math.round(unitBuy * soldQty * 100) / 100,
     sell: sellPrice,
     statut: 'Vendu',
+    saleDate: new Date().toISOString().split('T')[0],
     buyer, platform,
     pay: paid ? 'Payé' : 'En attente',
     livraison: delivered ? 'Livré' : 'Non livré',
@@ -832,7 +837,7 @@ function showPage(name) {
 }
 
 // DASHBOARD
-function filterDashTx() {
+function getDashPeriodRange() {
   const today = new Date().toISOString().substring(0, 10);
   const now   = new Date();
   let from = '', to = '';
@@ -855,9 +860,20 @@ function filterDashTx() {
     from = dashDateFrom;
     to   = dashDateTo;
   }
+  return { from, to };
+}
+
+function filterByPeriod(dateStr, from, to) {
+  if (!dateStr) return false;
+  if (from && dateStr < from) return false;
+  if (to   && dateStr > to)   return false;
+  return true;
+}
+
+function filterDashTx() {
+  const { from, to } = getDashPeriodRange();
   let list = [...transactions];
-  if (from) list = list.filter(t => { const d = t.purchaseDate || t.date; return d && d >= from; });
-  if (to)   list = list.filter(t => { const d = t.purchaseDate || t.date; return d && d <= to; });
+  if (from || to) list = list.filter(t => filterByPeriod(t.buyDate || t.purchaseDate || t.date, from, to));
   if (dashEventFilter) list = list.filter(t => (t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase()));
   if (dashBuyerFilter) list = list.filter(t => (t.buyer||'').toLowerCase().includes(dashBuyerFilter.toLowerCase()));
   return list;
@@ -924,17 +940,47 @@ function renderDashboard() {
 }
 
 function renderDashMetrics() {
+  const { from, to } = getDashPeriodRange();
+  const isAll = dashPeriod === 'all';
+
+  const base = transactions.filter(t => {
+    if (dashEventFilter && !(t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase())) return false;
+    if (dashBuyerFilter && !(t.buyer||'').toLowerCase().includes(dashBuyerFilter.toLowerCase())) return false;
+    return true;
+  });
+
+  // COÛT TOTAL ACHATS — filtré par buyDate
+  const buyInPeriod = isAll ? base : base.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
+  const tBuy = buyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+
+  // CA + BÉNÉFICE BRUT + PLACES VENDUES — filtrés par saleDate
+  const soldInPeriod = isAll
+    ? base.filter(t => t.statut === 'Vendu')
+    : base.filter(t => t.statut === 'Vendu' && filterByPeriod(t.saleDate, from, to));
+  const tSell  = soldInPeriod.reduce((s,t) => s + (t.sell||0), 0);
+  const grossP = soldInPeriod.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
+  const soldQty = soldInPeriod.reduce((s,t) => s + (t.qty||0), 0);
+
+  // PLACES EN STOCK — buyDate <= fin de période
+  const stockBase = base.filter(t => t.statut === 'En stock');
+  const stockInPeriod = isAll
+    ? stockBase
+    : stockBase.filter(t => { const bd = t.buyDate || t.purchaseDate; return !to || !bd || bd <= to; });
+  const sQty = stockInPeriod.reduce((s,t) => s + (t.qty||0), 0);
+
+  const paidC = costs.filter(c => c.status === 'Payé').reduce((s,c) => s + c.amount, 0);
+  const netP  = grossP - paidC;
+
+  // BÉNÉFICE AVEC INVENDUS — grossP - buy des tickets en stock achetés dans la période
+  const stockBuyInPeriod = isAll
+    ? stockBase
+    : stockBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
+  const profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+
+  // Pour les graphiques — utilise filterDashTx (filtré sur buyDate, event, buyer)
   const tx    = filterDashTx();
-  const sold  = tx.filter(t=>t.statut==='Vendu');
-  const stock = tx.filter(t=>t.statut==='En stock');
-  const grossP= sold.reduce((s,t)=>s+(t.sell-t.buy),0);
-  const paidC = costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
-  const netP  = grossP-paidC;
-  const sQty  = stock.reduce((s,t)=>s+t.qty,0);
-  const tBuy  = tx.reduce((s,t)=>s+t.buy,0);
-  const tSell = sold.reduce((s,t)=>s+t.sell,0);
-  const profitWithStock = tx.reduce((s,t)=>s+(t.sell?t.sell-t.buy:-t.buy),0) - paidC;
-  const soldQty = sold.reduce((s,t)=>s+t.qty, 0);
+  const sold  = tx.filter(t => t.statut === 'Vendu');
+  const stock = tx.filter(t => t.statut === 'En stock');
 
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
@@ -979,13 +1025,13 @@ function renderDashMetrics() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[sold.length,stock.length],backgroundColor:['rgba(0,224,0,.75)','rgba(255,32,32,.75)'],borderWidth:0}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,224,0,.75)','rgba(255,32,32,.75)'],borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
-  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${tx.length}</span>`;
+  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldInPeriod.length + stockInPeriod.length}</span>`;
   document.getElementById('pieLegend').innerHTML=`
-    <div><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(63,185,80,.7);margin-right:6px"></span>Vendus — ${sold.length}</div>
-    <div style="margin-top:2px"><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(248,81,73,.7);margin-right:6px"></span>En stock — ${stock.length} (${sQty} places)</div>
+    <div><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(63,185,80,.7);margin-right:6px"></span>Vendus — ${soldInPeriod.length}</div>
+    <div style="margin-top:2px"><span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:rgba(248,81,73,.7);margin-right:6px"></span>En stock — ${stockInPeriod.length} (${sQty} places)</div>
   `;
 }
 
@@ -1339,7 +1385,7 @@ function parseTicketMail(msg){
     const toHeader = hdrs['to']||hdrs['delivered-to']||'';
     const toEmail = (toHeader.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/)||[])[0]||'';
     const mailDateRaw = hdrs['date'] ? new Date(hdrs['date']).toISOString().split('T')[0] : '';
-    const res={event:'',date:'',purchaseDate:mailDateRaw,cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:'',orderNum:''};
+    const res={event:'',date:'',buyDate:mailDateRaw,cat:'',qty:1,buy:0,site:'',statut:'En stock',place:'',wanted:0,sell:0,pay:'',compte:toEmail,mdp:'',buyer:'',platform:'',livraison:'',orderNum:''};
     if(isTM) res.site='Ticketmaster';
     else if(isFnac) res.site='Fnac Spectacles';
     else res.site='Stade de France';
@@ -1606,6 +1652,8 @@ function openAddModal(id){
     document.getElementById('f-platform').value=t.platform||'';
     document.getElementById('f-pay').value=t.pay||'';
     document.getElementById('f-livraison').value=t.livraison||'';
+    document.getElementById('f-buydate').value=t.buyDate||t.purchaseDate||'';
+    document.getElementById('f-saledate').value=t.saleDate||'';
     document.getElementById('f-wanted').value=t.wanted||'';
   }else{
     document.getElementById('addModalTitle').textContent='Nouvelle transaction';
@@ -1614,6 +1662,8 @@ function openAddModal(id){
     document.getElementById('f-qty').value=1;
     ['f-buy','f-sell','f-wanted'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-pay').value='';document.getElementById('f-livraison').value='';
+    document.getElementById('f-buydate').value=new Date().toISOString().split('T')[0];
+    document.getElementById('f-saledate').value='';
   }
   document.getElementById('addModal').classList.add('open');
 }
@@ -1648,9 +1698,18 @@ function saveTransaction(){
     platform:document.getElementById('f-platform').value.trim(),
     pay:document.getElementById('f-pay').value,
     livraison:document.getElementById('f-livraison').value,
+    buyDate:document.getElementById('f-buydate').value||'',
+    saleDate:document.getElementById('f-saledate').value||'',
     wanted:parseFloat(document.getElementById('f-wanted').value)||0,
   };
-  if(editingId){const i=transactions.findIndex(x=>x.id===editingId);if(i!==-1)transactions[i]=t;}
+  if(editingId){
+    const i=transactions.findIndex(x=>x.id===editingId);
+    if(i!==-1){
+      // preserve purchaseDate for backward compat if buyDate is now set
+      const prev=transactions[i];
+      transactions[i]={...prev,...t,buyDate:t.buyDate||(prev.buyDate||prev.purchaseDate||'')};
+    }
+  }
   else transactions.push(t);
   saveTx();closeModal('addModal');showToast(editingId?'Modifié':'Ajouté');
   renderDashboard();renderJournal();renderWTS();
