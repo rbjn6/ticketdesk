@@ -1005,8 +1005,6 @@ function toggleAllShare(v) {
   document.querySelectorAll('.share-cb').forEach(cb => cb.checked = v);
 }
 
-let _shareFullUrl = '';
-
 function generateShareLink() {
   const checked = Array.from(document.querySelectorAll('.share-cb:checked')).map(cb => cb.dataset.id);
   if (!checked.length) { showToast('Sélectionne au moins un billet', 'err'); return; }
@@ -1014,24 +1012,28 @@ function generateShareLink() {
     .filter(t => checked.includes(String(t.id)))
     .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0}));
   const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  _shareFullUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
-  document.getElementById('shareLinkInput').value = 'rbjn6.github.io/ticketdesk/?stock=…';
+  const longUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
+  const inp = document.getElementById('shareLinkInput');
+  inp.value = longUrl.substring(0, 50) + '...';
+  inp.setAttribute('data-fullurl', longUrl);
   document.getElementById('shareLinkResult').style.display = 'block';
 }
 
 function copyShareLink() {
-  navigator.clipboard.writeText(_shareFullUrl)
+  const fullUrl = document.getElementById('shareLinkInput').getAttribute('data-fullurl') || '';
+  navigator.clipboard.writeText(fullUrl)
     .then(() => showToast('Lien copié'))
     .catch(() => {
       const ta = document.createElement('textarea');
-      ta.value = _shareFullUrl;
+      ta.value = fullUrl;
       document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
       showToast('Lien copié');
     });
 }
 
 function openShareLink() {
-  if (_shareFullUrl) window.open(_shareFullUrl, '_blank');
+  const fullUrl = document.getElementById('shareLinkInput').getAttribute('data-fullurl');
+  if (fullUrl) window.open(fullUrl, '_blank');
 }
 
 function renderPublicStock(data) {
