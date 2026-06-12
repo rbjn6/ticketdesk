@@ -1077,15 +1077,16 @@ function renderDashMetrics() {
   const buyInPeriod = isAll ? base : base.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
   const tBuy = buyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
 
-  // CA + BÉNÉFICE BRUT + PLACES VENDUES — filtrés par saleDate
+  // CA + BÉNÉFICE BRUT + PLACES VENDUES — Vendu OU Archivé avec saleDate
+  const wasSold = t => t.statut === 'Vendu' || (t.statut === 'Archivé' && t.saleDate);
   const soldInPeriod = isAll
-    ? base.filter(t => t.statut === 'Vendu')
-    : base.filter(t => t.statut === 'Vendu' && filterByPeriod(t.saleDate, from, to));
+    ? base.filter(wasSold)
+    : base.filter(t => wasSold(t) && filterByPeriod(t.saleDate, from, to));
   const tSell  = soldInPeriod.reduce((s,t) => s + (t.sell||0), 0);
   const grossP = soldInPeriod.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
   const soldQty = soldInPeriod.reduce((s,t) => s + (t.qty||0), 0);
 
-  // PLACES EN STOCK — buyDate <= fin de période
+  // PLACES EN STOCK (inventaire courant uniquement)
   const stockBase = base.filter(t => t.statut === 'En stock');
   const stockInPeriod = isAll
     ? stockBase
@@ -1097,10 +1098,11 @@ function renderDashMetrics() {
     .reduce((s,c) => s + c.amount, 0);
   const netP  = grossP - paidC;
 
-  // BÉNÉFICE AVEC INVENDUS — grossP - buy des tickets en stock achetés dans la période
+  // BÉNÉFICE AVEC INVENDUS — inclut En stock + Archivés jamais vendus (pas de saleDate)
+  const unsoldBase = base.filter(t => t.statut === 'En stock' || (t.statut === 'Archivé' && !t.saleDate));
   const stockBuyInPeriod = isAll
-    ? stockBase
-    : stockBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
+    ? unsoldBase
+    : unsoldBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
   const profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
 
   // Pour les graphiques — utilise filterDashTx (filtré sur buyDate, event, buyer)
@@ -1132,7 +1134,7 @@ function renderDashMetrics() {
   const evMap={};
   tx.forEach(t=>{
     if(!evMap[t.event])evMap[t.event]=0;
-    evMap[t.event]+=t.statut==='Vendu'?(t.sell-t.buy):-t.buy;
+    evMap[t.event]+=(t.statut==='Vendu'||(t.statut==='Archivé'&&t.saleDate))?((t.sell||0)-(t.buy||0)):-(t.buy||0);
   });
   const labels=Object.keys(evMap), data=labels.map(e=>Math.round(evMap[e]));
 
