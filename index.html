@@ -172,7 +172,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 }
 .tx-card{
   background:var(--bg-card);border:1px solid var(--border);
-  border-top:none;overflow:hidden;cursor:pointer;transition:background .1s;
+  border-top:none;border-bottom:2px solid var(--border);
+  overflow:hidden;cursor:pointer;transition:background .1s;
 }
 .tx-card:hover{background:var(--bg-card-hover)}
 .tx-card:last-child{border-radius:0 0 var(--radius) var(--radius)}
@@ -181,11 +182,11 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .tx-card.is-archive{border-left:3px solid var(--text-disabled)}
 .tx-summary{
   display:grid;grid-template-columns:80px minmax(0,200px) 90px 1fr 120px 90px 120px;
-  gap:12px;align-items:center;padding:10px 14px;
+  gap:12px;align-items:center;padding:15px 14px;min-height:60px;
 }
-.tx-event{font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-date{font-size:13px;color:var(--accent-blue);white-space:nowrap}
-.tx-info{font-size:13px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-event{font-size:16px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:14px;color:var(--accent-blue);white-space:nowrap}
+.tx-info{font-size:14px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-buyer{font-size:13px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-profit{font-size:14px;font-weight:700;text-align:right;white-space:nowrap}
 .tx-badges{display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-end;align-items:center}
@@ -1084,7 +1085,7 @@ function generateShareLink() {
   if (!checked.length) { showToast('Sélectionne au moins un billet', 'err'); return; }
   const data = transactions
     .filter(t => checked.includes(String(t.id)))
-    .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0}));
+    .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0, place: t.place||''}));
   const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   const longUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
   const inp = document.getElementById('shareLinkInput');
@@ -1120,24 +1121,27 @@ function renderPublicStock(data) {
   pub.style.display = 'block';
   document.getElementById('publicContent').innerHTML = `
     <div style="max-width:500px;margin:0 auto;padding:32px 16px 60px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#4d9fff;margin-bottom:2px">TICKETDESK</div>
-      <h1 style="font-size:21px;font-weight:700;color:#f0f0f0;margin:0 0 22px">Billets disponibles</h1>
+      <div style="font-size:22px;font-weight:800;letter-spacing:4px;color:var(--accent-blue);margin-bottom:2px">TICKETDESK</div>
+      <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);margin:0 0 22px">Billets disponibles</h1>
       ${!data.length
-        ? '<p style="color:#686868;font-size:14px">Aucun billet disponible pour le moment.</p>'
+        ? '<p style="color:var(--text-secondary);font-size:14px">Aucun billet disponible pour le moment.</p>'
         : data.map(t => `
           <div class="pub-card">
-            <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:8px">${t.event||'—'}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center">
-              ${t.date ? `<span style="color:#4d9fff;font-weight:600;font-size:14px">${fmtDate(t.date)}</span>` : ''}
-              ${t.lieu ? `<span style="color:#686868;font-size:13px">${t.lieu}</span>` : ''}
-              ${t.cat  ? `<span class="pub-tag">${t.cat}</span>` : ''}
-              <span style="color:#f0f0f0;font-weight:600;font-size:14px">${t.qty} place${t.qty>1?'s':''}</span>
-              ${t.wanted ? `<span style="color:#00e000;font-weight:700;font-size:16px">${fmtFull(t.wanted)}</span>` : ''}
+            <div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:10px">${t.event||'—'}</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center">
+                ${t.date ? `<span style="color:var(--accent-blue);font-weight:600">${fmtDate(t.date)}</span>` : ''}
+                ${t.lieu ? `<span style="color:var(--text-secondary)">${t.lieu}</span>` : ''}
+                <span style="color:var(--text-primary);font-weight:600">${t.qty} place${t.qty>1?'s':''}</span>
+              </div>
+              ${t.cat ? `<div><span class="pub-tag">${t.cat}</span></div>` : ''}
+              ${t.place ? `<div style="color:var(--text-secondary)">${t.place}</div>` : ''}
+              ${t.wanted ? `<div style="color:var(--accent-green);font-weight:700;font-size:16px">Prix : ${fmtFull(t.wanted)}</div>` : ''}
             </div>
           </div>`).join('')}
-      <div style="margin-top:24px;padding:20px;background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:10px;text-align:center">
-        <p style="font-size:15px;color:#a0a0a0;margin-bottom:6px">Intéressé(e) par un ou plusieurs billets ?</p>
-        <p style="font-size:13px;color:#505050">Contactez-nous pour plus d'informations.</p>
+      <div style="margin-top:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);text-align:center">
+        <p style="font-size:15px;color:var(--text-secondary);margin-bottom:6px">Intéressé(e) par un ou plusieurs billets ?</p>
+        <p style="font-size:13px;color:var(--text-disabled)">Contactez-nous pour plus d'informations.</p>
       </div>
     </div>`;
 }
@@ -1531,14 +1535,14 @@ function renderJournalList() {
         <span class="badge ${badgeClass}">${badgeLabel}</span>
         <span class="tx-event">${t.event}</span>
         <span class="tx-date">${fmtDate(t.date)}</span>
-        <span class="tx-info">${t.qty}x${t.cat?' · '+t.cat:''}${t.place?' · '+t.place:''}</span>
+        <span class="tx-info">${t.qty}x${t.cat?' · '+t.cat:''}</span>
         <span class="tx-buyer">${t.buyer||''}</span>
         <span class="tx-profit" style="color:${pc}">${fmt(profit)}</span>
         <div class="tx-badges">
-          ${t.pay==='Payé'?'<span class="badge b-paye">Payé</span>':''}
-          ${t.pay==='En attente'?'<span class="badge b-attente">Att.</span>':''}
-          ${t.livraison==='Livré'?'<span class="badge b-livre">Livré</span>':''}
-          ${t.livraison==='Non livré'?'<span class="badge b-nonlivre">✗</span>':''}
+          ${t.pay==='Payé'?`<span class="badge b-paye" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Payé</span>`:''}
+          ${t.pay==='En attente'?`<span class="badge b-attente" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">En attente</span>`:''}
+          ${t.livraison==='Livré'?`<span class="badge b-livre" style="cursor:pointer" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">Livré</span>`:''}
+          ${t.livraison==='Non livré'?`<span class="badge b-nonlivre" style="cursor:pointer" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">Non livré</span>`:''}
         </div>
       </div>
       <div class="tx-detail" id="${did}">
@@ -1585,6 +1589,20 @@ function deleteAllTransactions(){
   transactions=[];
   saveTx();renderJournal();renderDashboard();renderWTS();
   showToast('Toutes les transactions supprimées');
+}
+function toggleTxPay(id) {
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  t.pay = t.pay === 'Payé' ? 'En attente' : 'Payé';
+  saveTx(); renderJournalList(); renderDashboard();
+  showToast(t.pay === 'Payé' ? 'Marqué Payé' : 'Marqué En attente');
+}
+function toggleTxLivraison(id) {
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  t.livraison = t.livraison === 'Livré' ? 'Non livré' : 'Livré';
+  saveTx(); renderJournalList();
+  showToast(t.livraison === 'Livré' ? 'Marqué Livré' : 'Marqué Non livré');
 }
 
 // WTS
