@@ -739,36 +739,39 @@ function savePreorders() {
   localStorage.setItem(PREORDER_KEY, JSON.stringify(preorders));
   driveSyncDebounced();
 }
+function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='none'?'block':'none';}
 function renderPreorders() {
   const el = document.getElementById('preordersList');
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
-  el.innerHTML = preorders.map(p => {
-    const sc = p.statut === 'Trouvé' ? 'po-trouve' : p.statut === 'Annulé' ? 'po-annule' : 'po-recherche';
-    return `
-    <div class="po-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
-        <div style="min-width:0;flex:1">
-          <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:6px">${p.event||'—'}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-            <span class="po-status ${sc}">${p.statut||'En recherche'}</span>
-            ${p.date?`<span style="font-size:13px;color:var(--accent)">${fmtDate(p.date)}</span>`:''}
-            ${p.lieu?`<span style="font-size:13px;color:var(--text2)">${p.lieu}</span>`:''}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn btn-sm" onclick="openPreorderModal(${p.id})">Modifier</button>
-          <button class="btn btn-sm btn-danger" onclick="deletePreorder(${p.id})">Supprimer</button>
-        </div>
+  const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:100px 1fr 110px 130px 110px;gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
+    <span>Statut</span><span>Événement</span><span>Date</span><span>Acheteur</span><span style="text-align:right">Budget</span>
+  </div>`;
+  const cards = sorted.map(p => {
+    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--text-disabled)':'var(--accent-blue)';
+    const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#484f58':'#58a6ff';
+    const did = 'pod-'+p.id;
+    return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
+      <div style="display:grid;grid-template-columns:100px 1fr 110px 130px 110px;gap:12px;align-items:center;padding:13px 14px;min-height:52px">
+        <span style="font-size:11px;font-weight:600;padding:3px 6px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center">${p.statut||'En recherche'}</span>
+        <span style="font-size:16px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</span>
+        <span style="font-size:15px;color:var(--accent-blue);white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:15px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
+        <span style="font-size:16px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--text2)">
-        ${p.budget?`<span>Budget : <strong style="color:var(--text)">${fmtFull(p.budget)}</strong></span>`:''}
-        ${p.buyer?`<span>Acheteur : <strong style="color:var(--text)">${p.buyer}</strong></span>`:''}
-        ${p.platform?`<span>Plateforme : <strong style="color:var(--text)">${p.platform}</strong></span>`:''}
-        ${p.notes?`<div style="width:100%;margin-top:4px;font-style:italic">${p.notes}</div>`:''}
+      <div id="${did}" style="display:none;border-top:2px solid #3d4451;padding:12px 14px">
+        ${p.lieu?`<div style="font-size:13px;color:#8b949e;margin-bottom:5px">📍 ${p.lieu}</div>`:''}
+        ${p.platform?`<div style="font-size:13px;color:#8b949e;margin-bottom:5px">Plateforme : ${p.platform}</div>`:''}
+        ${p.notes?`<div style="font-size:13px;color:#8b949e;font-style:italic;margin-bottom:8px">${p.notes}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+  el.innerHTML = header + cards;
 }
 function openPreorderModal(id) {
   editingPreorderId = id || null;
@@ -1128,29 +1131,40 @@ function renderPublicStock(data) {
   const pub = document.getElementById('publicPage');
   if (!pub) return;
   pub.style.display = 'block';
+  const sorted = [...data].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const byEvent = {};
+  sorted.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
   document.getElementById('publicContent').innerHTML = `
-    <div style="max-width:500px;margin:0 auto;padding:32px 16px 60px">
-      <div style="font-size:22px;font-weight:800;letter-spacing:4px;color:var(--accent-blue);margin-bottom:2px">TICKETDESK</div>
-      <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);margin:0 0 22px">Billets disponibles</h1>
-      ${!data.length
-        ? '<p style="color:var(--text-secondary);font-size:14px">Aucun billet disponible pour le moment.</p>'
-        : data.map(t => `
-          <div class="pub-card">
-            <div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:10px">${t.event||'—'}</div>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
-              <div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center">
-                ${t.date ? `<span style="color:var(--accent-blue);font-weight:600">${fmtDate(t.date)}</span>` : ''}
-                ${t.lieu ? `<span style="color:var(--text-secondary)">${t.lieu}</span>` : ''}
-                <span style="color:var(--text-primary);font-weight:600">${t.qty} place${t.qty>1?'s':''}</span>
-              </div>
-              ${t.cat ? `<div><span class="pub-tag">${t.cat}</span></div>` : ''}
-              ${t.place ? `<div style="color:var(--text-secondary)">${t.place}</div>` : ''}
-              ${t.wanted ? `<div style="color:var(--accent-green);font-weight:700;font-size:16px">Prix : ${fmtFull(t.wanted)}</div>` : ''}
-            </div>
-          </div>`).join('')}
-      <div style="margin-top:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);text-align:center">
-        <p style="font-size:15px;color:var(--text-secondary);margin-bottom:6px">Intéressé(e) par un ou plusieurs billets ?</p>
-        <p style="font-size:13px;color:var(--text-disabled)">Contactez-nous pour plus d'informations.</p>
+    <div style="max-width:520px;margin:0 auto;padding:28px 14px 60px;font-family:system-ui,-apple-system,sans-serif">
+      <div style="font-size:22px;font-weight:800;letter-spacing:4px;color:#58a6ff;margin-bottom:20px">TICKETDESK</div>
+      ${!data.length ? '<p style="color:#8b949e;font-size:14px">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
+        <div style="margin-bottom:28px">
+          <div style="font-size:20px;font-weight:700;color:#e6edf3;margin-bottom:12px">${eventName}</div>
+          ${Object.entries(byDate).map(([date,tickets])=>`
+            ${date?`<div style="font-size:14px;font-weight:600;color:#58a6ff;margin-bottom:8px">${fmtDate(date)}</div>`:''}
+            ${tickets.map(t=>{
+              const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
+              return `<div style="background:#1e2430;border:1px solid #30363d;border-radius:8px;padding:12px;margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:${t.place?'5px':'0'}">
+                      <span style="font-size:15px;font-weight:700;color:#e6edf3">${t.qty}x</span>
+                      ${t.cat?`<span style="font-size:14px;color:#c9d1d9">${t.cat}</span>`:''}
+                    </div>
+                    ${t.place?`<div style="font-size:13px;color:#8b949e">${t.place}</div>`:''}
+                  </div>
+                  <div style="text-align:right;flex-shrink:0">
+                    ${ppp?`<div style="font-size:16px;font-weight:700;color:#3fb950">${fmtFull(ppp)}/place</div>`:`<div style="font-size:13px;color:#8b949e;font-style:italic">Prix sur demande</div>`}
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          `).join('')}
+        </div>
+      `).join('')}
+      <div style="padding:18px;background:#1e2430;border:1px solid #30363d;border-radius:8px;text-align:center">
+        <p style="font-size:14px;color:#8b949e;margin:0 0 4px">Intéressé(e) par un ou plusieurs billets ?</p>
+        <p style="font-size:12px;color:#484f58;margin:0">Contactez-nous pour plus d'informations.</p>
       </div>
     </div>`;
 }
