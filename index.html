@@ -745,17 +745,20 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:100px 1fr 110px 130px 110px;gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
-    <span>Statut</span><span>Événement</span><span>Date</span><span>Acheteur</span><span style="text-align:right">Budget</span>
+  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:100px 1fr 100px 150px 120px;gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
+    <span>Statut</span><span>Événement</span><span>Date</span><span>Acheteur</span><span style="text-align:right">Budget max</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--text-disabled)':'var(--accent-blue)';
     const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#484f58':'#58a6ff';
     const did = 'pod-'+p.id;
     return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
-      <div style="display:grid;grid-template-columns:100px 1fr 110px 130px 110px;gap:12px;align-items:center;padding:13px 14px;min-height:52px">
+      <div style="display:grid;grid-template-columns:100px 1fr 100px 150px 120px;gap:12px;align-items:center;padding:13px 14px;min-height:65px">
         <span style="font-size:11px;font-weight:600;padding:3px 6px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center">${p.statut||'En recherche'}</span>
-        <span style="font-size:16px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</span>
+        <div style="min-width:0;overflow:hidden">
+          <div style="font-size:17px;font-weight:700;color:#e6edf3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</div>
+          ${p.lieu?`<div style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${p.lieu}</div>`:''}
+        </div>
         <span style="font-size:15px;color:var(--accent-blue);white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
         <span style="font-size:15px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
         <span style="font-size:16px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
@@ -1145,16 +1148,16 @@ function renderPublicStock(data) {
             ${tickets.map(t=>{
               const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
               return `<div style="background:#1e2430;border:1px solid #30363d;border-radius:8px;padding:12px;margin-bottom:8px">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
                   <div style="flex:1;min-width:0">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:${t.place?'5px':'0'}">
                       <span style="font-size:15px;font-weight:700;color:#e6edf3">${t.qty}x</span>
-                      ${t.cat?`<span style="font-size:14px;color:#c9d1d9">${t.cat}</span>`:''}
+                      ${t.cat?`<span style="font-size:14px;color:#e6edf3">${t.cat}</span>`:''}
                     </div>
                     ${t.place?`<div style="font-size:13px;color:#8b949e">${t.place}</div>`:''}
                   </div>
                   <div style="text-align:right;flex-shrink:0">
-                    ${ppp?`<div style="font-size:16px;font-weight:700;color:#3fb950">${fmtFull(ppp)}/place</div>`:`<div style="font-size:13px;color:#8b949e;font-style:italic">Prix sur demande</div>`}
+                    ${ppp?`<div style="font-size:16px;font-weight:700;color:#e6edf3">${fmtFull(ppp)}/place</div>`:`<div style="font-size:13px;color:#8b949e;font-style:italic">Prix sur demande</div>`}
                   </div>
                 </div>
               </div>`;
