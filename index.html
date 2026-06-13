@@ -168,8 +168,9 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   display:grid;grid-template-columns:90px minmax(0,220px) 100px 1fr 140px 100px 160px;
   gap:12px;border-radius:var(--radius) var(--radius) 0 0;
   border:1px solid var(--border);border-bottom:none;margin-top:8px;
-  font-size:10px;color:var(--text-disabled);text-transform:uppercase;letter-spacing:.08em;align-items:center;
+  font-size:13px;color:var(--text-disabled);text-transform:uppercase;letter-spacing:.08em;align-items:center;
 }
+.journal-header span:nth-child(5){text-align:left}
 .journal-header span:nth-child(6){text-align:right}
 .journal-header span:nth-child(7){text-align:right}
 .tx-card{
@@ -189,7 +190,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .tx-event{font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-date{font-size:16px;color:var(--accent-blue);white-space:nowrap}
 .tx-info{font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-buyer{font-size:16px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-buyer{font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
 .tx-profit{font-size:18px;font-weight:600;text-align:right;white-space:nowrap}
 .tx-badges{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:center;white-space:nowrap}
 .tx-summary > .badge{font-size:14px;padding:4px 12px}
