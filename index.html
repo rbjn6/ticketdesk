@@ -376,11 +376,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue)}
         </div>
         <button class="btn btn-primary" id="gmailConnectBtn" id="loginGoogleBtn" style="width:100%;justify-content:center">Connecter Gmail + Drive</button>
         <div style="margin-top:8px;display:none" id="gmailScanRow">
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <div style="flex:1"><label class="flabel">Du</label><input type="date" id="scan-date-from"></div>
-            <div style="flex:1"><label class="flabel">Au</label><input type="date" id="scan-date-to"></div>
+          <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center;margin-bottom:6px">Scanner les billets</button>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="gmailScan(7)" style="flex:1;justify-content:center">Dernière semaine</button>
+            <button class="btn btn-sm" onclick="gmailScan(30)" style="flex:1;justify-content:center">Dernier mois</button>
           </div>
-          <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center">Scanner les billets</button>
         </div>
       </div>
       <div id="importResults" style="display:none">
@@ -744,22 +744,28 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   el.innerHTML = preorders.map(p => {
-    const borderColor = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#484f58':'#58a6ff';
-    const badgeBg = p.statut==='Trouvé'?'rgba(63,185,80,.15)':p.statut==='Annulé'?'rgba(72,79,88,.15)':'rgba(88,166,255,.15)';
+    const sc = p.statut === 'Trouvé' ? 'po-trouve' : p.statut === 'Annulé' ? 'po-annule' : 'po-recherche';
     return `
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;border-left:3px solid ${borderColor};padding:14px;margin-bottom:8px">
-      <div style="font-size:17px;font-weight:700;color:#e6edf3;margin-bottom:8px">${p.event||'—'}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:${p.notes?'8px':'10px'}">
-        <span style="font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:${badgeBg};color:${borderColor}">${p.statut||'En recherche'}</span>
-        ${p.date?`<span style="color:#484f58">·</span><span style="font-size:13px;color:#58a6ff">${fmtDate(p.date)}</span>`:''}
-        ${p.lieu?`<span style="color:#484f58">·</span><span style="font-size:13px;color:#8b949e">${p.lieu}</span>`:''}
-        ${p.buyer?`<span style="color:#484f58">·</span><span style="font-size:13px;color:#8b949e">${p.buyer}</span>`:''}
-        ${p.budget?`<span style="color:#484f58">·</span><span style="font-size:13px;font-weight:600;color:#e6edf3">${fmtFull(p.budget)}</span>`:''}
+    <div class="po-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <div style="min-width:0;flex:1">
+          <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:6px">${p.event||'—'}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <span class="po-status ${sc}">${p.statut||'En recherche'}</span>
+            ${p.date?`<span style="font-size:13px;color:var(--accent)">${fmtDate(p.date)}</span>`:''}
+            ${p.lieu?`<span style="font-size:13px;color:var(--text2)">${p.lieu}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm" onclick="openPreorderModal(${p.id})">Modifier</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePreorder(${p.id})">Supprimer</button>
+        </div>
       </div>
-      ${p.notes?`<div style="font-size:13px;color:#8b949e;font-style:italic;margin-bottom:10px">${p.notes}</div>`:''}
-      <div style="display:flex;justify-content:flex-end;gap:6px">
-        <button class="btn btn-sm" onclick="openPreorderModal(${p.id})">Modifier</button>
-        <button class="btn btn-sm btn-danger" onclick="deletePreorder(${p.id})">Supprimer</button>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--text2)">
+        ${p.budget?`<span>Budget : <strong style="color:var(--text)">${fmtFull(p.budget)}</strong></span>`:''}
+        ${p.buyer?`<span>Acheteur : <strong style="color:var(--text)">${p.buyer}</strong></span>`:''}
+        ${p.platform?`<span>Plateforme : <strong style="color:var(--text)">${p.platform}</strong></span>`:''}
+        ${p.notes?`<div style="width:100%;margin-top:4px;font-style:italic">${p.notes}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1122,49 +1128,29 @@ function renderPublicStock(data) {
   const pub = document.getElementById('publicPage');
   if (!pub) return;
   pub.style.display = 'block';
-  const groups = {};
-  data.forEach(t => { const k = t.event||'—'; if(!groups[k]) groups[k]=[]; groups[k].push(t); });
-  const sortedGroups = Object.entries(groups).sort(([,a],[,b]) => (a[0].date||'9999').localeCompare(b[0].date||'9999'));
-  const totalPlaces = data.reduce((s,t) => s+(t.qty||1), 0);
   document.getElementById('publicContent').innerHTML = `
-    <div style="max-width:520px;margin:0 auto;padding:28px 14px 60px;font-family:system-ui,-apple-system,sans-serif">
-      <div style="text-align:center;margin-bottom:24px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.12em;color:#8b949e;text-transform:uppercase;margin-bottom:6px">Catalogue</div>
-        <div style="font-size:15px;color:#e6edf3">Billets disponibles · <strong>${totalPlaces}</strong> place${totalPlaces>1?'s':''}</div>
-      </div>
-      ${!data.length ? '<p style="color:#8b949e;font-size:14px;text-align:center">Aucun billet disponible.</p>' : sortedGroups.map(([eventName,tickets]) => {
-        const firstDate = tickets.find(t=>t.date)?.date||'';
-        const lieu = tickets.find(t=>t.lieu)?.lieu||'';
-        const totalQty = tickets.reduce((s,t)=>s+(t.qty||1),0);
-        return `<div style="background:#1e2430;border:1px solid #30363d;border-radius:12px;margin-bottom:16px;overflow:hidden">
-          <div style="padding:16px 16px 12px;border-bottom:1px solid #30363d">
-            <div style="font-size:18px;font-weight:700;color:#e6edf3;margin-bottom:8px">${eventName}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:#8b949e">
-              ${firstDate?`<span>📅 ${fmtDate(firstDate)}</span>`:''}
-              ${lieu?`<span>📍 ${lieu}</span>`:''}
-              <span>🎟 ${totalQty} place${totalQty>1?'s':''}</span>
+    <div style="max-width:500px;margin:0 auto;padding:32px 16px 60px">
+      <div style="font-size:22px;font-weight:800;letter-spacing:4px;color:var(--accent-blue);margin-bottom:2px">TICKETDESK</div>
+      <h1 style="font-size:20px;font-weight:700;color:var(--text-primary);margin:0 0 22px">Billets disponibles</h1>
+      ${!data.length
+        ? '<p style="color:var(--text-secondary);font-size:14px">Aucun billet disponible pour le moment.</p>'
+        : data.map(t => `
+          <div class="pub-card">
+            <div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:10px">${t.event||'—'}</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center">
+                ${t.date ? `<span style="color:var(--accent-blue);font-weight:600">${fmtDate(t.date)}</span>` : ''}
+                ${t.lieu ? `<span style="color:var(--text-secondary)">${t.lieu}</span>` : ''}
+                <span style="color:var(--text-primary);font-weight:600">${t.qty} place${t.qty>1?'s':''}</span>
+              </div>
+              ${t.cat ? `<div><span class="pub-tag">${t.cat}</span></div>` : ''}
+              ${t.place ? `<div style="color:var(--text-secondary)">${t.place}</div>` : ''}
+              ${t.wanted ? `<div style="color:var(--accent-green);font-weight:700;font-size:16px">Prix : ${fmtFull(t.wanted)}</div>` : ''}
             </div>
-          </div>
-          <div>
-            ${tickets.map(t => {
-              const pricePerSeat = t.wanted&&t.qty ? t.wanted/t.qty : null;
-              return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05)">
-                <div style="flex:1;min-width:0">
-                  ${t.cat?`<span style="display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#2d3747;color:#8b949e;letter-spacing:.04em;margin-bottom:4px">${t.cat}</span>`:''}
-                  ${t.place?`<div style="font-size:13px;color:#c9d1d9">${t.place}</div>`:''}
-                </div>
-                <div style="text-align:right;flex-shrink:0">
-                  <div style="font-size:13px;color:#8b949e">${t.qty}x</div>
-                  ${pricePerSeat?`<div style="font-size:15px;font-weight:700;color:#3fb950">${fmtFull(pricePerSeat)}/place</div>`:`<div style="font-size:13px;color:#8b949e;font-style:italic">Prix sur demande</div>`}
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>`;
-      }).join('')}
-      <div style="margin-top:16px;padding:18px;background:#1e2430;border:1px solid #30363d;border-radius:12px;text-align:center">
-        <p style="font-size:14px;color:#8b949e;margin:0 0 4px">Intéressé(e) par un ou plusieurs billets ?</p>
-        <p style="font-size:12px;color:#484f58;margin:0">Contactez-nous pour plus d'informations.</p>
+          </div>`).join('')}
+      <div style="margin-top:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);text-align:center">
+        <p style="font-size:15px;color:var(--text-secondary);margin-bottom:6px">Intéressé(e) par un ou plusieurs billets ?</p>
+        <p style="font-size:13px;color:var(--text-disabled)">Contactez-nous pour plus d'informations.</p>
       </div>
     </div>`;
 }
@@ -1701,7 +1687,7 @@ function gmailConnect(){
 async function fetchGmailProfile(token){
   try{const r=await fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+token}});const d=await r.json();if(d.emailAddress)localStorage.setItem('ticketdesk_gmail_email',d.emailAddress);document.getElementById('gmailEmail').textContent=d.emailAddress||'';}catch(e){}
 }
-async function gmailScan(){
+async function gmailScan(days){
   if(!gmailToken)return;showToast('Scan en cours…');
   const queries=['subject:confirmation+commande','subject:confirmation+commande+fnac','subject:Stade+de+France+commande'];
   const allMsgs=[];
@@ -1709,9 +1695,7 @@ async function gmailScan(){
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
   for(const id of ids.slice(0,100)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
-  const _df=document.getElementById('scan-date-from')?.value;
-  const _dt=document.getElementById('scan-date-to')?.value;
-  if(_df||_dt) importCandidates=importCandidates.filter(c=>{if(!c.buyDate)return true;if(_df&&c.buyDate<_df)return false;if(_dt&&c.buyDate>_dt)return false;return true;});
+  if(days){const cutoff=new Date(Date.now()-days*86400000).toISOString().split('T')[0];importCandidates=importCandidates.filter(c=>!c.buyDate||c.buyDate>=cutoff);}
   renderImportResults();
 }
 function parseTicketMail(msg){
