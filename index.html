@@ -740,33 +740,39 @@ function savePreorders() {
   driveSyncDebounced();
 }
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+function cyclePOStatus(id){
+  const p=preorders.find(x=>x.id===id);if(!p)return;
+  const cycle={'En recherche':'Trouvé','Trouvé':'Annulé','Annulé':'En recherche'};
+  p.statut=cycle[p.statut]||'En recherche';
+  savePreorders();renderPreorders();
+}
 function renderPreorders() {
   const el = document.getElementById('preordersList');
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:100px 1fr 100px 150px 120px;gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
-    <span>Statut</span><span>Événement</span><span>Date</span><span>Acheteur</span><span style="text-align:right">Budget max</span>
+  const cols = '110px 200px 100px 130px 1fr 130px 100px';
+  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
+    <span>Statut</span><span>Événement</span><span>Date</span><span>Lieu</span><span>Infos</span><span>Acheteur</span><span style="text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--text-disabled)':'var(--accent-blue)';
     const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#484f58':'#58a6ff';
     const did = 'pod-'+p.id;
     return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
-      <div style="display:grid;grid-template-columns:100px 1fr 100px 150px 120px;gap:12px;align-items:center;padding:13px 14px;min-height:65px">
-        <span style="font-size:11px;font-weight:600;padding:3px 6px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center">${p.statut||'En recherche'}</span>
+      <div style="display:grid;grid-template-columns:${cols};gap:12px;align-items:center;padding:13px 14px;min-height:65px">
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="font-size:11px;font-weight:600;padding:3px 6px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
         <div style="min-width:0;overflow:hidden">
           <div style="font-size:17px;font-weight:700;color:#e6edf3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</div>
-          ${p.lieu?`<div style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${p.lieu}</div>`:''}
         </div>
         <span style="font-size:15px;color:var(--accent-blue);white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:15px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.lieu||'—'}</span>
+        <span style="font-size:14px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:${p.notes?'italic':'normal'}">${p.notes||'—'}</span>
         <span style="font-size:15px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
         <span style="font-size:16px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
       <div id="${did}" style="display:none;border-top:2px solid #3d4451;padding:12px 14px">
-        ${p.lieu?`<div style="font-size:13px;color:#8b949e;margin-bottom:5px">📍 ${p.lieu}</div>`:''}
         ${p.platform?`<div style="font-size:13px;color:#8b949e;margin-bottom:5px">Plateforme : ${p.platform}</div>`:''}
-        ${p.notes?`<div style="font-size:13px;color:#8b949e;font-style:italic;margin-bottom:8px">${p.notes}</div>`:''}
         <div style="display:flex;gap:8px;margin-top:6px">
           <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
           <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
