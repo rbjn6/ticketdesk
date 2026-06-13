@@ -751,13 +751,13 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cols = '15% 20% 12% 13% 13% 12% 15%';
+  const cols = '10% 15% 10% 10% 15% 12% 28%';
   const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
     <span>Statut</span><span>Événement</span><span>Date</span><span>Lieu</span><span>Infos</span><span>Acheteur</span><span style="text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
-    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--text-disabled)':'var(--accent-blue)';
-    const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#484f58':'#58a6ff';
+    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
+    const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#f85149':'#58a6ff';
     const did = 'pod-'+p.id;
     return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
       <div style="display:grid;grid-template-columns:${cols};gap:12px;align-items:center;padding:13px 14px;min-height:65px">
