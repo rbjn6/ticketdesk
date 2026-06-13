@@ -838,6 +838,7 @@ function openSellModal(id) {
         style="width:100px">
       <span id="sm-qty-sell-err" style="display:none;color:var(--danger,#e55);font-size:13px;margin-top:4px;display:none"></span>
     </div>`;
+  applyModalStyles(document.getElementById('sellModal'));
   document.getElementById('sm-buyer').value = '';
   document.getElementById('sm-platform').value = '';
   document.getElementById('sm-sell').value = '';
@@ -1526,8 +1527,8 @@ function renderJournalList() {
     for(let i=0;i<maxRows;i++){
       const l = colL[i]||null, r = colR[i]||null;
       rows += `<div style="display:contents">
-        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val"${l.c?` style="color:${l.c}"`:''}>${l.v}</div>`:''}</div>
-        <div class="tx-drow" style="padding-left:12px;border-left:2px solid #3d4451">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val"${r.c?` style="color:${r.c}"`:''}>${r.v}</div>`:''}</div>
+        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val" style="color:${l.c||'#8b949e'}">${l.v}</div>`:''}</div>
+        <div class="tx-drow" style="padding-left:12px;border-left:2px solid #3d4451">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val" style="color:${r.c||'#8b949e'}">${r.v}</div>`:''}</div>
       </div>`;
     }
 
@@ -2127,6 +2128,18 @@ checkAuth();
 renderGmail();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
+function applyModalStyles(root) {
+  const modal = root && root.querySelector ? (root.querySelector('.modal') || root) : root;
+  if (!modal) return;
+  modal.style.background = '#1e2430';
+  modal.querySelectorAll('input:not([type=checkbox]):not([type=radio]),select,textarea').forEach(function(el) {
+    el.style.background = '#13171f';
+    el.style.border = '1px solid #30363d';
+    el.style.color = '#e6edf3';
+  });
+  modal.querySelectorAll('.flabel').forEach(function(el) { el.style.color = '#8b949e'; });
+}
+
 // Login button listeners + public share page detection
 window.addEventListener('DOMContentLoaded', function() {
   // Public share page — intercept before anything else
@@ -2145,6 +2158,7 @@ window.addEventListener('DOMContentLoaded', function() {
   if(submitBtn) submitBtn.addEventListener('click', doLogin);
   if(googleBtn) googleBtn.addEventListener('click', gmailConnect);
   if(pinInput)  pinInput.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  document.querySelectorAll('.modal-overlay').forEach(function(overlay) { applyModalStyles(overlay); });
 });
 </script>
 <div class="login-screen" id="loginScreen">
