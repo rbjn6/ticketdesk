@@ -751,7 +751,7 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cols = '110px 200px 100px 130px 1fr 130px 100px';
+  const cols = '12% 18% 10% 12% 25% 13% 10%';
   const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:12px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
     <span>Statut</span><span>Événement</span><span>Date</span><span>Lieu</span><span>Infos</span><span>Acheteur</span><span style="text-align:right">Budget</span>
   </div>`;
