@@ -175,11 +175,10 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .journal-header span:nth-child(7){text-align:right}
 .tx-card{
   background:var(--bg-card);border:1px solid var(--border);
-  border-top:none;border-bottom:2px solid var(--border);
+  border-radius:10px;margin-bottom:6px;
   overflow:hidden;cursor:pointer;transition:background .1s;
 }
 .tx-card:hover{background:var(--bg-card-hover)}
-.tx-card:last-child{border-radius:0 0 var(--radius) var(--radius)}
 .tx-card.is-vendu{border-left:3px solid var(--accent-green)}
 .tx-card.is-stock{border-left:3px solid var(--accent-red)}
 .tx-card.is-archive{border-left:3px solid var(--text-disabled)}
@@ -1493,7 +1492,7 @@ function renderJournalList() {
     return;
   }
 
-  document.getElementById('journalList').style.cssText='border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);overflow:hidden';
+  document.getElementById('journalList').style.cssText='margin-top:6px';
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = t.sell ? (t.sell - t.buy) : -t.buy;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
