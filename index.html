@@ -757,7 +757,7 @@ function renderPreorders() {
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const cols = '55px 1fr 62px 55px 60px 28px 55px 55px';
   const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:8px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
-    <span>Statut</span><span>Événement</span><span>Date</span><span>Lieu</span><span>Catégorie</span><span>Qté</span><span>Acheteur</span><span style="text-align:right">Budget</span>
+    <span>Statut</span><span>Événement</span><span>Date</span><span>Catégorie</span><span>Qté</span><span>Lieu</span><span>Acheteur</span><span style="text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
@@ -770,9 +770,9 @@ function renderPreorders() {
           <div style="font-size:15px;font-weight:700;color:#e6edf3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</div>
         </div>
         <span style="font-size:13px;color:var(--accent-blue);white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
-        <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.lieu||'—'}</span>
         <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.cat||'—'}</span>
         <span style="font-size:13px;color:#8b949e;white-space:nowrap;text-align:center">${p.qty||1}</span>
+        <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.lieu||'—'}</span>
         <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
         <span style="font-size:14px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
