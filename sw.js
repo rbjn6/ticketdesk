@@ -1,5 +1,5 @@
 // Service worker minimal — pas de cache pour éviter les problèmes de mise à jour
-// v2
+// v3
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => {
   e.waitUntil(
