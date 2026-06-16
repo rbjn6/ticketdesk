@@ -755,9 +755,10 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cols = '55px 1fr 62px 55px 60px 28px 55px 55px';
+  const cols = '85px 75px 55px 25px 45px 35px 1fr 45px';
+  const cellStyle = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
   const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:8px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
-    <span>Statut</span><span>Événement</span><span>Date</span><span>Qté</span><span>Catégorie</span><span>Lieu</span><span>Acheteur</span><span style="text-align:right">Budget</span>
+    <span style="${cellStyle}">Statut</span><span style="${cellStyle}">Événement</span><span style="${cellStyle}">Date</span><span style="${cellStyle}">Qté</span><span style="${cellStyle}">Cat.</span><span style="${cellStyle}">Lieu</span><span style="${cellStyle}">Acheteur</span><span style="${cellStyle};text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
@@ -765,21 +766,21 @@ function renderPreorders() {
     const did = 'pod-'+p.id;
     return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
       <div style="display:grid;grid-template-columns:${cols};gap:8px;align-items:center;padding:11px 14px;min-height:52px;overflow:hidden">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="font-size:10px;font-weight:600;padding:2px 5px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
-        <div style="min-width:0;overflow:hidden">
-          <div style="font-size:15px;font-weight:700;color:#e6edf3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</div>
-        </div>
-        <span style="font-size:13px;color:var(--accent-blue);white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
-        <span style="font-size:13px;color:#8b949e;white-space:nowrap;text-align:center">${p.qty||1}</span>
-        <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.cat||'—'}</span>
-        <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.lieu||'—'}</span>
-        <span style="font-size:13px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
-        <span style="font-size:14px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="font-size:10px;font-weight:600;padding:2px 5px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};${cellStyle};text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
+        <span style="font-size:15px;font-weight:700;color:#e6edf3;${cellStyle}">${p.event||'—'}</span>
+        <span style="font-size:13px;color:var(--accent-blue);${cellStyle}">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:13px;color:#8b949e;${cellStyle};text-align:center">${p.qty||1}</span>
+        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.cat||'—'}</span>
+        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.lieu||'—'}</span>
+        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.buyer||'—'}</span>
+        <span style="font-size:13px;font-weight:600;color:var(--text-primary);${cellStyle};text-align:right">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
       <div id="${did}" style="display:none;border-top:2px solid #3d4451;padding:12px 14px">
-        ${p.notes?`<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Notes</div><div style="font-size:13px;color:#8b949e;font-style:italic">${p.notes}</div></div>`:''}
-        ${p.platform?`<div style="font-size:13px;color:#8b949e;margin-bottom:5px">Plateforme : ${p.platform}</div>`:''}
-        <div style="display:flex;gap:8px;margin-top:6px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
+          ${p.notes?`<div><div style="font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Notes</div><div style="font-size:14px;color:#e6edf3">${p.notes}</div></div>`:''}
+          ${p.platform?`<div><div style="font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Plateforme</div><div style="font-size:14px;color:#e6edf3">${p.platform}</div></div>`:''}
+        </div>
+        <div style="display:flex;gap:8px">
           <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
           <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
         </div>
