@@ -755,25 +755,25 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cols = '85px 75px 55px 25px 45px 35px 1fr 45px';
-  const cellStyle = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
-  const header = `<div style="background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:${cols};gap:8px;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">
-    <span style="${cellStyle}">Statut</span><span style="${cellStyle}">Événement</span><span style="${cellStyle}">Date</span><span style="${cellStyle}">Qté</span><span style="${cellStyle}">Cat.</span><span style="${cellStyle}">Lieu</span><span style="${cellStyle}">Acheteur</span><span style="${cellStyle};text-align:right">Budget</span>
+  const cols = '100px 90px 70px 30px 60px 50px 1fr 60px';
+  const cs = 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px';
+  const header = `<div style="background:var(--bg-nav);padding:0;display:grid;grid-template-columns:${cols};gap:0;border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px;align-items:center">
+    <span style="${cs}">Statut</span><span style="${cs}">Événement</span><span style="${cs}">Date</span><span style="${cs}">Qté</span><span style="${cs}">Cat.</span><span style="${cs}">Lieu</span><span style="${cs}">Acheteur</span><span style="${cs};text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
     const badgeHex = p.statut==='Trouvé'?'#3fb950':p.statut==='Annulé'?'#f85149':'#58a6ff';
     const did = 'pod-'+p.id;
     return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s" onclick="togglePODetail('${did}')">
-      <div style="display:grid;grid-template-columns:${cols};gap:8px;align-items:center;padding:11px 14px;min-height:52px;overflow:hidden">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="font-size:10px;font-weight:600;padding:2px 5px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};${cellStyle};text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
-        <span style="font-size:15px;font-weight:700;color:#e6edf3;${cellStyle}">${p.event||'—'}</span>
-        <span style="font-size:13px;color:var(--accent-blue);${cellStyle}">${p.date?fmtDate(p.date):'—'}</span>
-        <span style="font-size:13px;color:#8b949e;${cellStyle};text-align:center">${p.qty||1}</span>
-        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.cat||'—'}</span>
-        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.lieu||'—'}</span>
-        <span style="font-size:13px;color:#8b949e;${cellStyle}">${p.buyer||'—'}</span>
-        <span style="font-size:13px;font-weight:600;color:var(--text-primary);${cellStyle};text-align:right">${p.budget?fmtFull(p.budget):'—'}</span>
+      <div style="display:grid;grid-template-columns:${cols};gap:0;align-items:center;height:60px;overflow:hidden">
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="font-size:13px;font-weight:600;padding:3px 8px;border-radius:20px;background:${badgeHex}22;color:${badgeHex};${cs};text-align:center;cursor:pointer;margin:0 8px">${p.statut||'En recherche'}</span>
+        <span style="font-size:16px;font-weight:700;color:#e6edf3;${cs}">${p.event||'—'}</span>
+        <span style="font-size:14px;color:#58a6ff;${cs}">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:14px;color:#e6edf3;${cs};text-align:center">${p.qty||1}</span>
+        <span style="font-size:14px;color:#e6edf3;${cs}">${p.cat||'—'}</span>
+        <span style="font-size:13px;color:#8b949e;${cs}">${p.lieu||'—'}</span>
+        <span style="font-size:13px;color:#8b949e;${cs}">${p.buyer||'—'}</span>
+        <span style="font-size:16px;font-weight:700;color:#e6edf3;${cs};text-align:right">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
       <div id="${did}" style="display:none;border-top:2px solid #3d4451;padding:12px 14px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
