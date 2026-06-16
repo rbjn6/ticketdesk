@@ -755,7 +755,7 @@ function renderPreorders() {
   if (!el) return;
   if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cs = 'flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 6px';
+  const cs = 'flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px;box-sizing:border-box';
   const rowFlex = 'width:100%;display:flex;align-items:center;overflow:hidden;box-sizing:border-box';
   const header = `<div style="${rowFlex};background:var(--bg-nav);border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px">
     <span style="${cs};flex:0 0 80px">Statut</span><span style="${cs};flex:0 0 75px">Événement</span><span style="${cs};flex:0 0 62px">Date</span><span style="${cs};flex:0 0 22px">Qté</span><span style="${cs};flex:0 0 50px">Cat.</span><span style="${cs};flex:0 0 40px">Lieu</span><span style="${cs};flex:1 1 auto">Acheteur</span><span style="${cs};flex:0 0 50px;text-align:right">Budget</span>
