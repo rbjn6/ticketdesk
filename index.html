@@ -22,10 +22,10 @@
   --text-primary:   #f9fafb;
   --text-secondary: #8b9ab0;
   --text-disabled:  #4a5568;
-  --accent-blue:   #2979ff;
-  --accent-green:  #00e676;
-  --accent-red:    #ff1744;
-  --accent-yellow: #ff9100;
+  --accent-blue:   #00b4ff;
+  --accent-green:  #00ff41;
+  --accent-red:    #ff003c;
+  --accent-yellow: #ff7700;
   --accent-purple: #bc8cff;
   --radius:    12px;
   --radius-sm: 8px;
@@ -89,10 +89,10 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .btn:hover{border-color:var(--accent-blue);background:var(--bg-card-hover)}
 .btn:active{opacity:.85}
 .btn-primary{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue);font-weight:600}
-.btn-primary:hover{background:#1565c0;border-color:#1565c0}
+.btn-primary:hover{background:#007aa3;border-color:#007aa3}
 .btn-sm{padding:6px 12px;font-size:13px}
-.btn-danger{color:var(--accent-red);border-color:rgba(255,23,68,.3);background:transparent}
-.btn-danger:hover{background:rgba(255,23,68,.08);border-color:var(--accent-red)}
+.btn-danger{color:var(--accent-red);border-color:rgba(255,0,60,.3);background:transparent}
+.btn-danger:hover{background:rgba(255,0,60,.08);border-color:var(--accent-red)}
 
 /* ── CARDS ─────────────────────────────────────────── */
 .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
@@ -106,12 +106,12 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 
 /* ── BADGES ────────────────────────────────────────── */
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.b-vendu{background:rgba(0,230,118,.15);color:var(--accent-green)}
-.b-stock{background:rgba(255,23,68,.15);color:var(--accent-red)}
-.b-paye{background:rgba(0,230,118,.15);color:var(--accent-green)}
-.b-attente{background:rgba(255,145,0,.15);color:var(--accent-yellow)}
-.b-livre{background:rgba(0,230,118,.15);color:var(--accent-green)}
-.b-nonlivre{background:rgba(255,23,68,.15);color:var(--accent-red)}
+.b-vendu{background:rgba(0,255,65,.15);color:var(--accent-green)}
+.b-stock{background:rgba(255,0,60,.15);color:var(--accent-red)}
+.b-paye{background:rgba(0,255,65,.15);color:var(--accent-green)}
+.b-attente{background:rgba(255,119,0,.15);color:var(--accent-yellow)}
+.b-livre{background:rgba(0,255,65,.15);color:var(--accent-green)}
+.b-nonlivre{background:rgba(255,0,60,.15);color:var(--accent-red)}
 .b-archive{background:rgba(74,85,104,.25);color:var(--text-secondary)}
 
 /* ── SECTION TITLES ────────────────────────────────── */
@@ -175,7 +175,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .flabel{font-size:11px;color:var(--text-secondary);letter-spacing:.1em;margin-bottom:6px;display:block;font-weight:600;text-transform:uppercase}
 input,select,textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:14px;font-family:inherit;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
 .modal input,.modal select,.modal textarea{background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;border-radius:10px;padding:12px 14px}
-input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(41,121,255,.2)}
+input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(0,180,255,.2)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-actions{display:flex;gap:8px;margin-top:20px}
 .form-actions .btn{flex:1;justify-content:center}
@@ -188,9 +188,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .login-tagline{font-size:13px;color:var(--text-secondary);margin-bottom:28px}
 .login-field-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;text-align:left;margin-bottom:6px;display:block;font-weight:600}
 .login-field{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg-main);color:var(--text-primary);font-size:14px;margin-bottom:14px;font-family:inherit;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
-.login-field:focus{outline:none;border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(41,121,255,.2)}
+.login-field:focus{outline:none;border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(0,180,255,.2)}
 .login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 20px;background:var(--accent-blue);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;transition:all .15s}
-.login-btn:hover{background:#1565c0}.login-btn:active{opacity:.85}
+.login-btn:hover{background:#007aa3}.login-btn:active{opacity:.85}
 .login-divider{display:flex;align-items:center;gap:10px;margin:18px 0}
 .login-divider-line{flex:1;height:1px;background:var(--border)}
 .login-divider-text{font-size:12px;color:var(--text-disabled)}
@@ -200,8 +200,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .login-error{font-size:13px;color:var(--accent-red);margin-bottom:10px;min-height:18px}
 .toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:9px 18px;font-size:14px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.02em;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:rgba(0,230,118,.4);color:var(--accent-green)}
-.toast.err{border-color:rgba(255,23,68,.4);color:var(--accent-red)}
+.toast.ok{border-color:rgba(0,255,65,.4);color:var(--accent-green)}
+.toast.err{border-color:rgba(255,0,60,.4);color:var(--accent-red)}
 
 /* ── MISC ──────────────────────────────────────────── */
 .empty{text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:13px}
@@ -211,9 +211,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .dash-chip.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
 .po-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
 .po-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.po-recherche{background:rgba(41,121,255,.15);color:var(--accent-blue)}
-.po-trouve{background:rgba(0,230,118,.15);color:var(--accent-green)}
-.po-annule{background:rgba(255,23,68,.15);color:var(--accent-red)}
+.po-recherche{background:rgba(0,180,255,.15);color:var(--accent-blue)}
+.po-trouve{background:rgba(0,255,65,.15);color:var(--accent-green)}
+.po-annule{background:rgba(255,0,60,.15);color:var(--accent-red)}
 .metric-block{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .metric-block-title{font-size:11px;color:var(--text-secondary);letter-spacing:.1em;margin-bottom:10px;font-weight:600;text-transform:uppercase}
 .metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
@@ -221,18 +221,18 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .metric-row-total{margin-top:4px;padding-top:8px;border-top:1px solid var(--border)}
 .metric-row-label{font-size:12px;color:var(--text-secondary)}
 .metric-row-val{font-size:14px;font-weight:600;color:var(--text-primary)}
-.alerts-wrap{background:#1a0a0a;border:1px solid rgba(255,23,68,.3);border-radius:12px;overflow:hidden;margin-bottom:14px}
-.alert-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,23,68,.2);cursor:pointer}
-.alert-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-bottom:1px solid rgba(255,23,68,.1);font-size:13px;line-height:1.4;transition:background .1s}
+.alerts-wrap{background:#1a0a0a;border:1px solid rgba(255,0,60,.3);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.alert-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,0,60,.2);cursor:pointer}
+.alert-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-bottom:1px solid rgba(255,0,60,.1);font-size:13px;line-height:1.4;transition:background .1s}
 .alert-item:last-child{border-bottom:none}
-.alert-item:hover{background:rgba(255,23,68,.08)}
+.alert-item:hover{background:rgba(255,0,60,.08)}
 .nav-badge{display:none;align-items:center;justify-content:center;background:var(--accent-red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle}
 .share-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
 .share-item:last-child{border-bottom:none}
 .share-item:hover{background:var(--bg-card-hover)}
 #publicPage{display:none;position:fixed;inset:0;background:var(--bg-main);overflow-y:auto;z-index:2000;-webkit-overflow-scrolling:touch}
 .pub-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px}
-.pub-tag{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:12px;background:rgba(41,121,255,.15);color:var(--accent-blue)}
+.pub-tag{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:12px;background:rgba(0,180,255,.15);color:var(--accent-blue)}
 </style>
 </head>
 <body>
@@ -703,7 +703,7 @@ function renderPreorders() {
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
-    const badgeHex = p.statut==='Trouvé'?'#00e676':p.statut==='Annulé'?'#ff1744':'#2979ff';
+    const badgeHex = p.statut==='Trouvé'?'#00ff41':p.statut==='Annulé'?'#ff003c':'#00b4ff';
     const did = 'pod-'+p.id;
     return `<div style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s;box-sizing:border-box" onclick="togglePODetail('${did}')">
       <div style="${rowFlex};height:60px">
@@ -1111,12 +1111,12 @@ function renderPublicStock(data) {
                   <div style="flex:1;min-width:0">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:${t.place?'6px':'0'}">
                       <span style="font-size:15px;font-weight:700;color:#f9fafb">${t.qty}x</span>
-                      ${t.cat?`<span style="font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(41,121,255,.15);color:#2979ff;font-weight:600">${t.cat}</span>`:''}
+                      ${t.cat?`<span style="font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(0,180,255,.15);color:#00b4ff;font-weight:600">${t.cat}</span>`:''}
                     </div>
                     ${t.place?`<div style="font-size:13px;color:#8b9ab0">${t.place}</div>`:''}
                   </div>
                   <div style="text-align:right;flex-shrink:0">
-                    ${ppp?`<div style="font-size:18px;font-weight:700;color:#00e676">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#8b9ab0;font-style:italic">Prix sur demande</div>`}
+                    ${ppp?`<div style="font-size:18px;font-weight:700;color:#00ff41">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#8b9ab0;font-style:italic">Prix sur demande</div>`}
                   </div>
                 </div>
               </div>`;
@@ -1142,32 +1142,32 @@ function computeAlerts() {
     // Invendu + événement imminent
     if (t.statut !== 'Vendu') {
       if (daysUntil <= 1)
-        alerts.push({urgency:0, color:'#ff1744', msg:`${t.event} dans moins de 24h — pas encore vendu`,       id:t.id, type:'24h-invendu'});
+        alerts.push({urgency:0, color:'#ff003c', msg:`${t.event} dans moins de 24h — pas encore vendu`,       id:t.id, type:'24h-invendu'});
       else if (daysUntil <= 3)
-        alerts.push({urgency:1, color:'#ff1744', msg:`${t.event} dans moins de 3 jours — pas encore vendu`,   id:t.id, type:'3j-invendu'});
+        alerts.push({urgency:1, color:'#ff003c', msg:`${t.event} dans moins de 3 jours — pas encore vendu`,   id:t.id, type:'3j-invendu'});
       else if (daysUntil <= 7)
-        alerts.push({urgency:2, color:'#ff1744', msg:`${t.event} dans moins de 7 jours — pas encore vendu`,   id:t.id, type:'7j-invendu'});
+        alerts.push({urgency:2, color:'#ff003c', msg:`${t.event} dans moins de 7 jours — pas encore vendu`,   id:t.id, type:'7j-invendu'});
       else if (daysUntil <= 15)
-        alerts.push({urgency:3, color:'#ff9100', msg:`${t.event} dans moins de 15 jours — pas encore vendu`,  id:t.id, type:'15j-invendu'});
+        alerts.push({urgency:3, color:'#ff7700', msg:`${t.event} dans moins de 15 jours — pas encore vendu`,  id:t.id, type:'15j-invendu'});
     }
 
     // Vendu mais non livré + événement imminent
     if (t.statut === 'Vendu' && t.livraison !== 'Livré') {
       if (daysUntil <= 1)
-        alerts.push({urgency:0, color:'#ff1744', msg:`${t.event} dans moins de 24h — transfert en attente`,       id:t.id, type:'24h-nonlivre'});
+        alerts.push({urgency:0, color:'#ff003c', msg:`${t.event} dans moins de 24h — transfert en attente`,       id:t.id, type:'24h-nonlivre'});
       else if (daysUntil <= 3)
-        alerts.push({urgency:1, color:'#ff1744', msg:`${t.event} dans moins de 3 jours — transfert en attente`,   id:t.id, type:'3j-nonlivre'});
+        alerts.push({urgency:1, color:'#ff003c', msg:`${t.event} dans moins de 3 jours — transfert en attente`,   id:t.id, type:'3j-nonlivre'});
       else if (daysUntil <= 7)
-        alerts.push({urgency:2, color:'#ff1744', msg:`${t.event} dans moins de 7 jours — transfert en attente`,   id:t.id, type:'7j-nonlivre'});
+        alerts.push({urgency:2, color:'#ff003c', msg:`${t.event} dans moins de 7 jours — transfert en attente`,   id:t.id, type:'7j-nonlivre'});
     }
 
     // Paiement en attente
     if (t.statut === 'Vendu' && t.pay === 'En attente' && t.saleDate) {
       const daysSinceSale = Math.floor((now - new Date(t.saleDate)) / (1000*60*60*24));
       if (daysSinceSale >= 7)
-        alerts.push({urgency:4, color:'#ff9100', msg:`Paiement en attente depuis 7 jours — ${t.event}`, id:t.id, type:'paiement7j'});
+        alerts.push({urgency:4, color:'#ff7700', msg:`Paiement en attente depuis 7 jours — ${t.event}`, id:t.id, type:'paiement7j'});
       else if (daysSinceSale >= 3)
-        alerts.push({urgency:5, color:'#ff9100', msg:`Paiement en attente depuis 3 jours — ${t.event}`, id:t.id, type:'paiement3j'});
+        alerts.push({urgency:5, color:'#ff7700', msg:`Paiement en attente depuis 3 jours — ${t.event}`, id:t.id, type:'paiement3j'});
     }
   });
   alerts.sort((a,b) => a.urgency - b.urgency);
@@ -1184,7 +1184,7 @@ function renderDashAlerts() {
     } else {
       el.innerHTML = `<div class="alerts-wrap">
         <div class="alert-header" onclick="toggleAlerts()">
-          <span style="color:#ff1744">${alerts.length} alerte${alerts.length>1?'s':''}</span>
+          <span style="color:#ff003c">${alerts.length} alerte${alerts.length>1?'s':''}</span>
           <svg style="flex-shrink:0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="${alertsCollapsed?'6 9 12 15 18 9':'6 15 12 9 18 15'}"/></svg>
         </div>
         ${alertsCollapsed?'':alerts.map(a=>`<div class="alert-item" onclick="openTicketInJournal(${a.id})"><span style="width:6px;height:6px;border-radius:50%;background:${a.color};flex-shrink:0;display:inline-block"></span>${a.msg}<span style="margin-left:auto;color:var(--text3);font-size:12px">›</span></div>`).join('')}
@@ -1333,7 +1333,7 @@ function renderDashMetrics() {
   if(chartEvents)chartEvents.destroy();
   chartEvents=new Chart(document.getElementById('chartEvents'),{
     type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(0,230,118,.75)':'rgba(255,23,68,.75)'),borderRadius:4,borderSkipped:false}]},
+    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(0,255,65,.75)':'rgba(255,0,60,.75)'),borderRadius:4,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
@@ -1345,13 +1345,13 @@ function renderDashMetrics() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,230,118,.75)','rgba(255,23,68,.75)'],borderWidth:0}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,255,65,.75)','rgba(255,0,60,.75)'],borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
   document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldInPeriod.length + stockInPeriod.length}</span>`;
   document.getElementById('pieLegend').innerHTML=`
-    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,230,118,.75);margin-right:6px"></span>Vendus — ${soldInPeriod.length}</div>
-    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,23,68,.75);margin-right:6px"></span>En stock — ${stockInPeriod.length} (${sQty} places)</div>
+    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,255,65,.75);margin-right:6px"></span>Vendus — ${soldInPeriod.length}</div>
+    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,0,60,.75);margin-right:6px"></span>En stock — ${stockInPeriod.length} (${sQty} places)</div>
   `;
 }
 
