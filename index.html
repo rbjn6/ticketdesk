@@ -316,6 +316,31 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <span style="font-size:15px;font-weight:600">Précommandes</span>
         <button class="btn btn-sm btn-primary" onclick="openPreorderModal()">+ Ajouter</button>
       </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <div style="position:relative;flex-shrink:0">
+          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="po-search" type="text" placeholder="Rechercher événement…" oninput="renderPreorders()"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:200px">
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <select id="po-statut" onchange="renderPreorders()"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px">
+            <option value="">Tous les statuts</option>
+            <option value="En recherche">En recherche</option>
+            <option value="Trouvé">Trouvé</option>
+            <option value="Annulé">Annulé</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input id="po-buyer" type="text" placeholder="Acheteur…" oninput="renderPreorders()"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:160px">
+        </div>
+      </div>
       <div id="preordersList"></div>
     </div>
 
@@ -716,8 +741,17 @@ function cyclePOStatus(id){
 function renderPreorders() {
   const el = document.getElementById('preordersList');
   if (!el) return;
-  if (!preorders.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
-  const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const poSearch = (document.getElementById('po-search')?.value || '').toLowerCase();
+  const poStatut = document.getElementById('po-statut')?.value || '';
+  const poBuyer  = (document.getElementById('po-buyer')?.value  || '').toLowerCase();
+  const filtered = preorders.filter(p => {
+    if (poSearch && !(p.event||'').toLowerCase().includes(poSearch)) return false;
+    if (poStatut && (p.statut||'En recherche') !== poStatut) return false;
+    if (poBuyer  && !(p.buyer||'').toLowerCase().includes(poBuyer))  return false;
+    return true;
+  });
+  if (!filtered.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
+  const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const cs = 'box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
   const rowFlex = 'width:100%;display:flex;align-items:center;overflow:hidden;box-sizing:border-box';
   const header = `<div style="${rowFlex};padding-left:3px;background:var(--bg-nav);border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px;position:sticky;top:0;z-index:10">
@@ -920,11 +954,13 @@ function driveSyncDebounced() {
   _driveTimer = setTimeout(driveSync, 1500);
 }
 
+function fixZero(v) { return (Math.abs(v) < 0.005) ? 0 : v; }
 function fmt(n) {
+  n = fixZero(n);
   const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
   return (n<0?'−':n>0?'+':'')+s+' €';
 }
-function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n===0?0:n); }
+function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(fixZero(n)); }
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 function showToast(msg,type='ok') {
   const t=document.getElementById('toast');
@@ -1330,14 +1366,12 @@ function renderDashMetrics() {
   const sold  = tx.filter(t => t.statut === 'Vendu');
   const stock = tx.filter(t => t.statut === 'En stock');
 
-  const fixZero = v => Object.is(v, -0) ? 0 : (Math.abs(v) < 0.005 ? 0 : v);
-  const _fv = v => fixZero(v);
-  const _db = v => _fv(v) >= 0 ? '#00ff88' : '#ff6b6b';
-  const _cls = v => _fv(v) >= 0 ? 'mv-pos' : 'mv-neg';
-  const _fmt = v => fmtFull(_fv(v));
+  const _db = v => fixZero(v) >= 0 ? '#00ff88' : '#ff6b6b';
+  const _cls = v => fixZero(v) >= 0 ? 'mv-pos' : 'mv-neg';
+  const _fmt = v => fmtFull(v);
   const _cs = 'min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box';
   const _csB = v => `border-top:2px solid ${_db(v)};${_cs}`;
-  const _sc = v => _fv(v) >= 0 ? 'is-vendu' : 'is-stock';
+  const _sc = v => fixZero(v) >= 0 ? 'is-vendu' : 'is-stock';
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
@@ -1392,7 +1426,7 @@ function renderFilters() {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-statut" onchange="setFilter('statut',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-statut" onchange="setFilter('statut',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Statut</option>
             <option value="Vendu">Vendus</option>
             <option value="En stock">En stock</option>
@@ -1401,7 +1435,7 @@ function renderFilters() {
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-pay" onchange="setFilter('pay',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-pay" onchange="setFilter('pay',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Paiement</option>
             <option value="Payé">Payé</option>
             <option value="En attente">En attente</option>
@@ -1409,7 +1443,7 @@ function renderFilters() {
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="">Livraison</option>
             <option value="Livré">Livré</option>
             <option value="Non livré">Non livré</option>
@@ -1417,7 +1451,7 @@ function renderFilters() {
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
         </div>
         <div style="position:relative;flex-shrink:0">
-          <select id="sel-sort" onchange="setFilter('sort',this.value)" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+          <select id="sel-sort" onchange="setFilter('sort',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
             <option value="date">Date</option>
             <option value="event">A – Z</option>
             <option value="profit">Bénéfice</option>
@@ -1428,12 +1462,14 @@ function renderFilters() {
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input id="search-input" type="text" placeholder="Rechercher événement…"
             oninput="setFilter('search',this.value)"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
             style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:220px">
         </div>
         <div style="position:relative;flex-shrink:0">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <input id="buyer-input" type="text" placeholder="Acheteur…"
             oninput="setFilter('buyer',this.value)"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
             style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
         </div>
       </div>
@@ -1512,7 +1548,7 @@ function renderJournalList() {
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = t.sell ? (t.sell - t.buy) : -t.buy;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
-    const isPos  = profit >= 0;
+    const isPos  = fixZero(profit) >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
@@ -1532,7 +1568,7 @@ function renderJournalList() {
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
-      {l:'Marge',       v: margin !== null ? (margin>=0?'+':'')+margin+'%' : '—', c: margin !== null ? (margin>=0 ? 'var(--green)' : 'var(--red)') : undefined},
+      {l:'Marge',       v: margin !== null ? (fixZero(margin)>=0?'+':'')+margin+'%' : '—', c: margin !== null ? (fixZero(margin)>=0 ? 'var(--green)' : 'var(--red)') : undefined},
       {l:'Prix voulu',  v: t.wanted ? fmtFull(t.wanted) : '—'},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
