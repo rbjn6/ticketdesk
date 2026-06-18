@@ -99,7 +99,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 
 /* ── METRICS ───────────────────────────────────────── */
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .15s,box-shadow .15s,border-color .15s}
+.metric-card:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .metric-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-weight:600}
 .metric-value{font-size:28px;font-weight:700}
 .mv-pos{color:var(--accent-green)}.mv-neg{color:var(--accent-red)}.mv-warn{color:var(--accent-yellow)}.mv-hi{color:var(--accent-blue)}
@@ -115,7 +116,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .b-archive{background:rgba(74,85,104,.25);color:var(--text-secondary)}
 
 /* ── SECTION TITLES ────────────────────────────────── */
-.stitle{font-size:11px;font-weight:600;color:var(--text-secondary);margin:18px 0 10px;letter-spacing:1.5px;text-transform:uppercase}
+.stitle{font-size:11px;font-weight:600;color:var(--text-secondary);margin:18px 0 10px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.stitle::before{content:'';width:3px;height:14px;background:var(--accent-blue);border-radius:2px;flex-shrink:0;display:inline-block}
 
 /* ── JOURNAL ───────────────────────────────────────── */
 .journal-header{background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:90px minmax(0,220px) 100px 1fr 140px 100px 160px;gap:12px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;margin-top:8px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;align-items:center;font-weight:600}
@@ -182,10 +184,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 /* ── LOGIN ─────────────────────────────────────────── */
 .login-screen{position:fixed;inset:0;background:var(--bg-main);display:flex;align-items:center;justify-content:center;z-index:500}
-.login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3)}
-.login-logo{font-size:44px;font-weight:800;letter-spacing:4px;margin-bottom:6px}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 40px rgba(0,180,255,0.08)}
+.login-logo{font-size:24px;font-weight:800;letter-spacing:6px;margin-bottom:6px}
 .login-logo-t{color:var(--accent-blue)}.login-logo-d{color:var(--text-primary)}
-.login-tagline{font-size:13px;color:var(--text-secondary);margin-bottom:28px}
+.login-tagline{font-size:12px;color:var(--text-secondary);margin-bottom:28px}
 .login-field-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;text-align:left;margin-bottom:6px;display:block;font-weight:600}
 .login-field{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg-main);color:var(--text-primary);font-size:14px;margin-bottom:14px;font-family:inherit;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
 .login-field:focus{outline:none;border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(0,180,255,.2)}
@@ -198,10 +200,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .login-google-btn:hover{border-color:var(--accent-blue);color:var(--text-primary)}.login-google-btn:active{opacity:.7}
 .login-note{font-size:11px;color:var(--text-disabled);margin-top:16px;line-height:1.6}
 .login-error{font-size:13px;color:var(--accent-red);margin-bottom:10px;min-height:18px}
-.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:9px 18px;font-size:14px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.02em;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:500;min-width:200px;max-width:320px;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;letter-spacing:.02em;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:rgba(0,255,136,.4);color:var(--accent-green)}
-.toast.err{border-color:rgba(255,107,107,.4);color:var(--accent-red)}
+.toast.ok{border-color:rgba(0,255,136,.4);border-left:3px solid var(--accent-green);color:var(--accent-green)}
+.toast.err{border-color:rgba(255,107,107,.4);border-left:3px solid var(--accent-red);color:var(--accent-red)}
 
 /* ── MISC ──────────────────────────────────────────── */
 .empty{text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:13px}
@@ -267,9 +269,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <div id="dashAlerts"></div>
       <div id="dashFilters"></div>
       <div id="metricsGrid"></div>
-      <p class="stitle">Bénéfice par événement</p>
+      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Bénéfice par événement</span></div>
       <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
-      <p class="stitle">Répartition</p>
+      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Répartition</span></div>
       <div class="card" style="padding:12px;display:flex;align-items:center;gap:20px">
         <div style="position:relative;width:100px;height:100px;flex-shrink:0">
           <canvas id="chartPie" role="img" aria-label="Vendus vs stock"></canvas>
@@ -698,7 +700,7 @@ function renderPreorders() {
   const sorted = [...preorders].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const cs = 'box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
   const rowFlex = 'width:100%;display:flex;align-items:center;overflow:hidden;box-sizing:border-box';
-  const header = `<div style="${rowFlex};padding-left:3px;background:var(--bg-nav);border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px">
+  const header = `<div style="${rowFlex};padding-left:3px;background:var(--bg-nav);border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px;position:sticky;top:0;z-index:10">
     <span style="${cs};width:10%;padding-right:8px">Statut</span><span style="${cs};width:10%;padding-right:8px">Événement</span><span style="${cs};width:10%;padding-right:12px">Date</span><span style="${cs};width:5%;padding-right:12px">Qté</span><span style="${cs};width:10%;padding-right:8px">Cat.</span><span style="${cs};width:10%;padding-right:8px">Lieu</span><span style="${cs};width:35%;padding-right:8px">Acheteur</span><span style="${cs};width:10%;text-align:right;padding-right:0">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
@@ -1098,7 +1100,9 @@ function renderPublicStock(data) {
   document.getElementById('publicContent').innerHTML = `
     <div style="max-width:800px;margin:0 auto;padding:40px 20px 60px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#111827;min-height:100vh">
       <div style="font-size:13px;font-weight:600;letter-spacing:4px;color:#8b9ab0;text-transform:uppercase;margin-bottom:6px">TICKETDESK</div>
-      <div style="font-size:14px;color:#8b9ab0;margin-bottom:32px">Billets disponibles · ${data.length} place${data.length>1?'s':''}</div>
+      <div style="font-size:14px;color:#8b9ab0;margin-bottom:4px">Billets disponibles · ${data.length} place${data.length>1?'s':''}</div>
+      <div style="font-size:11px;color:#4a5568;margin-bottom:20px">Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+      <div style="border-top:1px solid #2d3d55;margin-bottom:24px"></div>
       ${!data.length ? '<p style="color:#8b9ab0;font-size:14px">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
         <div style="background:#1a2540;border:1px solid #2d3d55;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
           <div style="font-size:20px;font-weight:700;color:#f9fafb;margin-bottom:4px">${eventName}</div>
@@ -1106,7 +1110,7 @@ function renderPublicStock(data) {
             ${date?`<div style="font-size:13px;color:#8b9ab0;margin-bottom:12px">${fmtDate(date)}</div>`:''}
             ${tickets.map(t=>{
               const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
-              return `<div style="background:#131f35;border:1px solid #2d3d55;border-radius:10px;padding:14px 16px;margin-top:8px">
+              return `<div style="background:#131f35;border:1px solid #2d3d55;border-left:3px solid #00b4ff;border-radius:10px;padding:14px 16px;margin-top:8px">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
                   <div style="flex:1;min-width:0">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:${t.place?'6px':'0'}">
@@ -1127,6 +1131,9 @@ function renderPublicStock(data) {
       <div style="padding:20px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;text-align:center;margin-top:8px">
         <p style="font-size:14px;color:#8b9ab0;margin:0 0 4px">Intéressé(e) par un ou plusieurs billets ?</p>
         <p style="font-size:12px;color:#4a5568;margin:0">Contactez-nous pour plus d'informations.</p>
+      </div>
+      <div style="text-align:center;margin-top:40px;padding-bottom:20px">
+        <span style="font-size:11px;color:#2d3d55;letter-spacing:1px">Généré avec TicketDesk</span>
       </div>
     </div>`;
 }
@@ -1324,9 +1331,12 @@ function renderDashMetrics() {
   const labels=Object.keys(evMap), data=labels.map(e=>Math.round(evMap[e]));
 
   if(chartEvents)chartEvents.destroy();
-  chartEvents=new Chart(document.getElementById('chartEvents'),{
+  const _ctx=document.getElementById('chartEvents').getContext('2d');
+  const _gPos=_ctx.createLinearGradient(0,0,0,200);_gPos.addColorStop(0,'rgba(0,255,136,.9)');_gPos.addColorStop(1,'rgba(0,255,136,.4)');
+  const _gNeg=_ctx.createLinearGradient(0,0,0,200);_gNeg.addColorStop(0,'rgba(255,107,107,.9)');_gNeg.addColorStop(1,'rgba(255,107,107,.4)');
+  chartEvents=new Chart(_ctx,{
     type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(0,255,136,.75)':'rgba(255,107,107,.75)'),borderRadius:4,borderSkipped:false}]},
+    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?_gPos:_gNeg),borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
@@ -1338,7 +1348,7 @@ function renderDashMetrics() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,255,136,.75)','rgba(255,107,107,.75)'],borderWidth:0}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,255,136,.75)','rgba(255,107,107,.75)'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
   document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldInPeriod.length + stockInPeriod.length}</span>`;
@@ -1466,7 +1476,7 @@ function renderJournalList() {
   }
 
   if(!list.length){
-    document.getElementById('journalList').innerHTML='<div class="empty">Aucune transaction</div>';
+    document.getElementById('journalList').innerHTML='<div style="text-align:center;padding:60px 20px;color:#4a5568"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div style="font-size:15px;font-weight:600;color:#8b9ab0;margin-bottom:6px">Aucune transaction</div><div style="font-size:13px;color:#4a5568">Ajoute un billet ou importe depuis Gmail</div></div>';
     return;
   }
 
@@ -1530,12 +1540,12 @@ function renderJournalList() {
       <div class="tx-detail" id="${did}">
         <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
         <div class="tx-detail-actions">
-          <button class="btn btn-sm" onclick="editTransaction(${t.id})">Modifier</button>
+          <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onclick="editTransaction(${t.id})">Modifier</button>
           ${t.statut==='Archivé'
-            ? `<button class="btn btn-sm" onclick="unarchiveTransaction(${t.id})">Désarchiver</button>`
-            : `${t.statut==='En stock'?`<button class="btn btn-sm btn-primary" onclick="openSellModal(${t.id})">Vendre</button>`:''}
-               <button class="btn btn-sm" onclick="archiveTransaction(${t.id})">Archiver</button>`}
-          <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})">Supprimer</button>
+            ? `<button style="border:1px solid #00ff88;background:transparent;color:#00ff88;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onclick="unarchiveTransaction(${t.id})">Désarchiver</button>`
+            : `${t.statut==='En stock'?`<button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onclick="openSellModal(${t.id})">Vendre</button>`:''}
+               <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onclick="archiveTransaction(${t.id})">Archiver</button>`}
+          <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
     </div>`;
@@ -1879,10 +1889,12 @@ function updateSyncIndicator(state) {
   const t   = ls ? new Date(ls).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '—';
   const txt = state === 'syncing' ? 'sync…' : state === 'ok' ? 'sync ' + t : 'sync err';
   const col = state === 'ok' ? 'var(--green)' : state === 'err' ? 'var(--red)' : 'var(--yellow)';
+  const html = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${col};margin-right:5px;flex-shrink:0;vertical-align:middle"></span>${txt}`;
+  const wrap = 'display:flex;align-items:center;font-size:12px;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px';
   const el  = document.getElementById('syncIndicator');
-  if (el)  { el.textContent = txt;  el.style.color = col; }
+  if (el)  { el.innerHTML = html; el.style.cssText = wrap; el.style.color = col; }
   const elM = document.getElementById('syncIndicatorMobile');
-  if (elM) { elM.textContent = txt; elM.style.color = col; }
+  if (elM) { elM.innerHTML = html; elM.style.color = col; }
 }
 
 // COSTS
@@ -2143,8 +2155,8 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">D</span></div>
-    <div class="login-tagline">Gestionnaire de revente de billets</div>
+    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">ICKETDESK</span></div>
+    <div class="login-tagline">Gestion de revente · Privé</div>
     <div class="login-error" id="loginError"></div>
     <label class="login-field-label">Identifiant</label>
     <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
