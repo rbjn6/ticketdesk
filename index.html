@@ -141,7 +141,6 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .is-archive:hover,.is-archive.hover-card:hover{border-color:#8b9ab0 !important;background:var(--bg-card-hover) !important}
 .is-recherche:hover{border-color:#00b4ff !important;background:var(--bg-card-hover) !important}
 .is-trouve:hover{border-color:#00ff88 !important;background:var(--bg-card-hover) !important}
-.is-annule:hover{border-color:#ff6b6b !important;background:var(--bg-card-hover) !important}
 .btn:not(.btn-primary):not(.btn-danger):hover{border-color:var(--accent-blue)}
 .bnav:hover{color:var(--accent-blue)}
 .badge[style*="cursor:pointer"]:hover{opacity:.8}
@@ -235,7 +234,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .po-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .po-recherche{background:rgba(0,180,255,.15);color:var(--accent-blue)}
 .po-trouve{background:rgba(0,255,136,.15);color:var(--accent-green)}
-.po-annule{background:rgba(255,107,107,.15);color:var(--accent-red)}
 .metric-block{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .metric-block-title{font-size:11px;color:var(--text-secondary);letter-spacing:.1em;margin-bottom:10px;font-weight:600;text-transform:uppercase}
 .metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
@@ -318,21 +316,20 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
         <div style="position:relative;flex-shrink:0">
-          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="po-search" type="text" placeholder="Rechercher événement…" oninput="renderPreorders()"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
-            style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:200px">
-        </div>
-        <div style="position:relative;flex-shrink:0">
           <select id="po-statut" onchange="renderPreorders()"
             onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
             style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px">
             <option value="">Tous les statuts</option>
             <option value="En recherche">En recherche</option>
             <option value="Trouvé">Trouvé</option>
-            <option value="Annulé">Annulé</option>
           </select>
           <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="po-search" type="text" placeholder="Rechercher événement…" oninput="renderPreorders()"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:200px">
         </div>
         <div style="position:relative;flex-shrink:0">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -549,7 +546,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <select id="po-statut">
         <option value="En recherche">En recherche</option>
         <option value="Trouvé">Trouvé</option>
-        <option value="Annulé">Annulé</option>
       </select>
     </div>
     <div class="frow">
@@ -618,7 +614,7 @@ const PREORDER_KEY = 'ticketdesk_preorders';
 
 let transactions    = JSON.parse(localStorage.getItem(TX_KEY)        || '[]');
 let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
-let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
+let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]').map(p => p.statut === 'Annulé' ? {...p, statut: 'En recherche'} : p);
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let driveFileId     = localStorage.getItem('ticketdesk_drive_fid') || null;
 let driveSyncing    = false;
@@ -734,7 +730,7 @@ function savePreorders() {
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='none'?'block':'none';}
 function cyclePOStatus(id){
   const p=preorders.find(x=>x.id===id);if(!p)return;
-  const cycle={'En recherche':'Trouvé','Trouvé':'Annulé','Annulé':'En recherche'};
+  const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
   p.statut=cycle[p.statut]||'En recherche';
   savePreorders();renderPreorders();
 }
@@ -758,9 +754,9 @@ function renderPreorders() {
     <span style="${cs};width:10%;padding-right:8px">Statut</span><span style="${cs};width:10%;padding-right:8px">Événement</span><span style="${cs};width:10%;padding-right:12px">Date</span><span style="${cs};width:5%;padding-right:12px">Qté</span><span style="${cs};width:10%;padding-right:8px">Cat.</span><span style="${cs};width:10%;padding-right:8px">Lieu</span><span style="${cs};width:35%;padding-right:8px">Acheteur</span><span style="${cs};width:10%;text-align:right;padding-right:0">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
-    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
-    const badgeHex = p.statut==='Trouvé'?'#00ff88':p.statut==='Annulé'?'#ff6b6b':'#00b4ff';
-    const statusClass = p.statut==='Trouvé'?'is-trouve':p.statut==='Annulé'?'is-annule':'is-recherche';
+    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':'var(--accent-blue)';
+    const badgeHex = p.statut==='Trouvé'?'#00ff88':'#00b4ff';
+    const statusClass = p.statut==='Trouvé'?'is-trouve':'is-recherche';
     const did = 'pod-'+p.id;
     return `<div class="hover-card ${statusClass}" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;box-sizing:border-box" onclick="togglePODetail('${did}')">
       <div style="${rowFlex};height:60px">
@@ -780,12 +776,45 @@ function renderPreorders() {
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'">Transférer</button>
           <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
         </div>
       </div>
     </div>`;
   }).join('');
   el.innerHTML = header + cards;
+}
+function transferPreorderToJournal(id) {
+  const p = preorders.find(x => x.id === id);
+  if (!p) return;
+  editingId = null;
+  document.getElementById('addModalTitle').textContent = 'Transférer vers journal';
+  document.getElementById('f-statut').value = 'Vendu';
+  document.getElementById('f-event').value = p.event || '';
+  document.getElementById('f-date').value = p.date || '';
+  document.getElementById('f-lieu').value = p.lieu || '';
+  document.getElementById('f-cat').value = p.cat || '';
+  document.getElementById('f-qty').value = p.qty || 1;
+  document.getElementById('f-buyer').value = p.buyer || '';
+  document.getElementById('f-platform').value = p.platform || '';
+  document.getElementById('f-bloc').value = '';
+  document.getElementById('f-rang').value = '';
+  document.getElementById('f-siege').value = '';
+  document.getElementById('f-site').value = '';
+  document.getElementById('f-site-autre').value = '';
+  document.getElementById('f-site-autre-wrap').style.display = 'none';
+  document.getElementById('f-compte').value = '';
+  document.getElementById('f-mdp').value = '';
+  document.getElementById('f-buy').value = '';
+  document.getElementById('f-sell').value = '';
+  document.getElementById('f-pay').value = '';
+  document.getElementById('f-livraison').value = '';
+  document.getElementById('f-ordernum').value = '';
+  document.getElementById('f-buydate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-saledate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-wanted').value = '';
+  window._transferringPreorderId = id;
+  document.getElementById('addModal').classList.add('open');
 }
 function openPreorderModal(id) {
   editingPreorderId = id || null;
@@ -2122,7 +2151,16 @@ function saveTransaction(){
     }
   }
   else transactions.push(t);
-  saveTx();closeModal('addModal');showToast(editingId?'Modifié':'Ajouté');
+  saveTx();closeModal('addModal');
+  if (window._transferringPreorderId) {
+    preorders = preorders.filter(x => x.id !== window._transferringPreorderId);
+    savePreorders();
+    window._transferringPreorderId = null;
+    renderPreorders();
+    showToast('Précommande transférée vers le journal');
+  } else {
+    showToast(editingId?'Modifié':'Ajouté');
+  }
   renderDashboard();renderJournal();renderWTS();
 }
 function openCostModal(){document.getElementById('costModal').classList.add('open');}
