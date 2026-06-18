@@ -984,8 +984,7 @@ function driveSyncDebounced() {
 }
 
 function noNegZero(n) {
-  const rounded = Math.round(n * 100) / 100;
-  return rounded === 0 ? 0 : rounded;
+  return Math.round(n) === 0 ? 0 : n;
 }
 function fixZero(v) { return noNegZero(v); }
 function fmt(n) {
@@ -1410,12 +1409,12 @@ function renderDashMetrics() {
   const stock = tx.filter(t => t.statut === 'En stock');
 
   const _fz = v => (Math.abs(v) < 0.005) ? 0 : v;
-  const _db = v => v > -0.50 ? '#00ff88' : '#ff6b6b';
-  const _cls = v => v > -0.50 ? 'mv-pos' : 'mv-neg';
+  const _db = v => Math.round(v) >= 0 ? '#00ff88' : '#ff6b6b';
+  const _cls = v => Math.round(v) >= 0 ? 'mv-pos' : 'mv-neg';
   const _fmt = v => fmtFull(v);
   const _cs = 'min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box';
   const _csB = v => `border-top:2px solid ${_db(v)};${_cs}`;
-  const _sc = v => v > -0.50 ? 'is-vendu' : 'is-stock';
+  const _sc = v => Math.round(v) >= 0 ? 'is-vendu' : 'is-stock';
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
@@ -1592,7 +1591,7 @@ function renderJournalList() {
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = Math.round((((t.sell||0) - (t.buy||0)) + Number.EPSILON) * 100) / 100 || 0;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
-    const isPos  = profit > -0.50;
+    const isPos  = Math.round(profit) >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
@@ -1612,7 +1611,7 @@ function renderJournalList() {
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
-      {l:'Marge',       v: margin !== null ? (margin > -0.50?'+':'')+margin+'%' : '—', c: margin !== null ? (margin > -0.50 ? 'var(--green)' : 'var(--red)') : undefined},
+      {l:'Marge',       v: margin !== null ? (Math.round(margin) >= 0?'+':'')+margin+'%' : '—', c: margin !== null ? (Math.round(margin) >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
       {l:'Prix voulu',  v: t.wanted ? fmtFull(t.wanted) : '—'},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
