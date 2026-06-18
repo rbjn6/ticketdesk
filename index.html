@@ -93,6 +93,9 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .btn-sm{padding:6px 12px;font-size:13px}
 .btn-danger{color:var(--accent-red);border-color:rgba(255,107,107,.3);background:transparent}
 .btn-danger:hover{background:rgba(255,107,107,.08);border-color:var(--accent-red)}
+.tx-detail-actions .btn:hover{border-color:var(--accent-blue);background:var(--bg-card-hover)}
+.tx-detail-actions .btn.btn-primary:hover{background:#007aa3;border-color:#007aa3}
+.tx-detail-actions .btn.btn-danger:hover{background:rgba(255,107,107,.08);border-color:#ff6b6b}
 
 /* ── CARDS ─────────────────────────────────────────── */
 .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
@@ -1933,7 +1936,7 @@ function renderCosts(){
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:16px;font-weight:600">${fmtFull(c.amount)}</div>
-        <button onclick="toggleCostStatus(${c.id})" class="badge ${c.status==='Payé'?'b-paye':'b-attente'}" style="margin-top:4px;cursor:pointer;display:inline-flex;font-family:inherit">${c.status}</button>
+        <span onclick="toggleCostStatus(${c.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;${c.status==='Payé'?'background:rgba(0,255,136,.15);color:#00ff88':'background:rgba(255,159,67,.15);color:#ff9f43'}">${c.status}</span>
       </div>
       <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0">×</button>
     </div>`).join('');
