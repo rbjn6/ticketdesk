@@ -983,15 +983,22 @@ function driveSyncDebounced() {
   _driveTimer = setTimeout(driveSync, 1500);
 }
 
-function noNegZero(n) { return n + 0 === 0 ? 0 : n; }
-function fixZero(v) { return noNegZero((Math.abs(v) < 0.005) ? 0 : v); }
+function noNegZero(n) {
+  const rounded = Math.round(n * 100) / 100;
+  return rounded === 0 ? 0 : rounded;
+}
+function fixZero(v) { return noNegZero(v); }
 function fmt(n) {
   n = noNegZero(n);
+  const rounded = Math.round(n);
+  if (rounded === 0) n = 0;
   const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
   return (n<0?'−':n>0?'+':'')+s+' €';
 }
 function fmtFull(n) {
   n = noNegZero(n);
+  const rounded = Math.round(n);
+  if (rounded === 0) n = 0;
   return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
 }
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
