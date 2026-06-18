@@ -901,7 +901,7 @@ function fmt(n) {
   const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
   return (n<0?'−':n>0?'+':'')+s+' €';
 }
-function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n); }
+function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n===0?0:n); }
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 function showToast(msg,type='ok') {
   const t=document.getElementById('toast');
@@ -1302,24 +1302,17 @@ function renderDashMetrics() {
   const sold  = tx.filter(t => t.statut === 'Vendu');
   const stock = tx.filter(t => t.statut === 'En stock');
 
+  const _db = v => v>=0?'#00ff88':'#ff6b6b';
   document.getElementById('metricsGrid').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0;margin-bottom:12px">Flux financiers</div>
-        <div class="metric-card"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
-        <div class="metric-card"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
-        <div class="metric-card"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${profitWithStock>=0?'mv-pos':'mv-neg'}">${fmtFull(profitWithStock)}</div></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0;margin-bottom:12px">Résultat</div>
-        <div class="metric-card"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
-        <div class="metric-card"><div class="metric-label">Coûts fixes payés</div><div class="metric-value">−${fmtFull(paidC)}</div></div>
-        <div class="metric-card" style="border-color:var(--border2)"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}" style="font-size:26px">${fmtFull(netP)}</div></div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="metric-card"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
-      <div class="metric-card"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
+      <div class="metric-card" style="border-top:2px solid #00b4ff;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
+      <div class="metric-card" style="border-top:2px solid #00b4ff;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
+      <div class="metric-card" style="border-top:2px solid ${_db(profitWithStock)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${profitWithStock>=0?'mv-pos':'mv-neg'}">${fmtFull(profitWithStock)}</div></div>
+      <div class="metric-card" style="border-top:2px solid ${_db(grossP)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
+      <div class="metric-card" style="border-top:2px solid #ff9f43;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Coûts fixes payés</div><div class="metric-value">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
+      <div class="metric-card" style="border-top:2px solid ${_db(netP)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}">${fmtFull(netP)}</div></div>
+      <div class="metric-card" style="border-top:2px solid #00ff88;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
+      <div class="metric-card" style="border-top:2px solid #ff9f43;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
     </div>
   `;
 
