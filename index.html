@@ -985,11 +985,14 @@ function driveSyncDebounced() {
 
 function fixZero(v) { return (Math.abs(v) < 0.005) ? 0 : v; }
 function fmt(n) {
-  n = fixZero(n);
+  n = (Math.abs(n) < 0.005) ? 0 : n;
   const a=Math.abs(n), s=a>=1000?(a/1000).toFixed(1)+'k':Math.round(a)+'';
   return (n<0?'−':n>0?'+':'')+s+' €';
 }
-function fmtFull(n) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(fixZero(n)); }
+function fmtFull(n) {
+  n = (Math.abs(n) < 0.005) ? 0 : n;
+  return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+}
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 function showToast(msg,type='ok') {
   const t=document.getElementById('toast');
@@ -1395,12 +1398,13 @@ function renderDashMetrics() {
   const sold  = tx.filter(t => t.statut === 'Vendu');
   const stock = tx.filter(t => t.statut === 'En stock');
 
-  const _db = v => fixZero(v) >= 0 ? '#00ff88' : '#ff6b6b';
-  const _cls = v => fixZero(v) >= 0 ? 'mv-pos' : 'mv-neg';
+  const _fz = v => (Math.abs(v) < 0.005) ? 0 : v;
+  const _db = v => _fz(v) >= 0 ? '#00ff88' : '#ff6b6b';
+  const _cls = v => _fz(v) >= 0 ? 'mv-pos' : 'mv-neg';
   const _fmt = v => fmtFull(v);
   const _cs = 'min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box';
   const _csB = v => `border-top:2px solid ${_db(v)};${_cs}`;
-  const _sc = v => fixZero(v) >= 0 ? 'is-vendu' : 'is-stock';
+  const _sc = v => _fz(v) >= 0 ? 'is-vendu' : 'is-stock';
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
@@ -1577,7 +1581,7 @@ function renderJournalList() {
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = t.sell ? (t.sell - t.buy) : -t.buy;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
-    const isPos  = fixZero(profit) >= 0;
+    const isPos  = (Math.abs(profit) < 0.005 ? 0 : profit) >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
@@ -1597,7 +1601,7 @@ function renderJournalList() {
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
-      {l:'Marge',       v: margin !== null ? (fixZero(margin)>=0?'+':'')+margin+'%' : '—', c: margin !== null ? (fixZero(margin)>=0 ? 'var(--green)' : 'var(--red)') : undefined},
+      {l:'Marge',       v: margin !== null ? ((Math.abs(margin)<0.005?0:margin)>=0?'+':'')+margin+'%' : '—', c: margin !== null ? ((Math.abs(margin)<0.005?0:margin)>=0 ? 'var(--green)' : 'var(--red)') : undefined},
       {l:'Prix voulu',  v: t.wanted ? fmtFull(t.wanted) : '—'},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
