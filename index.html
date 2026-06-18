@@ -1371,7 +1371,7 @@ function renderDashMetrics() {
     ? base.filter(wasSold)
     : base.filter(t => wasSold(t) && filterByPeriod(t.saleDate, from, to));
   const tSell  = soldInPeriod.reduce((s,t) => s + (t.sell||0), 0);
-  const grossP = soldInPeriod.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
+  let grossP = soldInPeriod.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
   const soldQty = soldInPeriod.reduce((s,t) => s + (t.qty||0), 0);
 
   // PLACES EN STOCK (inventaire courant uniquement)
@@ -1384,14 +1384,17 @@ function renderDashMetrics() {
   const paidC = costs
     .filter(c => c.status === 'Payé' && (isAll ? true : filterByPeriod(c.date, from, to)))
     .reduce((s,c) => s + c.amount, 0);
-  const netP  = grossP - paidC;
+  let netP  = grossP - paidC;
 
   // BÉNÉFICE AVEC INVENDUS — inclut En stock + Archivés jamais vendus (pas de saleDate)
   const unsoldBase = base.filter(t => t.statut === 'En stock' || (t.statut === 'Archivé' && !t.saleDate));
   const stockBuyInPeriod = isAll
     ? unsoldBase
     : unsoldBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
-  const profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+  let profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+  grossP = grossP || 0;
+  netP = netP || 0;
+  profitWithStock = profitWithStock || 0;
 
   // Pour les graphiques — utilise filterDashTx (filtré sur buyDate, event, buyer)
   const tx    = filterDashTx();
@@ -1579,7 +1582,7 @@ function renderJournalList() {
 
   document.getElementById('journalList').style.cssText='margin-top:6px';
   document.getElementById('journalList').innerHTML=list.map(t=>{
-    const profit = t.sell ? (t.sell - t.buy) : -t.buy;
+    const profit = Math.round((((t.sell||0) - (t.buy||0)) + Number.EPSILON) * 100) / 100 || 0;
     const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
     const isPos  = (Math.abs(profit) < 0.005 ? 0 : profit) >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
