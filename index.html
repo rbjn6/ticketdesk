@@ -101,6 +101,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .15s,box-shadow .15s,border-color .15s}
 .metric-card:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.hover-card{transition:border-color .15s,background .15s}
+.hover-card:hover{border-color:var(--accent-blue) !important;background:var(--bg-card-hover) !important}
 .metric-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-weight:600}
 .metric-value{font-size:28px;font-weight:700}
 .mv-pos{color:var(--accent-green)}.mv-neg{color:var(--accent-red)}.mv-warn{color:var(--accent-yellow)}.mv-hi{color:var(--accent-blue)}
@@ -231,7 +233,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .nav-badge{display:none;align-items:center;justify-content:center;background:var(--accent-red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle}
 .share-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
 .share-item:last-child{border-bottom:none}
-.share-item:hover{background:var(--bg-card-hover)}
+.share-item:hover{background:var(--bg-card-hover);border-color:var(--accent-blue)}
 #publicPage{display:none;position:fixed;inset:0;background:var(--bg-main);overflow-y:auto;z-index:2000;-webkit-overflow-scrolling:touch}
 .pub-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px}
 .pub-tag{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:12px;background:rgba(0,180,255,.15);color:var(--accent-blue)}
@@ -707,7 +709,7 @@ function renderPreorders() {
     const borderColor = p.statut==='Trouvé'?'var(--accent-green)':p.statut==='Annulé'?'var(--accent-red)':'var(--accent-blue)';
     const badgeHex = p.statut==='Trouvé'?'#00ff88':p.statut==='Annulé'?'#ff6b6b':'#00b4ff';
     const did = 'pod-'+p.id;
-    return `<div style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:background .1s;box-sizing:border-box" onclick="togglePODetail('${did}')">
+    return `<div class="hover-card" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;box-sizing:border-box" onclick="togglePODetail('${did}')">
       <div style="${rowFlex};height:60px">
         <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="${cs};width:10%;padding:3px 8px 3px 4px;font-size:13px;font-weight:600;border-radius:20px;background:${badgeHex}22;color:${badgeHex};text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
         <span style="${cs};width:10%;padding-right:8px;font-size:16px;font-weight:700;color:#e6edf3">${p.event||'—'}</span>
@@ -1309,17 +1311,23 @@ function renderDashMetrics() {
   const sold  = tx.filter(t => t.statut === 'Vendu');
   const stock = tx.filter(t => t.statut === 'En stock');
 
-  const _db = v => v>=0?'#00ff88':'#ff6b6b';
+  const fixZero = v => Object.is(v, -0) ? 0 : (Math.abs(v) < 0.005 ? 0 : v);
+  const _fv = v => fixZero(v);
+  const _db = v => _fv(v) >= 0 ? '#00ff88' : '#ff6b6b';
+  const _cls = v => _fv(v) >= 0 ? 'mv-pos' : 'mv-neg';
+  const _fmt = v => fmtFull(_fv(v));
+  const _cs = 'min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box';
+  const _csB = v => `border-top:2px solid ${_db(v)};${_cs}`;
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
-      <div class="metric-card" style="border-top:2px solid #00b4ff;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
-      <div class="metric-card" style="border-top:2px solid #00b4ff;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
-      <div class="metric-card" style="border-top:2px solid ${_db(profitWithStock)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${profitWithStock>=0?'mv-pos':'mv-neg'}">${fmtFull(profitWithStock)}</div></div>
-      <div class="metric-card" style="border-top:2px solid ${_db(grossP)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${grossP>=0?'mv-pos':'mv-neg'}">${fmtFull(grossP)}</div></div>
-      <div class="metric-card" style="border-top:2px solid #ff9f43;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Coûts fixes payés</div><div class="metric-value">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
-      <div class="metric-card" style="border-top:2px solid ${_db(netP)};min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Bénéfice net</div><div class="metric-value ${netP>=0?'mv-pos':'mv-neg'}">${fmtFull(netP)}</div></div>
-      <div class="metric-card" style="border-top:2px solid #00ff88;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
-      <div class="metric-card" style="border-top:2px solid #ff9f43;min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
+      <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
+      <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${_cls(profitWithStock)}">${_fmt(profitWithStock)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(grossP)}"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${_cls(grossP)}">${_fmt(grossP)}</div></div>
+      <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}">${_fmt(netP)}</div></div>
+      <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
+      <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
     </div>
   `;
 
@@ -1827,7 +1835,7 @@ function renderImportResults(){
   if(!importCandidates.length){showToast('Aucun billet parsé','err');document.getElementById('importResults').style.display='none';return;}
   document.getElementById('importResults').style.display='block';
   document.getElementById('importList').innerHTML=importCandidates.map((c,i)=>`
-    <div class="import-item">
+    <div class="import-item hover-card">
       <div class="icheck ${c.checked?'on':''}" onclick="toggleImport(${i})">${c.checked?'✓':''}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500">${c.event||'Événement inconnu'}</div>
@@ -1901,7 +1909,7 @@ function updateSyncIndicator(state) {
 function renderCosts(){
   if(!costs.length){document.getElementById('costsList').innerHTML='<div class="empty">Aucun coût fixe</div>';document.getElementById('costsTotal').innerHTML='';return;}
   document.getElementById('costsList').innerHTML=costs.map(c=>`
-    <div class="card" style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px">
+    <div class="card hover-card" style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px">
       <div style="flex:1;min-width:0">
         <div style="font-size:15px;font-weight:500">${c.type}</div>
         <div style="font-size:13px;color:var(--text2);margin-top:2px">${c.date?fmtDate(c.date):'—'}${c.notes?' · '+c.notes:''}</div>
