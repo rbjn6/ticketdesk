@@ -1132,24 +1132,28 @@ function renderDashFilters() {
     ...transactions.map(t => (t.saleDate||'').substring(0,4)),
     ...costs.map(c => (c.date||'').substring(0,4))
   ].filter(y => y && y.length === 4))].sort();
+  const monthSelect = `<select onchange="setDashFilter('month',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
+    <option value="">Tous les mois</option>
+    ${[['01','Janvier'],['02','Février'],['03','Mars'],['04','Avril'],['05','Mai'],['06','Juin'],['07','Juillet'],['08','Août'],['09','Septembre'],['10','Octobre'],['11','Novembre'],['12','Décembre']].map(([v,l])=>
+      `<option value="${v}" ${dashSelectedMonth===v?'selected':''}>${l}</option>`
+    ).join('')}
+  </select>`;
+  const yearSelect = `<select onchange="setDashFilter('year',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
+    <option value="">Toutes les années</option>
+    ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
+  </select>`;
   el.innerHTML = `
     <div style="margin-bottom:12px">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-        ${[['all','Tout'],['today','Aujourd\'hui'],['week','Semaine'],['month','Mois'],['year','Année']].map(([v,l])=>
+        ${[['all','Tout'],['today','Aujourd\'hui'],['week','Semaine']].map(([v,l])=>
           `<button class="dash-chip${dashPeriod===v?' active':''}" onclick="setDashFilter('period','${v}')">${l}</button>`
         ).join('')}
+        <button class="dash-chip${dashPeriod==='month'?' active':''}" onclick="setDashFilter('period','month')">Mois</button>
+        ${dashPeriod==='month' ? monthSelect : ''}
+        <button class="dash-chip${dashPeriod==='year'?' active':''}" onclick="setDashFilter('period','year')">Année</button>
+        ${dashPeriod==='year' ? yearSelect : ''}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-        <select onchange="setDashFilter('month',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
-          <option value="">Tous les mois</option>
-          ${[['01','Janvier'],['02','Février'],['03','Mars'],['04','Avril'],['05','Mai'],['06','Juin'],['07','Juillet'],['08','Août'],['09','Septembre'],['10','Octobre'],['11','Novembre'],['12','Décembre']].map(([v,l])=>
-            `<option value="${v}" ${dashSelectedMonth===v?'selected':''}>${l}</option>`
-          ).join('')}
-        </select>
-        <select onchange="setDashFilter('year',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
-          <option value="">Toutes les années</option>
-          ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
-        </select>
         <div style="position:relative;flex:1;min-width:160px">
           <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" placeholder="Événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="padding:6px 10px 6px 28px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;width:100%;box-sizing:border-box">
@@ -1163,7 +1167,7 @@ function renderDashFilters() {
 
 function setDashFilter(type, val) {
   if (type === 'period') {
-    dashPeriod = val;
+    dashPeriod = val; dashSelectedMonth = ''; dashSelectedYear = '';
     renderDashFilters(); renderDashMetrics();
   } else if (type === 'month') {
     dashSelectedMonth = val; renderDashMetrics(); renderDashFilters();
