@@ -1128,17 +1128,24 @@ function openShareModal() {
   if (!stock.length) {
     el.innerHTML = '<div class="empty">Aucun billet en stock</div>';
   } else {
-    el.innerHTML = stock.map(t => `
-      <label class="share-item">
-        <input type="checkbox" class="share-cb" data-id="${t.id}" checked
+    const byEvent = {};
+    stock.forEach(t => {
+      const ev = t.event || '—';
+      if (!byEvent[ev]) byEvent[ev] = [];
+      byEvent[ev].push(t);
+    });
+    el.innerHTML = Object.entries(byEvent).map(([ev, tickets]) => {
+      const totalQty = tickets.reduce((s,t) => s+(t.qty||1), 0);
+      const dates = [...new Set(tickets.map(t=>t.date).filter(Boolean))].map(fmtDate).join(', ');
+      return `<label class="share-item">
+        <input type="checkbox" class="share-cb" data-event="${encodeURIComponent(ev)}" checked
           style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
         <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:2px">
-            ${t.date ? fmtDate(t.date) : '—'}${t.cat ? ' · ' + t.cat : ''} · ${t.qty}x${t.wanted ? ' · ' + fmtFull(t.wanted) : ''}
-          </div>
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ev}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${totalQty} place${totalQty>1?'s':''}${dates?' · '+dates:''}</div>
         </div>
-      </label>`).join('');
+      </label>`;
+    }).join('');
   }
   document.getElementById('shareLinkResult').style.display = 'none';
   document.getElementById('shareModal').classList.add('open');
@@ -1149,10 +1156,10 @@ function toggleAllShare(v) {
 }
 
 function generateShareLink() {
-  const checked = Array.from(document.querySelectorAll('.share-cb:checked')).map(cb => cb.dataset.id);
-  if (!checked.length) { showToast('Sélectionne au moins un billet', 'err'); return; }
+  const checkedEvents = Array.from(document.querySelectorAll('.share-cb:checked')).map(cb => decodeURIComponent(cb.dataset.event));
+  if (!checkedEvents.length) { showToast('Sélectionne au moins un événement', 'err'); return; }
   const data = transactions
-    .filter(t => checked.includes(String(t.id)))
+    .filter(t => t.statut === 'En stock' && checkedEvents.includes(t.event||'—'))
     .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0, place: t.place||''}));
   const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   const longUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
@@ -1190,13 +1197,14 @@ function renderPublicStock(data) {
   const sorted = [...data].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const byEvent = {};
   sorted.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
+  const totalPlaces = data.reduce((s,t)=>s+(t.qty||1),0);
   document.getElementById('publicContent').innerHTML = `
     <div style="background:#111827;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif">
       <div style="max-width:700px;margin:0 auto;padding:0 16px 60px">
         <div style="text-align:center;padding:40px 20px 32px;border-bottom:1px solid #2d3d55;margin-bottom:32px">
-          <div style="font-size:12px;font-weight:800;letter-spacing:6px;color:#8b9ab0;text-transform:uppercase;margin-bottom:8px">TICKET<span style="color:#00b4ff">DESK</span></div>
+          <div style="font-size:12px;font-weight:800;letter-spacing:6px;text-transform:uppercase;margin-bottom:8px"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></div>
           <div style="font-size:22px;font-weight:700;color:#f9fafb;margin-bottom:4px">Billets disponibles</div>
-          <div style="font-size:13px;color:#8b9ab0">${data.length} place${data.length>1?'s':''} · Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+          <div style="font-size:13px;color:#8b9ab0">${totalPlaces} place${totalPlaces>1?'s':''} · Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
         </div>
         ${!data.length ? '<p style="color:#8b9ab0;font-size:14px;text-align:center">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
           <div style="background:#1a2540;border:1px solid #2d3d55;border-radius:16px;padding:0;margin-bottom:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
@@ -1206,8 +1214,8 @@ function renderPublicStock(data) {
             ${Object.entries(byDate).map(([date,tickets])=>`
               <div style="padding:16px 24px">
                 ${date?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-                  <span style="font-size:13px;font-weight:600;color:#8b9ab0;letter-spacing:0.5px">${fmtDate(date)}</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                  <span style="font-size:13px;font-weight:600;color:#00b4ff;letter-spacing:0.5px">${fmtDate(date)}</span>
                 </div>`:''}
                 ${tickets.map(t=>{
                   const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
@@ -1220,7 +1228,7 @@ function renderPublicStock(data) {
                       ${t.place?`<div style="font-size:13px;color:#8b9ab0;margin-top:2px">${t.place}</div>`:''}
                     </div>
                     <div style="text-align:right;flex-shrink:0">
-                      ${ppp?`<div style="font-size:20px;font-weight:700;color:#00ff88">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#4a5568;font-style:italic">Prix sur demande</div>`}
+                      ${ppp?`<div style="font-size:20px;font-weight:700;color:#f9fafb">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#4a5568;font-style:italic">Prix sur demande</div>`}
                     </div>
                   </div>`;
                 }).join('')}
