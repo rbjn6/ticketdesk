@@ -363,6 +363,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <div style="margin-top:8px;display:none" id="gmailScanRow">
           <button class="btn" onclick="gmailScan()" style="width:100%;justify-content:center;margin-bottom:6px">Scanner les billets</button>
           <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="gmailScan(1)" style="flex:1;justify-content:center">Dernières 24h</button>
             <button class="btn btn-sm" onclick="gmailScan(7)" style="flex:1;justify-content:center">Dernière semaine</button>
             <button class="btn btn-sm" onclick="gmailScan(30)" style="flex:1;justify-content:center">Dernier mois</button>
           </div>
@@ -1776,7 +1777,8 @@ async function gmailScan(days){
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=50`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
-  for(const id of ids.slice(0,100)){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed)importCandidates.push({...parsed,mailId:id,checked:true});}catch(e){}}
+  const allIds=ids.slice(0,50);const batchSize=10;
+  for(let i=0;i<allIds.length;i+=batchSize){const batch=allIds.slice(i,i+batchSize);const results=await Promise.all(batch.map(async id=>{try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);return parsed?{...parsed,mailId:id,checked:true}:null;}catch(e){return null;}}));importCandidates.push(...results.filter(Boolean));}
   if(days){const cutoff=new Date(Date.now()-days*86400000).toISOString().split('T')[0];importCandidates=importCandidates.filter(c=>!c.buyDate||c.buyDate>=cutoff);}
   renderImportResults();
 }
