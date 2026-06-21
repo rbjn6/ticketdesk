@@ -1092,10 +1092,14 @@ function getDashPeriodRange() {
     const d2 = new Date(d); d2.setDate(d.getDate() + 6);
     to = d2.toISOString().substring(0, 10);
   } else if (dashPeriod === 'month') {
-    const yr = dashSelectedYear  || today.substring(0, 4);
     const mo = dashSelectedMonth || today.substring(5, 7);
-    from = `${yr}-${mo}-01`;
-    to   = `${yr}-${mo}-31`;
+    if (dashSelectedYear) {
+      from = `${dashSelectedYear}-${mo}-01`;
+      to   = `${dashSelectedYear}-${mo}-31`;
+    } else {
+      from = `${today.substring(0,4)}-${mo}-01`;
+      to   = `${today.substring(0,4)}-${mo}-31`;
+    }
   } else if (dashPeriod === 'year') {
     const yr = dashSelectedYear || today.substring(0, 4);
     from = `${yr}-01-01`;
@@ -1133,7 +1137,9 @@ function renderDashFilters() {
     ...costs.map(c => (c.date||'').substring(0,4))
   ].filter(y => y && y.length === 4))].sort();
   const selStyle = `width:auto !important;min-width:unset !important;flex:none !important;padding:4px 24px 4px 10px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;cursor:pointer;appearance:none;-webkit-appearance:none;height:28px;outline:none;display:inline-block`;
-  const monthSelect = dashPeriod === 'month' ? `
+  const showMonth = dashPeriod === 'month' || dashSelectedMonth !== '';
+  const showYear  = dashPeriod === 'year'  || dashSelectedYear  !== '';
+  const monthSelect = showMonth ? `
     <select onchange="setDashFilter('month',this.value)" style="${selStyle}">
       <option value="">Tous</option>
       <option value="01" ${dashSelectedMonth==='01'?'selected':''}>Janvier</option>
@@ -1149,13 +1155,15 @@ function renderDashFilters() {
       <option value="11" ${dashSelectedMonth==='11'?'selected':''}>Novembre</option>
       <option value="12" ${dashSelectedMonth==='12'?'selected':''}>Décembre</option>
     </select>` : '';
-  const yearSelect = dashPeriod === 'year' ? `
+  const yearSelect = showYear ? `
     <select onchange="setDashFilter('year',this.value)" style="${selStyle}">
       <option value="">Toutes</option>
       ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
     </select>` : '';
+  const resetBtn = (dashSelectedMonth || dashSelectedYear) ? `
+    <button onclick="setDashFilter('reset','')" style="font-size:11px;color:#8b9ab0;background:none;border:none;cursor:pointer;padding:2px 6px;flex-shrink:0">× Réinit.</button>` : '';
   el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:8px">
       <button class="dash-chip${dashPeriod==='all'?' active':''}" onclick="setDashFilter('period','all')">Tout</button>
       <button class="dash-chip${dashPeriod==='today'?' active':''}" onclick="setDashFilter('period','today')">Aujourd'hui</button>
       <button class="dash-chip${dashPeriod==='week'?' active':''}" onclick="setDashFilter('period','week')">Semaine</button>
@@ -1163,22 +1171,30 @@ function renderDashFilters() {
       ${monthSelect}
       <button class="dash-chip${dashPeriod==='year'?' active':''}" onclick="setDashFilter('period','year')">Année</button>
       ${yearSelect}
-      <div style="position:relative;flex:1;min-width:160px;margin-left:4px">
+      ${resetBtn}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="position:relative;flex:1">
         <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" placeholder="Événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="width:100% !important;padding:7px 10px 7px 28px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;box-sizing:border-box">
+        <input type="text" placeholder="Rechercher événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="width:100% !important;padding:8px 10px 8px 30px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;box-sizing:border-box">
       </div>
-      <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="width:auto !important;padding:7px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;min-width:130px">
+      <div style="position:relative;flex:1">
+        <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="width:100% !important;padding:8px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;box-sizing:border-box">
+      </div>
     </div>`;
 }
 
 function setDashFilter(type, val) {
   if (type === 'period') {
-    dashPeriod = val; dashSelectedMonth = ''; dashSelectedYear = '';
+    dashPeriod = val;
     renderDashFilters(); renderDashMetrics();
   } else if (type === 'month') {
     dashSelectedMonth = val; renderDashMetrics(); renderDashFilters();
   } else if (type === 'year') {
     dashSelectedYear  = val; renderDashMetrics(); renderDashFilters();
+  } else if (type === 'reset') {
+    dashSelectedMonth = ''; dashSelectedYear = '';
+    renderDashFilters(); renderDashMetrics();
   } else if (type === 'event') {
     dashEventFilter = val; renderDashMetrics();
   } else if (type === 'buyer') {
