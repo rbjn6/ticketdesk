@@ -1772,14 +1772,16 @@ async function fetchGmailProfile(token){
 }
 async function gmailScan(days){
   if(!gmailToken)return;showToast('Scan en cours… 0 billet trouvé','ok',0);
+  const after=days?Math.floor((Date.now()-days*86400000)/1000):null;
+  const dateFilter=after?` after:${after}`:'';
+  const maxResults=days?50:200;
   const queries=['subject:confirmation+commande','subject:confirmation+commande+fnac','subject:Stade+de+France+commande'];
   const allMsgs=[];
-  for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=50`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
+  for(const query of queries){try{let pageToken='';do{const q=encodeURIComponent(query+dateFilter);const url=`https://www.googleapis.com/gmail/v1/users/me/messages?q=${q}&maxResults=${maxResults}${pageToken?'&pageToken='+pageToken:''}`;const r=await fetch(url,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);pageToken=d.nextPageToken||'';}while(pageToken);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
   const allIds=ids.slice(0,50);const batchSize=10;
   for(let i=0;i<allIds.length;i+=batchSize){const batch=allIds.slice(i,i+batchSize);await Promise.all(batch.map(async id=>{try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed){importCandidates.push({...parsed,mailId:id,checked:true});document.getElementById('toast').textContent=`Scan en cours… ${importCandidates.length} billet${importCandidates.length>1?'s':''} trouvé${importCandidates.length>1?'s':''}`;}}catch(e){}}));}
-  if(days){const cutoff=new Date(Date.now()-days*86400000).toISOString().split('T')[0];importCandidates=importCandidates.filter(c=>!c.buyDate||c.buyDate>=cutoff);}
   if(!importCandidates.length){showToast('Aucun billet trouvé','err',3000);}else{showToast(importCandidates.length+' billet(s) détecté(s)','ok',3000);}
   renderImportResults();
 }
