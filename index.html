@@ -998,10 +998,10 @@ function fmtFull(n) {
   return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
 }
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
-function showToast(msg,type='ok') {
+function showToast(msg,type='ok',duration=2500) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+type;
-  setTimeout(()=>t.className='toast',2500);
+  if(duration>0) setTimeout(()=>t.className='toast',duration);
 }
 
 function showPage(name) {
@@ -1771,15 +1771,16 @@ async function fetchGmailProfile(token){
   try{const r=await fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+token}});const d=await r.json();if(d.emailAddress)localStorage.setItem('ticketdesk_gmail_email',d.emailAddress);document.getElementById('gmailEmail').textContent=d.emailAddress||'';}catch(e){}
 }
 async function gmailScan(days){
-  if(!gmailToken)return;showToast('Scan en cours…');
+  if(!gmailToken)return;showToast('Scan en cours… 0 billet trouvé','ok',0);
   const queries=['subject:confirmation+commande','subject:confirmation+commande+fnac','subject:Stade+de+France+commande'];
   const allMsgs=[];
   for(const q of queries){try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(q)}&maxResults=50`,{headers:{Authorization:'Bearer '+gmailToken}});if(r.status===401){gmailToken=null;localStorage.removeItem(GMAIL_KEY);renderGmail();showToast('Session expirée','err');return;}const d=await r.json();if(d.messages)allMsgs.push(...d.messages);}catch(e){}}
   if(!allMsgs.length){showToast('Aucun mail trouvé','err');return;}
   const ids=[...new Set(allMsgs.map(m=>m.id))];importCandidates=[];
   const allIds=ids.slice(0,50);const batchSize=10;
-  for(let i=0;i<allIds.length;i+=batchSize){const batch=allIds.slice(i,i+batchSize);const results=await Promise.all(batch.map(async id=>{try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);return parsed?{...parsed,mailId:id,checked:true}:null;}catch(e){return null;}}));importCandidates.push(...results.filter(Boolean));}
+  for(let i=0;i<allIds.length;i+=batchSize){const batch=allIds.slice(i,i+batchSize);await Promise.all(batch.map(async id=>{try{const r=await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,{headers:{Authorization:'Bearer '+gmailToken}});const msg=await r.json();const parsed=parseTicketMail(msg);if(parsed){importCandidates.push({...parsed,mailId:id,checked:true});document.getElementById('toast').textContent=`Scan en cours… ${importCandidates.length} billet${importCandidates.length>1?'s':''} trouvé${importCandidates.length>1?'s':''}`;}}catch(e){}}));}
   if(days){const cutoff=new Date(Date.now()-days*86400000).toISOString().split('T')[0];importCandidates=importCandidates.filter(c=>!c.buyDate||c.buyDate>=cutoff);}
+  if(!importCandidates.length){showToast('Aucun billet trouvé','err',3000);}else{showToast(importCandidates.length+' billet(s) détecté(s)','ok',3000);}
   renderImportResults();
 }
 function parseTicketMail(msg){
