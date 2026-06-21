@@ -602,12 +602,29 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 <div class="modal-overlay" id="wtsFilterModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Sélectionner les événements</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-sm" onclick="toggleAllWTSFilter(true)">Tout sélectionner</button>
-      <button class="btn btn-sm" onclick="toggleAllWTSFilter(false)">Tout désélectionner</button>
+    <div class="modal-title">Filtrer le WTS</div>
+
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Événements</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-ev-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-ev-cb',false)">Tout désélectionner</button>
     </div>
-    <div id="wtsFilterList" style="max-height:320px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+    <div id="wtsFilterEvents" style="max-height:160px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
+
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Dates</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-dt-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-dt-cb',false)">Tout désélectionner</button>
+    </div>
+    <div id="wtsFilterDates" style="max-height:120px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
+
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Quantités</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qt-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qt-cb',false)">Tout désélectionner</button>
+    </div>
+    <div id="wtsFilterQtys" style="max-height:100px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:4px"></div>
+
     <div class="form-actions">
       <button class="btn" onclick="closeModal('wtsFilterModal')">Annuler</button>
       <button class="btn btn-primary" onclick="applyWTSFilter()">Appliquer</button>
@@ -651,7 +668,9 @@ let dashEventFilter = '';
 let dashBuyerFilter = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
-let wtsSelectedEvents = null; // null = tous les événements
+let wtsSelectedEvents = null;
+let wtsSelectedDates  = null;
+let wtsSelectedQtys   = null;
 let alertsCollapsed = false;
 let _driveTimer     = null;
 const CREDS_KEY = 'ticketdesk_creds';
@@ -1734,28 +1753,57 @@ function toggleTxLivraison(id) {
 }
 
 // WTS
+function _wtsCheckbox(cls,dataAttr,val,label,checked){
+  return `<label class="share-item"><input type="checkbox" class="${cls}" data-${dataAttr}="${encodeURIComponent(String(val))}" ${checked?'checked':''} style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0"><div style="font-size:14px;font-weight:600">${label}</div></label>`;
+}
+function _wtsCheckedEvents(){return Array.from(document.querySelectorAll('.wts-ev-cb:checked')).map(cb=>decodeURIComponent(cb.dataset.event));}
+function _wtsCheckedDates(){return Array.from(document.querySelectorAll('.wts-dt-cb:checked')).map(cb=>decodeURIComponent(cb.dataset.date));}
+function _refreshWTSDates(){
+  const evs=_wtsCheckedEvents();
+  const stock=transactions.filter(t=>t.statut==='En stock'&&evs.includes(t.event||'—'));
+  const dates=[...new Set(stock.map(t=>t.date||''))].sort();
+  const activeDates=wtsSelectedDates||dates;
+  document.getElementById('wtsFilterDates').innerHTML=dates.map(d=>_wtsCheckbox('wts-dt-cb','date',d,d?fmtDate(d):'Sans date',activeDates.includes(d))).join('');
+  _refreshWTSQtys();
+}
+function _refreshWTSQtys(){
+  const evs=_wtsCheckedEvents(), dts=_wtsCheckedDates();
+  const stock=transactions.filter(t=>t.statut==='En stock'&&evs.includes(t.event||'—')&&dts.includes(t.date||''));
+  const qtys=[...new Set(stock.map(t=>t.qty||1))].sort((a,b)=>a-b);
+  const activeQtys=wtsSelectedQtys||qtys;
+  document.getElementById('wtsFilterQtys').innerHTML=qtys.map(q=>_wtsCheckbox('wts-qt-cb','qty',q,q+'x',activeQtys.includes(q))).join('');
+}
 function openWTSFilter(){
-  const events=[...new Set(transactions.filter(t=>t.statut==='En stock').map(t=>t.event||'—'))].sort();
-  const active=wtsSelectedEvents||events;
-  document.getElementById('wtsFilterList').innerHTML=events.map(ev=>`
-    <label class="share-item">
-      <input type="checkbox" class="wts-filter-cb" data-event="${encodeURIComponent(ev)}" ${active.includes(ev)?'checked':''}
-        style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
-      <div style="font-size:14px;font-weight:600">${ev}</div>
-    </label>`).join('');
+  const allStock=transactions.filter(t=>t.statut==='En stock');
+  const events=[...new Set(allStock.map(t=>t.event||'—'))].sort();
+  const activeEvs=wtsSelectedEvents||events;
+  document.getElementById('wtsFilterEvents').innerHTML=events.map(ev=>_wtsCheckbox('wts-ev-cb','event',ev,ev,activeEvs.includes(ev))).join('');
+  document.querySelectorAll('.wts-ev-cb').forEach(cb=>cb.addEventListener('change',_refreshWTSDates));
+  _refreshWTSDates();
   document.getElementById('wtsFilterModal').classList.add('open');
 }
-function toggleAllWTSFilter(v){document.querySelectorAll('.wts-filter-cb').forEach(cb=>cb.checked=v);}
+function toggleAllWTSSection(cls,v){document.querySelectorAll('.'+cls).forEach(cb=>{cb.checked=v;});if(cls==='wts-ev-cb')_refreshWTSDates();else if(cls==='wts-dt-cb')_refreshWTSQtys();}
 function applyWTSFilter(){
-  const checked=Array.from(document.querySelectorAll('.wts-filter-cb:checked')).map(cb=>decodeURIComponent(cb.dataset.event));
-  const allEvents=[...new Set(transactions.filter(t=>t.statut==='En stock').map(t=>t.event||'—'))];
-  wtsSelectedEvents=checked.length===allEvents.length?null:checked;
+  const allStock=transactions.filter(t=>t.statut==='En stock');
+  const allEvs=[...new Set(allStock.map(t=>t.event||'—'))];
+  const checkedEvs=_wtsCheckedEvents();
+  wtsSelectedEvents=checkedEvs.length===allEvs.length?null:checkedEvs;
+  const evPool=wtsSelectedEvents||allEvs;
+  const allDts=[...new Set(allStock.filter(t=>evPool.includes(t.event||'—')).map(t=>t.date||''))];
+  const checkedDts=_wtsCheckedDates();
+  wtsSelectedDates=checkedDts.length===allDts.length?null:checkedDts;
+  const dtPool=wtsSelectedDates||allDts;
+  const allQtys=[...new Set(allStock.filter(t=>evPool.includes(t.event||'—')&&dtPool.includes(t.date||'')).map(t=>t.qty||1))];
+  const checkedQtys=Array.from(document.querySelectorAll('.wts-qt-cb:checked')).map(cb=>Number(decodeURIComponent(cb.dataset.qty)));
+  wtsSelectedQtys=checkedQtys.length===allQtys.length?null:checkedQtys;
   closeModal('wtsFilterModal');
   renderWTS();
 }
 function renderWTS(){
   const stock=transactions.filter(t=>t.statut==='En stock')
     .filter(t=>!wtsSelectedEvents||wtsSelectedEvents.includes(t.event||'—'))
+    .filter(t=>!wtsSelectedDates||wtsSelectedDates.includes(t.date||''))
+    .filter(t=>!wtsSelectedQtys||wtsSelectedQtys.includes(t.qty||1))
     .sort((a,b)=>{
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
