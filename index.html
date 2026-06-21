@@ -662,8 +662,8 @@ let filterSort      = 'date';
 let filterSearch    = '';
 let filterBuyer     = '';
 let dashPeriod      = 'all';
-let dashDateFrom    = '';
-let dashDateTo      = '';
+let dashSelectedMonth = '';
+let dashSelectedYear  = '';
 let dashEventFilter = '';
 let dashBuyerFilter = '';
 let chartEvents     = null, chartPie = null;
@@ -1075,15 +1075,16 @@ function getDashPeriodRange() {
     const d2 = new Date(d); d2.setDate(d.getDate() + 6);
     to = d2.toISOString().substring(0, 10);
   } else if (dashPeriod === 'month') {
-    from = today.substring(0, 7) + '-01';
-    to   = today.substring(0, 7) + '-31';
+    const yr = dashSelectedYear  || today.substring(0, 4);
+    const mo = dashSelectedMonth || today.substring(5, 7);
+    from = `${yr}-${mo}-01`;
+    to   = `${yr}-${mo}-31`;
   } else if (dashPeriod === 'year') {
-    from = today.substring(0, 4) + '-01-01';
-    to   = today.substring(0, 4) + '-12-31';
-  } else if (dashPeriod === 'custom') {
-    from = dashDateFrom;
-    to   = dashDateTo;
+    const yr = dashSelectedYear || today.substring(0, 4);
+    from = `${yr}-01-01`;
+    to   = `${yr}-12-31`;
   }
+  // 'all': from/to stay '' but filterByPeriod still applies month/year substrings
   return { from, to };
 }
 
@@ -1091,13 +1092,16 @@ function filterByPeriod(dateStr, from, to) {
   if (!dateStr) return false;
   if (from && dateStr < from) return false;
   if (to   && dateStr > to)   return false;
+  if (dashSelectedMonth && dateStr.substring(5, 7) !== dashSelectedMonth) return false;
+  if (dashSelectedYear  && dateStr.substring(0, 4) !== dashSelectedYear)  return false;
   return true;
 }
 
 function filterDashTx() {
   const { from, to } = getDashPeriodRange();
   let list = [...transactions];
-  if (from || to) list = list.filter(t => filterByPeriod(t.buyDate || t.purchaseDate || t.date, from, to));
+  if (from || to || dashSelectedMonth || dashSelectedYear)
+    list = list.filter(t => filterByPeriod(t.buyDate || t.purchaseDate || t.date, from, to));
   if (dashEventFilter) list = list.filter(t => (t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase()));
   if (dashBuyerFilter) list = list.filter(t => (t.buyer||'').toLowerCase().includes(dashBuyerFilter.toLowerCase()));
   return list;
@@ -1106,34 +1110,35 @@ function filterDashTx() {
 function renderDashFilters() {
   const el = document.getElementById('dashFilters');
   if (!el) return;
+  const years = [...new Set([
+    ...transactions.map(t => (t.buyDate||t.purchaseDate||t.date||'').substring(0,4)),
+    ...transactions.map(t => (t.saleDate||'').substring(0,4)),
+    ...costs.map(c => (c.date||'').substring(0,4))
+  ].filter(y => y && y.length === 4))].sort();
   el.innerHTML = `
     <div style="margin-bottom:12px">
-      <div class="dash-chips">
-        ${[['all','Tout'],['today',"Auj."],['week','Semaine'],['month','Mois'],['year','Année']].map(([v,l])=>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        ${[['all','Tout'],['today','Aujourd\'hui'],['week','Semaine'],['month','Mois'],['year','Année']].map(([v,l])=>
           `<button class="dash-chip${dashPeriod===v?' active':''}" onclick="setDashFilter('period','${v}')">${l}</button>`
         ).join('')}
       </div>
-      <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
-        <div style="flex:1;min-width:120px">
-          <div class="flabel" style="margin-bottom:4px">Du</div>
-          <input type="date" value="${dashDateFrom}" onchange="setDashFilter('from',this.value)" style="padding:7px 10px;font-size:13px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+        <select onchange="setDashFilter('month',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
+          <option value="">Tous les mois</option>
+          ${[['01','Janvier'],['02','Février'],['03','Mars'],['04','Avril'],['05','Mai'],['06','Juin'],['07','Juillet'],['08','Août'],['09','Septembre'],['10','Octobre'],['11','Novembre'],['12','Décembre']].map(([v,l])=>
+            `<option value="${v}" ${dashSelectedMonth===v?'selected':''}>${l}</option>`
+          ).join('')}
+        </select>
+        <select onchange="setDashFilter('year',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;cursor:pointer">
+          <option value="">Toutes les années</option>
+          ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
+        </select>
+        <div style="position:relative;flex:1;min-width:160px">
+          <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="padding:6px 10px 6px 28px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;width:100%;box-sizing:border-box">
         </div>
-        <div style="flex:1;min-width:120px">
-          <div class="flabel" style="margin-bottom:4px">Au</div>
-          <input type="date" value="${dashDateTo}" onchange="setDashFilter('to',this.value)" style="padding:7px 10px;font-size:13px">
-        </div>
-        <div style="flex:2;min-width:160px">
-          <div class="flabel" style="margin-bottom:4px">Événement</div>
-          <div style="position:relative">
-            <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="Filtrer…" value="${dashEventFilter}"
-              oninput="setDashFilter('event',this.value)" style="padding:7px 10px 7px 28px;font-size:13px">
-          </div>
-        </div>
-        <div style="flex:1;min-width:130px">
-          <div class="flabel" style="margin-bottom:4px">Acheteur</div>
-          <input type="text" placeholder="Filtrer…" value="${dashBuyerFilter}"
-            oninput="setDashFilter('buyer',this.value)" style="padding:7px 10px;font-size:13px">
+        <div style="position:relative;min-width:130px">
+          <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;width:100%;box-sizing:border-box">
         </div>
       </div>
     </div>`;
@@ -1141,16 +1146,12 @@ function renderDashFilters() {
 
 function setDashFilter(type, val) {
   if (type === 'period') {
-    dashPeriod = val; dashDateFrom = ''; dashDateTo = '';
+    dashPeriod = val;
     renderDashFilters(); renderDashMetrics();
-  } else if (type === 'from') {
-    dashDateFrom = val; dashPeriod = 'custom';
-    document.querySelectorAll('#dashFilters .dash-chip').forEach(c => c.classList.remove('active'));
-    renderDashMetrics();
-  } else if (type === 'to') {
-    dashDateTo = val; dashPeriod = 'custom';
-    document.querySelectorAll('#dashFilters .dash-chip').forEach(c => c.classList.remove('active'));
-    renderDashMetrics();
+  } else if (type === 'month') {
+    dashSelectedMonth = val; renderDashMetrics(); renderDashFilters();
+  } else if (type === 'year') {
+    dashSelectedYear  = val; renderDashMetrics(); renderDashFilters();
   } else if (type === 'event') {
     dashEventFilter = val; renderDashMetrics();
   } else if (type === 'buyer') {
@@ -1408,7 +1409,7 @@ function renderDashboard() {
 
 function renderDashMetrics() {
   const { from, to } = getDashPeriodRange();
-  const isAll = dashPeriod === 'all';
+  const isAll = dashPeriod === 'all' && !dashSelectedMonth && !dashSelectedYear;
 
   const base = transactions.filter(t => {
     if (dashEventFilter && !(t.event||'').toLowerCase().includes(dashEventFilter.toLowerCase())) return false;
