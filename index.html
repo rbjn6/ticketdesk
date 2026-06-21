@@ -1128,41 +1128,45 @@ function renderDashFilters() {
   const el = document.getElementById('dashFilters');
   if (!el) return;
   const years = [...new Set([
-    ...transactions.map(t => (t.buyDate||t.purchaseDate||t.date||'').substring(0,4)),
+    ...transactions.map(t => (t.buyDate||t.date||'').substring(0,4)),
     ...transactions.map(t => (t.saleDate||'').substring(0,4)),
     ...costs.map(c => (c.date||'').substring(0,4))
   ].filter(y => y && y.length === 4))].sort();
-  const sel = `padding:4px 8px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;cursor:pointer;height:28px;appearance:none;-webkit-appearance:none;padding-right:20px`;
-  const monthSelect = `<select onchange="setDashFilter('month',this.value)" style="${sel}">
-    <option value="">Tous les mois</option>
-    ${[['01','Jan'],['02','Fév'],['03','Mar'],['04','Avr'],['05','Mai'],['06','Juin'],['07','Juil'],['08','Août'],['09','Sep'],['10','Oct'],['11','Nov'],['12','Déc']].map(([v,l])=>
-      `<option value="${v}" ${dashSelectedMonth===v?'selected':''}>${l}</option>`
-    ).join('')}
-  </select>`;
-  const yearSelect = `<select onchange="setDashFilter('year',this.value)" style="${sel}">
-    <option value="">Toutes</option>
-    ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
-  </select>`;
+  const monthSelect = dashPeriod === 'month' ? `
+    <select onchange="setDashFilter('month',this.value)" style="padding:4px 24px 4px 10px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;cursor:pointer;appearance:none;-webkit-appearance:none;height:28px;outline:none">
+      <option value="">Tous</option>
+      <option value="01" ${dashSelectedMonth==='01'?'selected':''}>Janvier</option>
+      <option value="02" ${dashSelectedMonth==='02'?'selected':''}>Février</option>
+      <option value="03" ${dashSelectedMonth==='03'?'selected':''}>Mars</option>
+      <option value="04" ${dashSelectedMonth==='04'?'selected':''}>Avril</option>
+      <option value="05" ${dashSelectedMonth==='05'?'selected':''}>Mai</option>
+      <option value="06" ${dashSelectedMonth==='06'?'selected':''}>Juin</option>
+      <option value="07" ${dashSelectedMonth==='07'?'selected':''}>Juillet</option>
+      <option value="08" ${dashSelectedMonth==='08'?'selected':''}>Août</option>
+      <option value="09" ${dashSelectedMonth==='09'?'selected':''}>Septembre</option>
+      <option value="10" ${dashSelectedMonth==='10'?'selected':''}>Octobre</option>
+      <option value="11" ${dashSelectedMonth==='11'?'selected':''}>Novembre</option>
+      <option value="12" ${dashSelectedMonth==='12'?'selected':''}>Décembre</option>
+    </select>` : '';
+  const yearSelect = dashPeriod === 'year' ? `
+    <select onchange="setDashFilter('year',this.value)" style="padding:4px 24px 4px 10px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;cursor:pointer;appearance:none;-webkit-appearance:none;height:28px;outline:none">
+      <option value="">Toutes</option>
+      ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
+    </select>` : '';
   el.innerHTML = `
-    <div style="margin-bottom:12px">
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-        ${[['all','Tout'],['today','Aujourd\'hui'],['week','Semaine']].map(([v,l])=>
-          `<button class="dash-chip${dashPeriod===v?' active':''}" onclick="setDashFilter('period','${v}')">${l}</button>`
-        ).join('')}
-        <button class="dash-chip${dashPeriod==='month'?' active':''}" onclick="setDashFilter('period','month')">Mois</button>
-        ${dashPeriod==='month' ? monthSelect : ''}
-        <button class="dash-chip${dashPeriod==='year'?' active':''}" onclick="setDashFilter('period','year')">Année</button>
-        ${dashPeriod==='year' ? yearSelect : ''}
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="dash-chip${dashPeriod==='all'?' active':''}" onclick="setDashFilter('period','all')">Tout</button>
+      <button class="dash-chip${dashPeriod==='today'?' active':''}" onclick="setDashFilter('period','today')">Aujourd'hui</button>
+      <button class="dash-chip${dashPeriod==='week'?' active':''}" onclick="setDashFilter('period','week')">Semaine</button>
+      <button class="dash-chip${dashPeriod==='month'?' active':''}" onclick="setDashFilter('period','month')">Mois</button>
+      ${monthSelect}
+      <button class="dash-chip${dashPeriod==='year'?' active':''}" onclick="setDashFilter('period','year')">Année</button>
+      ${yearSelect}
+      <div style="position:relative;margin-left:8px">
+        <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="padding:4px 10px 4px 28px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;height:28px;outline:none;width:160px;box-sizing:border-box">
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-        <div style="position:relative;flex:1;min-width:160px">
-          <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="padding:6px 10px 6px 28px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;width:100%;box-sizing:border-box">
-        </div>
-        <div style="position:relative;min-width:130px">
-          <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="padding:6px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;width:100%;box-sizing:border-box">
-        </div>
-      </div>
+      <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="padding:4px 10px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;height:28px;outline:none;width:120px;box-sizing:border-box">
     </div>`;
 }
 
