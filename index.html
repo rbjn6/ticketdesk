@@ -589,17 +589,17 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Dates</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button class="btn btn-sm" onclick="toggleAllShareSection('share-dt-cb',true)">Tout sélectionner</button>
-      <button class="btn btn-sm" onclick="toggleAllShareSection('share-dt-cb',false)">Tout désélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllShareSection('share-date-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllShareSection('share-date-cb',false)">Tout désélectionner</button>
     </div>
-    <div id="shareFilterDates" style="max-height:100px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
+    <div id="share-dates-section" style="max-height:100px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
 
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Quantités</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button class="btn btn-sm" onclick="toggleAllShareSection('share-qt-cb',true)">Tout sélectionner</button>
-      <button class="btn btn-sm" onclick="toggleAllShareSection('share-qt-cb',false)">Tout désélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllShareSection('share-qty-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllShareSection('share-qty-cb',false)">Tout désélectionner</button>
     </div>
-    <div id="shareFilterQtys" style="max-height:80px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:4px"></div>
+    <div id="share-qtys-section" style="max-height:80px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:4px"></div>
 
     <div class="form-actions">
       <button class="btn" onclick="closeModal('shareModal')">Annuler</button>
@@ -630,17 +630,17 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Dates</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-dt-cb',true)">Tout sélectionner</button>
-      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-dt-cb',false)">Tout désélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-date-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-date-cb',false)">Tout désélectionner</button>
     </div>
-    <div id="wtsFilterDates" style="max-height:120px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
+    <div id="wts-dates-section" style="max-height:120px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px"></div>
 
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px">Quantités</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
-      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qt-cb',true)">Tout sélectionner</button>
-      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qt-cb',false)">Tout désélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qty-cb',true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSSection('wts-qty-cb',false)">Tout désélectionner</button>
     </div>
-    <div id="wtsFilterQtys" style="max-height:100px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:4px"></div>
+    <div id="wts-qtys-section" style="max-height:100px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:4px"></div>
 
     <div class="form-actions">
       <button class="btn" onclick="closeModal('wtsFilterModal')">Annuler</button>
@@ -1181,55 +1181,74 @@ function setDashFilter(type, val) {
 }
 
 // SHARE LINK
-function _shareItem(cls, val, label, sub) {
-  const onch = cls==='share-ev-cb'?'updateShareFilterSections()':cls==='share-dt-cb'?'updateShareQtySection()':'';
-  return `<label class="share-item"><input type="checkbox" class="${cls}" value="${encodeURIComponent(String(val))}" checked ${onch?`onchange="${onch}"`:''}
-    style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
-    <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>${sub?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${sub}</div>`:''}</div></label>`;
-}
-function updateShareFilterSections() {
-  const evs = Array.from(document.querySelectorAll('.share-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
+function updateWTSFilters(changedSection, modalPrefix) {
+  const prefix = modalPrefix || 'wts';
   const stock = transactions.filter(t => t.statut === 'En stock');
-  const dates = [...new Set(stock.filter(t => evs.includes(t.event||'—')).map(t => t.date).filter(Boolean))].sort();
-  document.getElementById('shareFilterDates').innerHTML = dates.map(d => _shareItem('share-dt-cb', d, fmtDate(d), '')).join('');
-  updateShareQtySection();
+  const checkedEvents = Array.from(document.querySelectorAll(`.${prefix}-ev-cb:checked`)).map(cb => cb.value);
+  const checkedDates  = Array.from(document.querySelectorAll(`.${prefix}-date-cb:checked`)).map(cb => cb.value);
+  const checkedQtys   = Array.from(document.querySelectorAll(`.${prefix}-qty-cb:checked`)).map(cb => Number(cb.value));
+
+  if (changedSection === 'events' || changedSection === 'init') {
+    const availDates = [...new Set(stock.filter(t => checkedEvents.includes(t.event||'—')).map(t => t.date).filter(Boolean))].sort();
+    renderWTSSection(prefix, 'dates', availDates, 'date');
+  }
+  if (changedSection === 'events' || changedSection === 'dates' || changedSection === 'init') {
+    // Re-read dates from DOM in case they were just re-rendered (all checked)
+    const datesNow = (changedSection === 'events' || changedSection === 'init')
+      ? Array.from(document.querySelectorAll(`.${prefix}-date-cb:checked`)).map(cb => cb.value)
+      : checkedDates;
+    const availQtys = [...new Set(stock.filter(t => checkedEvents.includes(t.event||'—') && datesNow.includes(t.date)).map(t => t.qty))].sort((a,b)=>a-b);
+    renderWTSSection(prefix, 'qtys', availQtys, 'qty');
+  }
+  if (changedSection === 'qtys') {
+    const availDates = [...new Set(stock.filter(t => checkedEvents.includes(t.event||'—') && checkedQtys.includes(t.qty)).map(t => t.date).filter(Boolean))].sort();
+    renderWTSSection(prefix, 'dates', availDates, 'date');
+  }
 }
-function updateShareQtySection() {
-  const evs = Array.from(document.querySelectorAll('.share-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const dts = Array.from(document.querySelectorAll('.share-dt-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const stock = transactions.filter(t => t.statut === 'En stock');
-  const qtys = [...new Set(stock.filter(t => evs.includes(t.event||'—') && dts.includes(t.date)).map(t => t.qty))].sort((a,b)=>a-b);
-  document.getElementById('shareFilterQtys').innerHTML = qtys.map(q => _shareItem('share-qt-cb', q, q+'x', '')).join('');
+
+function renderWTSSection(prefix, section, values, type) {
+  const container = document.getElementById(`${prefix}-${section}-section`);
+  if (!container) return;
+  const onch = `updateWTSFilters('${section === 'dates' ? 'dates' : 'qtys'}','${prefix}')`;
+  container.innerHTML = values.length
+    ? values.map(v => `<label class="share-item"><input type="checkbox" class="${prefix}-${type}-cb" value="${v}" checked onchange="${onch}"
+        style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
+        <div style="font-size:14px;font-weight:600">${type === 'date' ? fmtDate(v) : v+'x'}</div></label>`).join('')
+    : '<div style="font-size:13px;color:#8b9ab0;padding:6px 8px">Aucune option disponible</div>';
 }
+
 function toggleAllShareSection(cls, v) {
   document.querySelectorAll('.'+cls).forEach(cb => { cb.checked = v; });
-  if (cls === 'share-ev-cb') updateShareFilterSections();
-  else if (cls === 'share-dt-cb') updateShareQtySection();
+  if (cls === 'share-ev-cb')   updateWTSFilters('events', 'share');
+  else if (cls === 'share-date-cb') updateWTSFilters('dates',  'share');
+  else if (cls === 'share-qty-cb')  updateWTSFilters('qtys',   'share');
 }
 function openShareModal() {
   const stock = transactions.filter(t => t.statut === 'En stock');
   const el = document.getElementById('shareFilterEvents');
   if (!stock.length) {
     el.innerHTML = '<div class="empty">Aucun billet en stock</div>';
-    document.getElementById('shareFilterDates').innerHTML = '';
-    document.getElementById('shareFilterQtys').innerHTML = '';
+    document.getElementById('share-dates-section').innerHTML = '';
+    document.getElementById('share-qtys-section').innerHTML = '';
   } else {
     const events = [...new Set(stock.map(t => t.event||'—'))].sort();
     el.innerHTML = events.map(ev => {
-      const tickets = stock.filter(t => (t.event||'—') === ev);
-      const totalQty = tickets.reduce((s,t) => s+(t.qty||1), 0);
-      return _shareItem('share-ev-cb', ev, ev, totalQty+' place'+(totalQty>1?'s':''));
+      const totalQty = stock.filter(t => (t.event||'—') === ev).reduce((s,t) => s+(t.qty||1), 0);
+      return `<label class="share-item"><input type="checkbox" class="share-ev-cb" value="${ev.replace(/"/g,'&quot;')}" checked onchange="updateWTSFilters('events','share')"
+          style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ev}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${totalQty} place${totalQty>1?'s':''}</div></div></label>`;
     }).join('');
-    updateShareFilterSections();
+    updateWTSFilters('init', 'share');
   }
   document.getElementById('shareLinkResult').style.display = 'none';
   document.getElementById('shareModal').classList.add('open');
 }
 
 function generateShareLink() {
-  const checkedEvents = Array.from(document.querySelectorAll('.share-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const checkedDates  = Array.from(document.querySelectorAll('.share-dt-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const checkedQtys   = Array.from(document.querySelectorAll('.share-qt-cb:checked')).map(cb => Number(decodeURIComponent(cb.value)));
+  const checkedEvents = Array.from(document.querySelectorAll('.share-ev-cb:checked')).map(cb => cb.value);
+  const checkedDates  = Array.from(document.querySelectorAll('.share-date-cb:checked')).map(cb => cb.value);
+  const checkedQtys   = Array.from(document.querySelectorAll('.share-qty-cb:checked')).map(cb => Number(cb.value));
   if (!checkedEvents.length) { showToast('Sélectionne au moins un événement', 'err'); return; }
   const data = transactions
     .filter(t => t.statut === 'En stock' && checkedEvents.includes(t.event||'—') && checkedDates.includes(t.date) && checkedQtys.includes(t.qty))
@@ -1790,49 +1809,28 @@ function toggleTxLivraison(id) {
 }
 
 // WTS
-function updateWTSFilterSections() {
-  const checkedEvents = Array.from(document.querySelectorAll('.wts-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const stock = transactions.filter(t => t.statut === 'En stock');
-  const dates = [...new Set(stock.filter(t => checkedEvents.includes(t.event||'—')).map(t => t.date).filter(Boolean))].sort();
-  document.getElementById('wtsFilterDates').innerHTML = dates.map(d =>
-    `<label class="share-item"><input type="checkbox" class="wts-dt-cb" value="${encodeURIComponent(d)}" checked onchange="updateWTSQtySection()"
-      style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
-      <div style="font-size:14px;font-weight:600">${fmtDate(d)}</div></label>`
-  ).join('');
-  updateWTSQtySection();
-}
-function updateWTSQtySection() {
-  const checkedEvents = Array.from(document.querySelectorAll('.wts-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const checkedDates  = Array.from(document.querySelectorAll('.wts-dt-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  const stock = transactions.filter(t => t.statut === 'En stock');
-  const qtys = [...new Set(stock.filter(t => checkedEvents.includes(t.event||'—') && checkedDates.includes(t.date)).map(t => t.qty))].sort((a,b)=>a-b);
-  document.getElementById('wtsFilterQtys').innerHTML = qtys.map(q =>
-    `<label class="share-item"><input type="checkbox" class="wts-qt-cb" value="${q}" checked
-      style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
-      <div style="font-size:14px;font-weight:600">${q}x</div></label>`
-  ).join('');
-}
 function openWTSFilter() {
   const stock = transactions.filter(t => t.statut === 'En stock');
   const events = [...new Set(stock.map(t => t.event||'—'))].sort();
   const activeEvs = wtsSelectedEvents || events;
   document.getElementById('wtsFilterEvents').innerHTML = events.map(ev =>
-    `<label class="share-item"><input type="checkbox" class="wts-ev-cb" value="${encodeURIComponent(ev)}" ${activeEvs.includes(ev)?'checked':''} onchange="updateWTSFilterSections()"
+    `<label class="share-item"><input type="checkbox" class="wts-ev-cb" value="${ev.replace(/"/g,'&quot;')}" ${activeEvs.includes(ev)?'checked':''} onchange="updateWTSFilters('events','wts')"
       style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
       <div style="font-size:14px;font-weight:600">${ev}</div></label>`
   ).join('');
-  updateWTSFilterSections();
+  updateWTSFilters('init', 'wts');
   document.getElementById('wtsFilterModal').classList.add('open');
 }
 function toggleAllWTSSection(cls, v) {
   document.querySelectorAll('.'+cls).forEach(cb => { cb.checked = v; });
-  if (cls === 'wts-ev-cb') updateWTSFilterSections();
-  else if (cls === 'wts-dt-cb') updateWTSQtySection();
+  if (cls === 'wts-ev-cb')   updateWTSFilters('events', 'wts');
+  else if (cls === 'wts-date-cb') updateWTSFilters('dates',  'wts');
+  else if (cls === 'wts-qty-cb')  updateWTSFilters('qtys',   'wts');
 }
 function applyWTSFilter() {
-  wtsSelectedEvents = Array.from(document.querySelectorAll('.wts-ev-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  wtsSelectedDates  = Array.from(document.querySelectorAll('.wts-dt-cb:checked')).map(cb => decodeURIComponent(cb.value));
-  wtsSelectedQtys   = Array.from(document.querySelectorAll('.wts-qt-cb:checked')).map(cb => Number(cb.value));
+  wtsSelectedEvents = Array.from(document.querySelectorAll('.wts-ev-cb:checked')).map(cb => cb.value);
+  wtsSelectedDates  = Array.from(document.querySelectorAll('.wts-date-cb:checked')).map(cb => cb.value);
+  wtsSelectedQtys   = Array.from(document.querySelectorAll('.wts-qty-cb:checked')).map(cb => Number(cb.value));
   closeModal('wtsFilterModal');
   renderWTS();
 }
