@@ -1191,42 +1191,48 @@ function renderPublicStock(data) {
   const byEvent = {};
   sorted.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
   document.getElementById('publicContent').innerHTML = `
-    <div style="max-width:800px;margin:0 auto;padding:40px 20px 60px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#111827;min-height:100vh">
-      <div style="font-size:13px;font-weight:600;letter-spacing:4px;color:#8b9ab0;text-transform:uppercase;margin-bottom:6px">TICKETDESK</div>
-      <div style="font-size:14px;color:#8b9ab0;margin-bottom:4px">Billets disponibles · ${data.length} place${data.length>1?'s':''}</div>
-      <div style="font-size:11px;color:#4a5568;margin-bottom:20px">Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
-      <div style="border-top:1px solid #2d3d55;margin-bottom:24px"></div>
-      ${!data.length ? '<p style="color:#8b9ab0;font-size:14px">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
-        <div style="background:#1a2540;border:1px solid #2d3d55;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
-          <div style="font-size:20px;font-weight:700;color:#f9fafb;margin-bottom:4px">${eventName}</div>
-          ${Object.entries(byDate).map(([date,tickets])=>`
-            ${date?`<div style="font-size:13px;color:#8b9ab0;margin-bottom:12px">${fmtDate(date)}</div>`:''}
-            ${tickets.map(t=>{
-              const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
-              return `<div style="background:#131f35;border:1px solid #2d3d55;border-left:3px solid #00b4ff;border-radius:10px;padding:14px 16px;margin-top:8px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-                  <div style="flex:1;min-width:0">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:${t.place?'6px':'0'}">
-                      <span style="font-size:15px;font-weight:700;color:#f9fafb">${t.qty}x</span>
-                      ${t.cat?`<span style="font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(0,180,255,.15);color:#00b4ff;font-weight:600">${t.cat}</span>`:''}
-                    </div>
-                    ${t.place?`<div style="font-size:13px;color:#8b9ab0">${t.place}</div>`:''}
-                  </div>
-                  <div style="text-align:right;flex-shrink:0">
-                    ${ppp?`<div style="font-size:18px;font-weight:700;color:#00ff88">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#8b9ab0;font-style:italic">Prix sur demande</div>`}
-                  </div>
-                </div>
-              </div>`;
-            }).join('')}
-          `).join('')}
+    <div style="background:#111827;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif">
+      <div style="max-width:700px;margin:0 auto;padding:0 16px 60px">
+        <div style="text-align:center;padding:40px 20px 32px;border-bottom:1px solid #2d3d55;margin-bottom:32px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:6px;color:#8b9ab0;text-transform:uppercase;margin-bottom:8px">TICKET<span style="color:#00b4ff">DESK</span></div>
+          <div style="font-size:22px;font-weight:700;color:#f9fafb;margin-bottom:4px">Billets disponibles</div>
+          <div style="font-size:13px;color:#8b9ab0">${data.length} place${data.length>1?'s':''} · Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
         </div>
-      `).join('')}
-      <div style="padding:20px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;text-align:center;margin-top:8px">
-        <p style="font-size:14px;color:#8b9ab0;margin:0 0 4px">Intéressé(e) par un ou plusieurs billets ?</p>
-        <p style="font-size:12px;color:#4a5568;margin:0">Contactez-nous pour plus d'informations.</p>
-      </div>
-      <div style="text-align:center;margin-top:40px;padding-bottom:20px">
-        <span style="font-size:11px;color:#2d3d55;letter-spacing:1px">Généré avec TicketDesk</span>
+        ${!data.length ? '<p style="color:#8b9ab0;font-size:14px;text-align:center">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
+          <div style="background:#1a2540;border:1px solid #2d3d55;border-radius:16px;padding:0;margin-bottom:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
+            <div style="padding:20px 24px;border-bottom:1px solid #2d3d55;background:#131f35">
+              <div style="font-size:22px;font-weight:800;color:#f9fafb;letter-spacing:0.3px">${eventName}</div>
+            </div>
+            ${Object.entries(byDate).map(([date,tickets])=>`
+              <div style="padding:16px 24px">
+                ${date?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                  <span style="font-size:13px;font-weight:600;color:#8b9ab0;letter-spacing:0.5px">${fmtDate(date)}</span>
+                </div>`:''}
+                ${tickets.map(t=>{
+                  const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
+                  return `<div style="background:#0d1424;border:1px solid #2d3d55;border-left:3px solid #00b4ff;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:16px">
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                        <span style="font-size:16px;font-weight:700;color:#f9fafb">${t.qty}x</span>
+                        <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(0,180,255,0.15);color:#00b4ff;white-space:nowrap">${t.cat||'—'}</span>
+                      </div>
+                      ${t.place?`<div style="font-size:13px;color:#8b9ab0;margin-top:2px">${t.place}</div>`:''}
+                    </div>
+                    <div style="text-align:right;flex-shrink:0">
+                      ${ppp?`<div style="font-size:20px;font-weight:700;color:#00ff88">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#4a5568;font-style:italic">Prix sur demande</div>`}
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+        <div style="text-align:center;padding:24px;background:#1a2540;border:1px solid #2d3d55;border-radius:16px;margin-top:8px">
+          <div style="font-size:15px;font-weight:600;color:#f9fafb;margin-bottom:4px">Intéressé(e) par un ou plusieurs billets ?</div>
+          <div style="font-size:13px;color:#8b9ab0">Contactez-nous pour plus d'informations.</div>
+        </div>
+        <div style="text-align:center;margin-top:20px;font-size:11px;color:#4a5568;letter-spacing:1px">TICKETDESK · Gestion de revente privée</div>
       </div>
     </div>`;
 }
