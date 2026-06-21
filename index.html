@@ -316,7 +316,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
         <div style="position:relative;flex-shrink:0">
-          <select id="po-statut" onchange="renderPreorders()"
+          <select id="po-filter-statut" onchange="renderPreorders()"
             onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
             style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px">
             <option value="">Tous les statuts</option>
@@ -333,7 +333,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         </div>
         <div style="position:relative;flex-shrink:0">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input id="po-buyer" type="text" placeholder="Acheteur…" oninput="renderPreorders()"
+          <input id="po-filter-buyer" type="text" placeholder="Acheteur…" oninput="renderPreorders()"
             onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
             style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:160px">
         </div>
@@ -793,15 +793,15 @@ function renderPreorders() {
   const el = document.getElementById('preordersList');
   if (!el) return;
   const poSearch = (document.getElementById('po-search')?.value || '').toLowerCase();
-  const poStatut = document.getElementById('po-statut')?.value || '';
-  const poBuyer  = (document.getElementById('po-buyer')?.value  || '').toLowerCase();
+  const poStatut = document.getElementById('po-filter-statut')?.value || '';
+  const poBuyer  = (document.getElementById('po-filter-buyer')?.value || '').toLowerCase();
   const filtered = preorders.filter(p => {
     if (poSearch && !(p.event||'').toLowerCase().includes(poSearch)) return false;
     if (poStatut && (p.statut||'En recherche') !== poStatut) return false;
     if (poBuyer  && !(p.buyer||'').toLowerCase().includes(poBuyer))  return false;
     return true;
   });
-  if (!filtered.length) { el.innerHTML = '<div class="empty">Aucune précommande</div>'; return; }
+  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const cs = 'box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
   const rowFlex = 'width:100%;display:flex;align-items:center;overflow:hidden;box-sizing:border-box';
@@ -1215,7 +1215,6 @@ function updateWTSFilters(changedSection, modalPrefix) {
     renderWTSSection(prefix, 'dates', availDates, 'date');
   }
   if (changedSection === 'events' || changedSection === 'dates' || changedSection === 'init') {
-    // Re-read dates from DOM in case they were just re-rendered (all checked)
     const datesNow = (changedSection === 'events' || changedSection === 'init')
       ? Array.from(document.querySelectorAll(`.${prefix}-date-cb:checked`)).map(cb => cb.value)
       : checkedDates;
@@ -1684,7 +1683,7 @@ function renderJournalList() {
       return pb-pa;
     });
   } else {
-    list.sort((a,b)=>a.event.localeCompare(b.event)||a.date.localeCompare(b.date));
+    list.sort((a,b)=>(a.event||'').localeCompare(b.event||'')||(a.date||'').localeCompare(b.date||''));
   }
 
   // Compteur — toujours visible si filtre actif
@@ -1865,7 +1864,7 @@ function renderWTS(){
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
     });
-  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<span style="color:var(--text3)">Aucun billet en stock.</span>';return;}
+  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){
@@ -2114,8 +2113,6 @@ function importSelected(){
 async function driveSync(){
   if(!gmailToken||driveSyncing)return;
   driveSyncing=true;updateSyncIndicator('syncing');
-  console.log('SAVING TO DRIVE:', transactions.length, 'transactions');
-  console.log('DRIVE SAVE DATA:', JSON.stringify({transactions: transactions.length, preorders: preorders?.length}));
   try{
     const payload=JSON.stringify({transactions,costs,preorders,updatedAt:new Date().toISOString()});
     if(driveFileId){
@@ -2132,17 +2129,14 @@ async function driveSync(){
 }
 async function driveLoad(){
   if(!gmailToken)return false;
-  console.log('LOADING FROM DRIVE...');
   try{
     const r=await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`,{headers:{Authorization:'Bearer '+gmailToken}});
     const d=await r.json();if(!d.files||!d.files.length)return false;
     driveFileId=d.files[0].id;localStorage.setItem('ticketdesk_drive_fid',driveFileId);
     const c=await(await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:'Bearer '+gmailToken}})).json();
-    console.log('DRIVE LOAD RESULT:', c);
     if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
     if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
     if(c.preorders){preorders=c.preorders;localStorage.setItem(PREORDER_KEY,JSON.stringify(preorders));}
-    console.log('TRANSACTIONS LOADED:', transactions.length);
     localStorage.setItem('ticketdesk_last_sync',c.updatedAt||new Date().toISOString());
     return true;
   }catch(e){return false;}
@@ -2164,7 +2158,7 @@ function updateSyncIndicator(state) {
 
 // COSTS
 function renderCosts(){
-  if(!costs.length){document.getElementById('costsList').innerHTML='<div class="empty">Aucun coût fixe</div>';document.getElementById('costsTotal').innerHTML='';return;}
+  if(!costs.length){document.getElementById('costsList').innerHTML='<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun coût fixe</div><div style="font-size:12px;color:#4a5568">Ajoute tes abonnements, frais de plateforme…</div></div>';document.getElementById('costsTotal').innerHTML='';return;}
   document.getElementById('costsList').innerHTML=costs.map(c=>`
     <div class="card hover-card ${c.status==='Payé'?'is-vendu':'is-stock'}" style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px">
       <div style="flex:1;min-width:0">
@@ -2175,7 +2169,7 @@ function renderCosts(){
         <div style="font-size:16px;font-weight:600">${fmtFull(c.amount)}</div>
         <span onclick="toggleCostStatus(${c.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;${c.status==='Payé'?'background:rgba(0,255,136,.15);color:#00ff88':'background:rgba(255,159,67,.15);color:#ff9f43'}">${c.status}</span>
       </div>
-      <button onclick="deleteCost(${c.id})" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0">×</button>
+      <button onclick="deleteCost(${c.id})" onmouseenter="this.style.color='#ff6b6b'" onmouseleave="this.style.color='var(--text3)'" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0;transition:color .15s">×</button>
     </div>`).join('');
   const total=costs.reduce((s,c)=>s+c.amount,0);
   const paid=costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
@@ -2437,7 +2431,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <label class="login-field-label">Identifiant</label>
     <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
     <label class="login-field-label">Code PIN</label>
-    <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px" id="loginPinInput">
+    <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px">
     <button class="login-btn" onclick="_doLogin()">Accéder</button>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
     <button class="login-google-btn" onclick="_googleLogin()">
