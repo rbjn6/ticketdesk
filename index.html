@@ -343,6 +343,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
     <div class="page" id="page-wts">
       <p style="font-size:15px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
+      <button class="btn btn-sm" onclick="openWTSFilter()" style="margin-bottom:10px">Filtrer événements</button>
       <div class="wts-box" id="wtsPreview"></div>
       <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
         <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="copyWTS()">Copier pour Discord</button>
@@ -598,6 +599,22 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
   </div>
 </div>
 
+<div class="modal-overlay" id="wtsFilterModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Sélectionner les événements</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-sm" onclick="toggleAllWTSFilter(true)">Tout sélectionner</button>
+      <button class="btn btn-sm" onclick="toggleAllWTSFilter(false)">Tout désélectionner</button>
+    </div>
+    <div id="wtsFilterList" style="max-height:320px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal('wtsFilterModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="applyWTSFilter()">Appliquer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -634,6 +651,7 @@ let dashEventFilter = '';
 let dashBuyerFilter = '';
 let chartEvents     = null, chartPie = null;
 let importCandidates= [];
+let wtsSelectedEvents = null; // null = tous les événements
 let alertsCollapsed = false;
 let _driveTimer     = null;
 const CREDS_KEY = 'ticketdesk_creds';
@@ -1716,8 +1734,28 @@ function toggleTxLivraison(id) {
 }
 
 // WTS
+function openWTSFilter(){
+  const events=[...new Set(transactions.filter(t=>t.statut==='En stock').map(t=>t.event||'—'))].sort();
+  const active=wtsSelectedEvents||events;
+  document.getElementById('wtsFilterList').innerHTML=events.map(ev=>`
+    <label class="share-item">
+      <input type="checkbox" class="wts-filter-cb" data-event="${encodeURIComponent(ev)}" ${active.includes(ev)?'checked':''}
+        style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
+      <div style="font-size:14px;font-weight:600">${ev}</div>
+    </label>`).join('');
+  document.getElementById('wtsFilterModal').classList.add('open');
+}
+function toggleAllWTSFilter(v){document.querySelectorAll('.wts-filter-cb').forEach(cb=>cb.checked=v);}
+function applyWTSFilter(){
+  const checked=Array.from(document.querySelectorAll('.wts-filter-cb:checked')).map(cb=>decodeURIComponent(cb.dataset.event));
+  const allEvents=[...new Set(transactions.filter(t=>t.statut==='En stock').map(t=>t.event||'—'))];
+  wtsSelectedEvents=checked.length===allEvents.length?null:checked;
+  closeModal('wtsFilterModal');
+  renderWTS();
+}
 function renderWTS(){
   const stock=transactions.filter(t=>t.statut==='En stock')
+    .filter(t=>!wtsSelectedEvents||wtsSelectedEvents.includes(t.event||'—'))
     .sort((a,b)=>{
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
