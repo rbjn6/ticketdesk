@@ -592,7 +592,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <div class="fgroup"><label class="flabel">Acheteur</label><input type="text" id="po-buyer" placeholder="Pseudo"></div>
       <div class="fgroup"><label class="flabel">Plateforme</label><input type="text" id="po-platform" placeholder="Discord, Insta…"></div>
     </div>
-    <div class="fgroup"><label class="flabel">Notes</label><textarea id="po-notes" rows="2" style="resize:none"></textarea></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Notes</label><textarea id="po-notes" rows="2" style="resize:none"></textarea></div>
+      <div class="fgroup"><label class="flabel">Paiement</label><select id="po-pay"><option value="Non payé">Non payé</option><option value="Payé">Payé</option></select></div>
+    </div>
     <div class="form-actions">
       <button class="btn" onclick="closeModal('preorderModal')">Annuler</button>
       <button class="btn btn-primary" onclick="savePreorder()">Enregistrer</button>
@@ -809,12 +812,20 @@ function savePreorders() {
   localStorage.setItem(PREORDER_KEY, JSON.stringify(preorders));
   driveSyncDebounced();
 }
-function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+function togglePODetail(did){const el=document.getElementById(did);if(el)el.classList.toggle('open');}
 function cyclePOStatus(id){
   const p=preorders.find(x=>x.id===id);if(!p)return;
   const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
   p.statut=cycle[p.statut]||'En recherche';
   savePreorders();renderPreorders();
+}
+function togglePOPay(id) {
+  const p = preorders.find(x => x.id === id);
+  if (!p) return;
+  p.pay = p.pay === 'Payé' ? 'Non payé' : 'Payé';
+  savePreorders();
+  renderPreorders();
+  showToast(p.pay === 'Payé' ? 'Marqué Payé' : 'Marqué Non payé');
 }
 function renderPreorders() {
   const el = document.getElementById('preordersList');
@@ -830,10 +841,10 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const COLS = '85px minmax(0,180px) 90px 45px 1fr 100px 110px 90px';
+  const COLS = '85px minmax(0,200px) 100px 1fr 110px 100px 160px';
   const hc = 'display:flex;align-items:center';
   const header = `<div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px">
-    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc};justify-content:center">Qté</span><span style="${hc}">Catégorie</span><span style="${hc}">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget</span>
+    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc}">Catégorie</span><span style="${hc};padding-left:20px">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget · Payé</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
@@ -841,28 +852,49 @@ function renderPreorders() {
     const badgeColor  = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
     const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
-    return `<div class="${statusClass}" style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-shadow:0 4px 24px rgba(0,0,0,.3)" onclick="togglePODetail('${did}')">
-      <div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:0 14px;min-height:60px">
+    const colL = [
+      {l:'Lieu',       v: p.lieu     || '—'},
+      {l:'Catégorie',  v: p.cat      || '—'},
+      {l:'Quantité',   v: (p.qty||1)+'x'},
+      {l:'Notes',      v: p.notes    || '—'},
+    ];
+    const colR = [
+      {l:'Date',       v: p.date ? fmtDate(p.date) : '—'},
+      {l:'Budget max', v: p.budget ? fmtFull(p.budget) : '—'},
+      {l:'Acheteur',   v: p.buyer    || '—'},
+      {l:'Paiement',   v: p.pay      || 'Non payé'},
+    ];
+    if (p.platform) colR.push({l:'Plateforme', v: p.platform});
+    const maxRows = Math.max(colL.length, colR.length);
+    let rows = '';
+    for (let i=0; i<maxRows; i++) {
+      const l=colL[i]||null, r=colR[i]||null;
+      rows += `<div style="display:contents">
+        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val">${l.v}</div>`:''}</div>
+        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val">${r.v}</div>`:''}</div>
+      </div>`;
+    }
+    return `<div class="tx-card ${statusClass}">
+      <div class="tx-summary" onclick="togglePODetail('${did}')">
         <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${badgeBg};color:${badgeColor};cursor:pointer;white-space:nowrap">${p.statut||'En recherche'}</span>
-        <span style="display:flex;align-items:center;font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.event||'—'}</span>
-        <span style="display:flex;align-items:center;font-size:14px;color:#00b4ff;white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
-        <span style="display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-primary)">${p.qty||1}x</span>
-        <span style="display:flex;align-items:center;font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.cat||'—'}</span>
-        <span style="display:flex;align-items:center;font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.lieu||'—'}</span>
-        <span style="display:flex;align-items:center;font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.buyer||'—'}</span>
-        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
+        <span class="tx-event">${p.event||'—'}</span>
+        <span class="tx-date">${p.date?fmtDate(p.date):'—'}</span>
+        <span class="tx-info">${p.cat||'—'}</span>
+        <span class="tx-buyer">${p.lieu||'—'}</span>
+        <span style="font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center">${p.buyer||'—'}</span>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;padding-right:14px;white-space:nowrap">
+          ${p.pay==='Payé'
+            ?`<span class="badge b-paye" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Payé</span>`
+            :`<span class="badge b-nonlivre" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Non payé</span>`}
+          <span style="font-size:18px;font-weight:600;color:var(--text-primary)">${p.budget?fmtFull(p.budget):'—'}</span>
+        </div>
       </div>
       <div class="tx-detail" id="${did}">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
-          ${p.notes?`<div><div class="tx-drow-label">Notes</div><div class="tx-drow-val">${p.notes}</div></div>`:''}
-          ${p.platform?`<div><div class="tx-drow-label">Plateforme</div><div class="tx-drow-val">${p.platform}</div></div>`:''}
-          <div><div class="tx-drow-label">Quantité</div><div class="tx-drow-val">${p.qty||1} place${(p.qty||1)>1?'s':''}</div></div>
-          ${p.budget?`<div><div class="tx-drow-label">Budget max</div><div class="tx-drow-val">${fmtFull(p.budget)}</div></div>`:''}
-        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
         <div class="tx-detail-actions">
-          <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})">Transférer</button>
-          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
+          <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="openPreorderModal(${p.id})">Modifier</button>
+          <button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="transferPreorderToJournal(${p.id})">Transférer</button>
+          <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'" onclick="deletePreorder(${p.id})">Supprimer</button>
         </div>
       </div>
     </div>`;
@@ -914,6 +946,7 @@ function openPreorderModal(id) {
   document.getElementById('po-buyer').value    = p ? (p.buyer    || '') : '';
   document.getElementById('po-platform').value = p ? (p.platform || '') : '';
   document.getElementById('po-notes').value    = p ? (p.notes    || '') : '';
+  document.getElementById('po-pay').value      = p ? (p.pay      || 'Non payé') : 'Non payé';
   document.getElementById('po-statut').value   = p ? (p.statut   || 'En recherche') : 'En recherche';
   document.getElementById('preorderModal').classList.add('open');
 }
@@ -930,6 +963,7 @@ function savePreorder() {
     buyer:    document.getElementById('po-buyer').value.trim(),
     platform: document.getElementById('po-platform').value.trim(),
     notes:    document.getElementById('po-notes').value.trim(),
+    pay:      document.getElementById('po-pay').value,
     statut:   document.getElementById('po-statut').value,
   };
   if (editingPreorderId) {
