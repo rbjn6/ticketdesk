@@ -127,8 +127,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 /* ── JOURNAL ───────────────────────────────────────── */
 .journal-header{background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:90px minmax(0,220px) 100px 1fr 140px 100px 160px;gap:12px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;margin-top:8px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;align-items:center;font-weight:600}
 .journal-header span:nth-child(5){text-align:left;padding-left:20px}
-.journal-header span:nth-child(6){text-align:right}
-.journal-header span:nth-child(7){text-align:right}
+.journal-header span:nth-child(6){justify-content:flex-end;padding-right:14px}
+.journal-header span:nth-child(7){justify-content:flex-end;padding-right:14px}
 .tx-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .tx-card.is-stock:hover{border-color:#ff6b6b !important;background:var(--bg-card-hover)}
 .tx-card.is-vendu:hover{border-color:#00ff88 !important;background:var(--bg-card-hover)}
@@ -153,8 +153,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .tx-date{font-size:16px;color:var(--accent-blue);white-space:nowrap;display:flex;align-items:center}
 .tx-info{font-size:16px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
 .tx-buyer{font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;padding-left:20px;display:flex;align-items:center}
-.tx-profit{font-size:18px;font-weight:600;text-align:right;white-space:nowrap;display:flex;align-items:center;justify-content:flex-end}
-.tx-badges{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:center;white-space:nowrap}
+.tx-profit{font-size:18px;font-weight:600;white-space:nowrap;display:flex;align-items:center;justify-content:flex-end;padding-right:14px}
+.tx-badges{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:center;white-space:nowrap;padding-right:14px}
 .journal-header span{display:flex;align-items:center}
 .tx-summary > .badge{font-size:11px;padding:4px 10px}
 .tx-badges .badge{font-size:11px;padding:4px 10px;white-space:nowrap}
@@ -807,7 +807,7 @@ function renderPreorders() {
   const COLS = '90px minmax(0,200px) 100px 60px 1fr 120px 120px 100px';
   const hc = 'display:flex;align-items:center';
   const header = `<div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px">
-    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc};justify-content:center">Qté</span><span style="${hc}">Catégorie</span><span style="${hc}">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end">Budget</span>
+    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc};justify-content:center">Qté</span><span style="${hc}">Catégorie</span><span style="${hc}">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
@@ -824,7 +824,7 @@ function renderPreorders() {
         <span style="display:flex;align-items:center;font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.cat||'—'}</span>
         <span style="display:flex;align-items:center;font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.lieu||'—'}</span>
         <span style="display:flex;align-items:center;font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${p.buyer||'—'}</span>
-        <span style="display:flex;align-items:center;justify-content:flex-end;font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
+        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
       <div class="tx-detail" id="${did}">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
