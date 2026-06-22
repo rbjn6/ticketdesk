@@ -803,35 +803,37 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const cs = 'box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-  const rowFlex = 'width:100%;display:flex;align-items:center;overflow:hidden;box-sizing:border-box';
-  const header = `<div style="${rowFlex};padding-left:3px;background:var(--bg-nav);border-radius:10px 10px 0 0;font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;height:36px;position:sticky;top:0;z-index:10">
-    <span style="${cs};width:10%;padding-right:8px">Statut</span><span style="${cs};width:10%;padding-right:8px">Événement</span><span style="${cs};width:10%;padding-right:12px">Date</span><span style="${cs};width:5%;padding-right:12px">Qté</span><span style="${cs};width:10%;padding-right:8px">Cat.</span><span style="${cs};width:10%;padding-right:8px">Lieu</span><span style="${cs};width:35%;padding-right:8px">Acheteur</span><span style="${cs};width:10%;text-align:right;padding-right:0">Budget</span>
+  const COLS = '90px minmax(0,200px) 100px 60px 1fr 120px 120px 100px';
+  const header = `<div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px">
+    <span>Statut</span><span>Événement</span><span>Date</span><span style="text-align:center">Qté</span><span>Catégorie</span><span>Lieu</span><span>Acheteur</span><span style="text-align:right">Budget</span>
   </div>`;
   const cards = sorted.map(p => {
-    const borderColor = p.statut==='Trouvé'?'var(--accent-green)':'var(--accent-blue)';
-    const badgeHex = p.statut==='Trouvé'?'#00ff88':'#00b4ff';
-    const statusClass = p.statut==='Trouvé'?'is-trouve':'is-recherche';
+    const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
+    const badgeBg     = p.statut==='Trouvé' ? 'rgba(0,255,136,.15)' : 'rgba(0,180,255,.15)';
+    const badgeColor  = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
+    const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
-    return `<div class="hover-card ${statusClass}" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:10px;margin-bottom:6px;overflow:hidden;cursor:pointer;box-sizing:border-box" onclick="togglePODetail('${did}')">
-      <div style="${rowFlex};height:60px">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="${cs};width:10%;padding:3px 8px 3px 4px;font-size:13px;font-weight:600;border-radius:20px;background:${badgeHex}22;color:${badgeHex};text-align:center;cursor:pointer">${p.statut||'En recherche'}</span>
-        <span style="${cs};width:10%;padding-right:8px;font-size:16px;font-weight:700;color:#e6edf3">${p.event||'—'}</span>
-        <span style="${cs};width:10%;padding-right:12px;font-size:14px;color:#00b4ff">${p.date?fmtDate(p.date):'—'}</span>
-        <span style="${cs};width:5%;padding-right:12px;font-size:14px;color:#e6edf3;text-align:center">${p.qty||1}</span>
-        <span style="${cs};width:10%;padding-right:8px;font-size:14px;color:#e6edf3">${p.cat||'—'}</span>
-        <span style="${cs};width:10%;padding-right:8px;font-size:13px;color:#8b949e">${p.lieu||'—'}</span>
-        <span style="${cs};width:35%;padding-right:8px;font-size:13px;color:#8b949e">${p.buyer||'—'}</span>
-        <span style="${cs};width:10%;padding-right:0;font-size:16px;font-weight:700;color:#e6edf3;text-align:right">${p.budget?fmtFull(p.budget):'—'}</span>
+    return `<div class="${statusClass}" style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-shadow:0 4px 24px rgba(0,0,0,.3)" onclick="togglePODetail('${did}')">
+      <div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:0 14px;min-height:60px">
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${badgeBg};color:${badgeColor};cursor:pointer;white-space:nowrap">${p.statut||'En recherche'}</span>
+        <span style="font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</span>
+        <span style="font-size:14px;color:#00b4ff;white-space:nowrap">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:14px;color:var(--text-primary);text-align:center">${p.qty||1}x</span>
+        <span style="font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.cat||'—'}</span>
+        <span style="font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.lieu||'—'}</span>
+        <span style="font-size:13px;color:#8b9ab0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.buyer||'—'}</span>
+        <span style="font-size:15px;font-weight:600;color:var(--text-primary);text-align:right;white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
       </div>
-      <div id="${did}" style="display:none;border-top:1px solid #2d3d55;padding:16px 18px;background:#131f35">
+      <div class="tx-detail" id="${did}">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
-          ${p.notes?`<div><div style="font-size:11px;color:#8b9ab0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Notes</div><div style="font-size:14px;color:#f9fafb">${p.notes}</div></div>`:''}
-          ${p.platform?`<div><div style="font-size:11px;color:#8b9ab0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Plateforme</div><div style="font-size:14px;color:#f9fafb">${p.platform}</div></div>`:''}
+          ${p.notes?`<div><div class="tx-drow-label">Notes</div><div class="tx-drow-val">${p.notes}</div></div>`:''}
+          ${p.platform?`<div><div class="tx-drow-label">Plateforme</div><div class="tx-drow-val">${p.platform}</div></div>`:''}
+          <div><div class="tx-drow-label">Quantité</div><div class="tx-drow-val">${p.qty||1} place${(p.qty||1)>1?'s':''}</div></div>
+          ${p.budget?`<div><div class="tx-drow-label">Budget max</div><div class="tx-drow-val">${fmtFull(p.budget)}</div></div>`:''}
         </div>
-        <div style="display:flex;gap:8px">
+        <div class="tx-detail-actions">
           <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})">Modifier</button>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'">Transférer</button>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})">Transférer</button>
           <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})">Supprimer</button>
         </div>
       </div>
