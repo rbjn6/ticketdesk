@@ -841,10 +841,10 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const COLS = '85px minmax(0,200px) 100px 1fr 110px 100px 160px';
+  const COLS = '85px minmax(0,200px) 100px 1fr 110px 100px 90px 90px';
   const hc = 'display:flex;align-items:center';
   const header = `<div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px">
-    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc}">Catégorie</span><span style="${hc};padding-left:20px">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget · Payé</span>
+    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc}">Catégorie</span><span style="${hc};padding-left:20px">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget</span><span style="${hc};justify-content:flex-end;padding-right:14px">Payé</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
@@ -882,11 +882,11 @@ function renderPreorders() {
         <span class="tx-info">${p.cat||'—'}</span>
         <span class="tx-buyer">${p.lieu||'—'}</span>
         <span style="font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center">${p.buyer||'—'}</span>
-        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;padding-right:14px;white-space:nowrap">
+        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
+        <div style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;white-space:nowrap">
           ${p.pay==='Payé'
             ?`<span class="badge b-paye" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Payé</span>`
             :`<span class="badge b-nonlivre" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Non payé</span>`}
-          <span style="font-size:18px;font-weight:600;color:var(--text-primary)">${p.budget?fmtFull(p.budget):'—'}</span>
         </div>
       </div>
       <div class="tx-detail" id="${did}">
