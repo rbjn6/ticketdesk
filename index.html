@@ -100,7 +100,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 @media(max-width:768px){
   .sidebar{display:none}
   .bottomnav{display:none}
-  .topbar-mobile{display:flex;height:56px;padding:calc(var(--safe-top) + 12px) 16px 12px}
+  .topbar-mobile{display:flex;height:66px;padding:calc(var(--safe-top) + 16px) 20px 16px}
   .content{padding-bottom:calc(24px + var(--safe-bottom))}
   .journal-header{display:none!important}
   .po-header-desktop{display:none!important}
@@ -323,10 +323,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
   <div class="main-content">
     <div class="topbar-mobile">
       <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:6px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
       </button>
-      <span style="font-size:15px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
+      <span style="font-size:17px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
     </div>
 
   <div class="content">
@@ -501,6 +501,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     <button class="drawer-close" onclick="closeDrawer()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <nav class="drawer-nav">
+    <div style="height:90px;flex-shrink:0"></div>
     <button class="dnav active" id="dnav-dashboard" onclick="showPage('dashboard');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard</button>
     <button class="dnav" id="dnav-journal" onclick="showPage('journal');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
     <button class="dnav" id="dnav-preorders" onclick="showPage('preorders');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
@@ -2023,7 +2024,7 @@ function renderJournalList() {
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
     return `<div class="tx-card is-${cardClass}">
-      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="if(!_didLongPress)toggleDetail('${did}')" ontouchstart="mPressStart(event,${t.id})" ontouchend="mPressEnd(event)" ontouchmove="mPressEnd(null)">
+      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="toggleDetail('${did}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <span style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}</span>
@@ -2489,59 +2490,6 @@ document.addEventListener('touchend', e => {
   if (deltaX > 60 && touchStartX < 30) openDrawer();
   if (deltaX < -60) closeDrawer();
 }, {passive:true});
-let _pressTimer, _didLongPress = false;
-function mPressStart(e, id) {
-  _didLongPress = false;
-  const tx = e.touches[0].clientX, ty = e.touches[0].clientY;
-  _pressTimer = setTimeout(() => {
-    _didLongPress = true;
-    showContextMenu(id, tx, ty);
-  }, 500);
-}
-function mPressEnd(e) {
-  clearTimeout(_pressTimer);
-  if (_didLongPress) {
-    if (e) e.preventDefault();
-    _didLongPress = false;
-  }
-}
-function showContextMenu(id, x, y) {
-  if('vibrate' in navigator) navigator.vibrate(20);
-  const existing = document.getElementById('contextMenu');
-  if (existing) existing.remove();
-  const t = transactions.find(tx => tx.id === id);
-  if (!t) return;
-  const menu = document.createElement('div');
-  menu.id = 'contextMenu';
-  menu.style.cssText = `position:fixed;z-index:500;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:160px;left:${Math.min(x, window.innerWidth-180)}px;top:${Math.min(y, window.innerHeight-200)}px`;
-  const actions = [];
-  if (t.statut === 'En stock') {
-    actions.push({label:'Vendre', color:'#00b4ff', fn:`openSellModal(${id})`});
-    actions.push({label:'Réserver', color:'#ff9f43', fn:`openReserveModal(${id})`});
-    actions.push({label:'Archiver', color:'#8b9ab0', fn:`archiveTransaction(${id})`});
-  }
-  if (t.statut === 'Réservé') {
-    actions.push({label:'Vendre', color:'#00b4ff', fn:`openSellModal(${id})`});
-    actions.push({label:'Annuler résa', color:'#8b9ab0', fn:`annulerReservation(${id})`});
-  }
-  if (t.statut === 'Archivé') {
-    actions.push({label:'Désarchiver', color:'#00ff88', fn:`unarchiveTransaction(${id})`});
-  }
-  actions.push({label:'Modifier', color:'#f9fafb', fn:`editTransaction(${id})`});
-  actions.push({label:'Supprimer', color:'#ff6b6b', fn:`deleteTransaction(${id})`});
-  menu.innerHTML = actions.map(a => `
-    <div onclick="${a.fn};document.getElementById('contextMenu').remove()"
-      style="padding:10px 14px;font-size:14px;color:${a.color};cursor:pointer;border-radius:8px;transition:background .1s"
-      onmouseenter="this.style.background='rgba(255,255,255,0.05)'"
-      onmouseleave="this.style.background='none'">
-      ${a.label}
-    </div>`).join('');
-  document.body.appendChild(menu);
-  setTimeout(() => document.addEventListener('touchstart', () => {
-    const m = document.getElementById('contextMenu');
-    if (m) m.remove();
-  }, {once:true}), 100);
-}
 function initPullToRefresh() {
   let prStartY = 0, prActive = false;
   const contentEl = document.querySelector('.content');
