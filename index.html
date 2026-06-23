@@ -80,7 +80,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .drawer-overlay.open{display:block}
 .drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
-.drawer-head{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
+.drawer-head{height:90px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
 .drawer-logo{font-size:13px;font-weight:800;letter-spacing:3px;color:#f9fafb;text-transform:uppercase;flex:1}
 .drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
 .drawer-close:hover{color:#f9fafb}
@@ -90,7 +90,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .dnav:hover{background:rgba(255,255,255,.05);color:var(--text-primary)}
 .dnav.active{background:rgba(0,180,255,.12);color:var(--accent-blue)}
 .dnav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.tx-card-mobile{display:none;padding:14px}
+.tx-card-mobile{display:none}
 .po-card-mobile{display:none;padding:14px}
 .filters-desktop{display:block}
 .filters-mobile{display:none}
@@ -98,7 +98,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 @media(max-width:768px){
   .sidebar{display:none}
   .bottomnav{display:none}
-  .topbar-mobile{display:flex;height:56px}
+  .topbar-mobile{display:flex;height:68px;padding:calc(var(--safe-top) + 16px) 20px 16px}
   .content{padding-bottom:calc(24px + var(--safe-bottom))}
   .journal-header{display:none!important}
   .po-header-desktop{display:none!important}
@@ -318,12 +318,12 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
   <div class="main-content">
     <div class="topbar-mobile">
       <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:6px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
       </button>
       <div style="display:flex;align-items:center;gap:8px">
         <span id="syncIndicatorMobile" style="font-size:11px"></span>
-        <span style="font-size:15px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
+        <span style="font-size:18px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
       </div>
     </div>
 
@@ -488,7 +488,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <span class="drawer-logo">TICKETDESK</span>
+    <span class="drawer-logo"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
     <button class="drawer-close" onclick="closeDrawer()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <nav class="drawer-nav">
@@ -1333,17 +1333,27 @@ function renderDashFilters() {
     </select>` : '';
   const resetBtn = (dashSelectedMonth || dashSelectedYear) ? `
     <button onclick="setDashFilter('reset','')" style="font-size:11px;color:#8b9ab0;background:none;border:none;cursor:pointer;padding:2px 6px;flex-shrink:0">× Réinit.</button>` : '';
+  const isMobile = window.innerWidth < 768;
+  const mSelStyle = `width:100%;padding:10px 12px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;-webkit-appearance:none;appearance:none`;
+  const monthOpts = `<option value="">Tous</option><option value="01" ${dashSelectedMonth==='01'?'selected':''}>Janvier</option><option value="02" ${dashSelectedMonth==='02'?'selected':''}>Février</option><option value="03" ${dashSelectedMonth==='03'?'selected':''}>Mars</option><option value="04" ${dashSelectedMonth==='04'?'selected':''}>Avril</option><option value="05" ${dashSelectedMonth==='05'?'selected':''}>Mai</option><option value="06" ${dashSelectedMonth==='06'?'selected':''}>Juin</option><option value="07" ${dashSelectedMonth==='07'?'selected':''}>Juillet</option><option value="08" ${dashSelectedMonth==='08'?'selected':''}>Août</option><option value="09" ${dashSelectedMonth==='09'?'selected':''}>Septembre</option><option value="10" ${dashSelectedMonth==='10'?'selected':''}>Octobre</option><option value="11" ${dashSelectedMonth==='11'?'selected':''}>Novembre</option><option value="12" ${dashSelectedMonth==='12'?'selected':''}>Décembre</option>`;
+  const yearOpts = `<option value="">Toutes</option>${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}`;
+  const mobileSelects = (showMonth||showYear) && isMobile ? `
+    <div style="display:flex;gap:8px;margin-top:6px;margin-bottom:8px">
+      ${showMonth?`<div style="flex:1"><select onchange="setDashFilter('month',this.value)" style="${mSelStyle}">${monthOpts}</select></div>`:''}
+      ${showYear?`<div style="flex:1"><select onchange="setDashFilter('year',this.value)" style="${mSelStyle}">${yearOpts}</select></div>`:''}
+    </div>` : '';
   el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-bottom:${(showMonth||showYear)&&isMobile?'0':'8px'}">
       <button class="dash-chip${dashPeriod==='all'?' active':''}" onclick="setDashFilter('period','all')">Tout</button>
       <button class="dash-chip${dashPeriod==='today'?' active':''}" onclick="setDashFilter('period','today')">Aujourd'hui</button>
       <button class="dash-chip${dashPeriod==='week'?' active':''}" onclick="setDashFilter('period','week')">Semaine</button>
       <button class="dash-chip${dashPeriod==='month'?' active':''}" onclick="setDashFilter('period','month')">Mois</button>
-      ${monthSelect}
+      ${!isMobile?monthSelect:''}
       <button class="dash-chip${dashPeriod==='year'?' active':''}" onclick="setDashFilter('period','year')">Année</button>
-      ${yearSelect}
+      ${!isMobile?yearSelect:''}
       ${resetBtn}
     </div>
+    ${mobileSelects}
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <div style="position:relative;flex:1">
         <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1851,22 +1861,36 @@ function renderFilters() {
       </div>
     </div>
     <div class="filters-mobile">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="fchip${!filterStatut?' active':''}" id="mchip-all" onclick="setFilter('statut','')">Tous</button>
-          <button class="fchip${filterStatut==='Vendu'?' active':''}" id="mchip-Vendu" onclick="setFilter('statut','Vendu')">Vendus</button>
-          <button class="fchip${filterStatut==='En stock'?' active':''}" id="mchip-stock" onclick="setFilter('statut','En stock')">Stock</button>
-          <button class="fchip${filterStatut==='Réservé'?' active':''}" id="mchip-reserve" onclick="setFilter('statut','Réservé')">Réservés</button>
-          <button class="fchip${filterStatut==='Archivé'?' active':''}" id="mchip-archive" onclick="setFilter('statut','Archivé')">Archivés</button>
+      <div style="display:flex;gap:6px">
+        <select id="sel-statut-m" onchange="setFilter('statut',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+          <option value="">Statut</option>
+          <option value="Vendu">Vendus</option>
+          <option value="En stock">En stock</option>
+          <option value="Réservé">Réservés</option>
+          <option value="Archivé">Archivés</option>
+        </select>
+        <select id="sel-pay-m" onchange="setFilter('pay',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+          <option value="">Paiement</option>
+          <option value="Payé">Payé</option>
+          <option value="En attente">En attente</option>
+        </select>
+        <select id="sel-livraison-m" onchange="setFilter('livraison',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+          <option value="">Livraison</option>
+          <option value="Livré">Livré</option>
+          <option value="Non livré">Non livré</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div style="position:relative;flex:1">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="search-input-m" type="search" placeholder="Événement…" oninput="setFilter('search',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb">
         </div>
-        <button class="btn btn-primary btn-sm" onclick="openAddModal()" style="flex-shrink:0">+ Ajouter</button>
+        <div style="position:relative;flex:1">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input id="buyer-input-m" type="text" placeholder="Acheteur…" oninput="setFilter('buyer',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb">
+        </div>
       </div>
-      <div style="position:relative">
-        <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="search-input-m" type="search" placeholder="Rechercher événement…"
-          oninput="setFilter('search',this.value)"
-          style="padding:10px 12px 10px 34px;font-size:16px;border-radius:8px;width:100%;box-sizing:border-box">
-      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openAddModal()">+ Ajouter</button>
     </div>
   `;
 }
@@ -1877,11 +1901,13 @@ function syncFilterUI() {
   const sl = document.getElementById('sel-livraison'); if(sl) sl.value = filterLivraison;
   const so = document.getElementById('sel-sort'); if(so) so.value = filterSort;
   const sb = document.getElementById('buyer-input'); if(sb) sb.value = filterBuyer;
-  [['mchip-all',''],['mchip-Vendu','Vendu'],['mchip-stock','En stock'],['mchip-reserve','Réservé'],['mchip-archive','Archivé']].forEach(([id,v])=>{
-    const c=document.getElementById(id); if(c) c.classList.toggle('active', filterStatut===v);
-  });
+  const ssm = document.getElementById('sel-statut-m'); if(ssm) ssm.value = filterStatut;
+  const spm = document.getElementById('sel-pay-m'); if(spm) spm.value = filterPay;
+  const slm = document.getElementById('sel-livraison-m'); if(slm) slm.value = filterLivraison;
   const sm = document.getElementById('search-input-m');
   if(sm && sm !== document.activeElement) sm.value = filterSearch;
+  const bm = document.getElementById('buyer-input-m');
+  if(bm && bm !== document.activeElement) bm.value = filterBuyer;
 }
 
 function renderJournal() {
@@ -1983,20 +2009,20 @@ function renderJournalList() {
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
     return `<div class="tx-card is-${cardClass}">
-      <div class="tx-card-mobile" onclick="toggleDetail('${did}')">
+      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="toggleDetail('${did}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
-          <span style="font-size:16px;font-weight:700;color:${pc}">${fmt(profit)}</span>
+          <span style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}</span>
         </div>
-        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div style="font-size:13px;margin-bottom:0"><span style="color:#00b4ff">${fmtDate(t.date)}</span>${t.qty||t.cat?`<span style="color:#8b9ab0"> · </span><span style="color:#f9fafb">${t.qty?t.qty+'x':''}${t.qty&&t.cat?' · ':''}${t.cat||''}</span>`:''}</div>
+          <div style="font-size:14px"><span style="color:#00b4ff">${fmtDate(t.date)}</span>${t.qty||t.cat?`<span style="color:#8b9ab0"> · </span><span style="color:#f9fafb">${t.qty?t.qty+'x':''}${t.qty&&t.cat?' · ':''}${t.cat||''}</span>`:''}</div>
           <div style="display:flex;gap:4px;flex-wrap:nowrap;flex-shrink:0">
-            ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}" style="cursor:pointer;font-size:10px;padding:2px 6px" onclick="event.stopPropagation();toggleTxPay(${t.id})">${t.pay}</span>`:''}
-            ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}" style="cursor:pointer;font-size:10px;padding:2px 6px" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">${t.livraison}</span>`:''}
+            ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}" style="cursor:pointer;font-size:11px;padding:2px 6px" onclick="event.stopPropagation();toggleTxPay(${t.id})">${t.pay}</span>`:''}
+            ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}" style="cursor:pointer;font-size:11px;padding:2px 6px" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">${t.livraison}</span>`:''}
           </div>
         </div>
-        ${t.buyer?`<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
+        ${t.buyer?`<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
       </div>
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <span class="badge ${badgeClass}">${badgeLabel}</span>
