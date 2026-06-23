@@ -841,7 +841,7 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const GRID = '85px minmax(0,200px) 100px 1fr 110px 100px 90px 90px';
+  const GRID = '110px minmax(0,180px) 90px minmax(0,150px) 1fr 120px 90px 90px';
   const header = `<div style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
     <span>Statut</span><span>Événement</span><span>Date</span><span>Catégorie</span><span>Lieu</span><span>Acheteur</span><span style="text-align:right">Budget</span><span style="text-align:right">Payé</span>
   </div>`;
@@ -852,7 +852,7 @@ function renderPreorders() {
     const did = 'pod-'+p.id;
     return `<div class="${statusClass}" style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-sizing:border-box" onclick="togglePODetail('${did}')">
       <div style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden">${p.statut||'En recherche'}</span>
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.2)">${p.statut||'En recherche'}</span>
         <span style="font-size:18px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.event||'—'}</span>
         <span style="font-size:16px;color:#00b4ff;white-space:nowrap;overflow:hidden;display:flex;align-items:center">${p.date?fmtDate(p.date):'—'}</span>
         <span style="font-size:16px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.cat||'—'}</span>
@@ -2434,9 +2434,6 @@ function checkAuth() {
   const loginScreen = document.getElementById('loginScreen');
   if (!loginScreen) return;
 
-  const lgw = document.getElementById('loginGoogleWarning');
-  if (lgw) lgw.style.display = gmailToken ? 'none' : 'block';
-
   if (sessionStorage.getItem('td_unlocked')) {
     loginScreen.style.display = 'none';
     if (gmailToken) {
@@ -2528,9 +2525,6 @@ window.addEventListener('DOMContentLoaded', function() {
     <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px">
     <button class="login-btn" onclick="_doLogin()">Accéder</button>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
-    <div id="loginGoogleWarning" style="display:block;font-size:12px;color:#ff9f43;margin-top:12px;padding:10px 12px;background:rgba(255,159,67,0.08);border:1px solid rgba(255,159,67,0.3);border-radius:8px;line-height:1.5">
-      Pour ne pas perdre tes données, connecte ton compte Google avant de te connecter.
-    </div>
     <button class="login-google-btn" onclick="_googleLogin()" style="margin-top:10px">
       <div style="width:16px;height:16px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d9fff;flex-shrink:0">G</div>
       Connecter Gmail + Drive
