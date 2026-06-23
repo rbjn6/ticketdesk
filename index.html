@@ -876,13 +876,13 @@ function renderPreorders() {
     }
     return `<div class="tx-card ${statusClass}">
       <div class="tx-summary" onclick="togglePODetail('${did}')">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${badgeBg};color:${badgeColor};cursor:pointer;white-space:nowrap">${p.statut||'En recherche'}</span>
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${badgeBg};color:${badgeColor};cursor:pointer;white-space:nowrap;overflow:hidden;box-sizing:border-box">${p.statut||'En recherche'}</span>
         <span class="tx-event">${p.event||'—'}</span>
-        <span class="tx-date">${p.date?fmtDate(p.date):'—'}</span>
+        <span class="tx-date" style="overflow:hidden;box-sizing:border-box">${p.date?fmtDate(p.date):'—'}</span>
         <span class="tx-info">${p.cat||'—'}</span>
         <span class="tx-buyer">${p.lieu||'—'}</span>
         <span style="font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center">${p.buyer||'—'}</span>
-        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap">${p.budget?fmtFull(p.budget):'—'}</span>
+        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;box-sizing:border-box">${p.budget?fmtFull(p.budget):'—'}</span>
         <div style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;white-space:nowrap">
           ${p.pay==='Payé'
             ?`<span class="badge b-paye" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Payé</span>`
