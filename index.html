@@ -177,7 +177,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .fchip.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
 
 /* ── WTS ───────────────────────────────────────────── */
-.wts-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;font-family:monospace;font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text-primary);word-break:break-word;min-height:100px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.wts-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.6;color:var(--text-primary);min-height:100px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .wts-b{font-weight:700;color:var(--text-primary)}
 
 /* ── GMAIL ─────────────────────────────────────────── */
@@ -207,8 +207,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 /* ── LOGIN ─────────────────────────────────────────── */
 .login-screen{position:fixed;inset:0;background:var(--bg-main);display:flex;align-items:center;justify-content:center;z-index:500}
-.login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 40px rgba(0,180,255,0.08)}
-.login-logo{font-size:24px;font-weight:800;letter-spacing:6px;margin-bottom:6px}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 60px rgba(0,180,255,0.08)}
+.login-logo{font-size:32px;font-weight:800;letter-spacing:6px;margin-bottom:6px}
 .login-logo-t{color:var(--accent-blue)}.login-logo-d{color:var(--text-primary)}
 .login-tagline{font-size:12px;color:var(--text-secondary);margin-bottom:28px}
 .login-field-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;text-align:left;margin-bottom:6px;display:block;font-weight:600}
@@ -275,7 +275,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     </nav>
     <div class="sidebar-bottom">
       <span id="syncIndicator"></span>
-      <button class="btn btn-sm btn-danger" onclick="deleteAllTransactions()">Tout supprimer</button>
     </div>
   </aside>
 
@@ -420,6 +419,13 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <div style="font-size:14px;color:var(--text2);margin-bottom:12px" id="settings-gmail-info"></div>
         <button class="btn" onclick="gmailConnect()" style="width:100%;justify-content:center">Reconnecter Gmail + Drive</button>
         <button class="btn btn-danger" onclick="_logout()" style="width:100%;justify-content:center;margin-top:8px;color:var(--red);border-color:rgba(255,107,107,.3)">Se déconnecter</button>
+      </div>
+      <p class="stitle">Informations de contact</p>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Ces informations apparaissent sur la page publique partagée avec les clients.</div>
+        <div class="fgroup"><label class="flabel">Discord</label><input type="text" id="s-discord" placeholder="@username" oninput="saveContact()"></div>
+        <div class="fgroup"><label class="flabel">Instagram</label><input type="text" id="s-instagram" placeholder="@handle" oninput="saveContact()"></div>
+        <div class="fgroup"><label class="flabel">Téléphone</label><input type="text" id="s-phone" placeholder="+33 6 00 00 00 00" oninput="saveContact()"></div>
       </div>
     </div>
 
@@ -697,6 +703,7 @@ let transactions    = JSON.parse(localStorage.getItem(TX_KEY)        || '[]');
 let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
 let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]').map(p => p.statut === 'Annulé' ? {...p, statut: 'En recherche'} : p);
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
+let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
 let driveFileId     = localStorage.getItem('ticketdesk_drive_fid') || null;
 let driveSyncing    = false;
 let editingId       = null;
@@ -1357,7 +1364,7 @@ function generateShareLink() {
     .filter(t => t.statut === 'En stock' && checkedEvents.includes(t.event||'—') && checkedDates.includes(t.date) && checkedQtys.includes(t.qty))
     .map(t => ({event: t.event, date: t.date||'', lieu: t.lieu||'', cat: t.cat||'', qty: t.qty, wanted: t.wanted||0, place: t.place||''}));
   if (!data.length) { showToast('Aucun ticket correspond à la sélection', 'err'); return; }
-  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify({tickets: data, contact}))));
   const longUrl = window.location.origin + window.location.pathname + '?stock=' + b64;
   const inp = document.getElementById('shareLinkInput');
   inp.value = longUrl.substring(0, 50) + '...';
@@ -1382,7 +1389,7 @@ function openShareLink() {
   if (fullUrl) window.open(fullUrl, '_blank');
 }
 
-function renderPublicStock(data) {
+function renderPublicStock(raw) {
   const app = document.querySelector('.app');
   if (app) app.style.display = 'none';
   const ls = document.getElementById('loginScreen');
@@ -1390,6 +1397,8 @@ function renderPublicStock(data) {
   const pub = document.getElementById('publicPage');
   if (!pub) return;
   pub.style.display = 'block';
+  const data = Array.isArray(raw) ? raw : (raw.tickets || []);
+  const pubContact = Array.isArray(raw) ? {} : (raw.contact || {});
   const sorted = [...data].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const byEvent = {};
   sorted.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
@@ -1432,9 +1441,14 @@ function renderPublicStock(data) {
             `).join('')}
           </div>
         `).join('')}
-        <div style="text-align:center;padding:24px;background:#1a2540;border:1px solid #2d3d55;border-radius:16px;margin-top:8px">
-          <div style="font-size:15px;font-weight:600;color:#f9fafb;margin-bottom:4px">Intéressé(e) par un ou plusieurs billets ?</div>
-          <div style="font-size:13px;color:#8b9ab0">Contactez-nous pour plus d'informations.</div>
+        <div style="text-align:center;padding:20px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;margin-top:16px">
+          <div style="font-size:14px;font-weight:600;color:#f9fafb;margin-bottom:12px">Nous contacter</div>
+          <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+            ${pubContact.discord?`<div style="font-size:13px;color:#8b9ab0">Discord : <span style="color:#f9fafb">${pubContact.discord}</span></div>`:''}
+            ${pubContact.instagram?`<div style="font-size:13px;color:#8b9ab0">Instagram : <span style="color:#f9fafb">${pubContact.instagram}</span></div>`:''}
+            ${pubContact.phone?`<div style="font-size:13px;color:#8b9ab0">Téléphone : <span style="color:#f9fafb">${pubContact.phone}</span></div>`:''}
+            ${!pubContact.discord&&!pubContact.instagram&&!pubContact.phone?`<div style="font-size:13px;color:#8b9ab0">Contactez-nous pour plus d'informations.</div>`:''}
+          </div>
         </div>
         <div style="text-align:center;margin-top:20px;font-size:11px;color:#4a5568;letter-spacing:1px">TICKETDESK · Gestion de revente privée</div>
       </div>
@@ -1822,7 +1836,7 @@ function renderJournalList() {
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
       {l:'Marge',       v: margin !== null ? (Math.round(margin) >= 0?'+':'')+margin+'%' : '—', c: margin !== null ? (Math.round(margin) >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
-      {l:'Prix voulu',  v: t.wanted ? fmtFull(t.wanted) : '—'},
+      {l:'Prix voulu',  html: `<div style="display:flex;align-items:center;gap:8px"><input type="number" value="${t.wanted||0}" min="0" step="1" onchange="updateWanted(${t.id},this.value)" onclick="event.stopPropagation()" style="width:90px;padding:4px 8px;font-size:13px;border-radius:6px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;text-align:right"><span style="font-size:12px;color:#8b9ab0">€</span></div>`},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
 
@@ -1831,8 +1845,8 @@ function renderJournalList() {
     for(let i=0;i<maxRows;i++){
       const l = colL[i]||null, r = colR[i]||null;
       rows += `<div style="display:contents">
-        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val" style="color:${l.c||'#f9fafb'}">${l.v}</div>`:''}</div>
-        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val" style="color:${r.c||'#f9fafb'}">${r.v}</div>`:''}</div>
+        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div>${l.html||`<div class="tx-drow-val" style="color:${l.c||'#f9fafb'}">${l.v}</div>`}`:''}</div>
+        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div>${r.html||`<div class="tx-drow-val" style="color:${r.c||'#f9fafb'}">${r.v}</div>`}`:''}</div>
       </div>`;
     }
 
@@ -1906,6 +1920,32 @@ function deleteAllTransactions(){
   saveTx();renderJournal();renderDashboard();renderWTS();
   showToast('Toutes les transactions supprimées');
 }
+function updateWanted(id, val) {
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  t.wanted = parseFloat(val) || 0;
+  saveTx();
+  renderWTS();
+  showToast('Prix voulu mis à jour');
+}
+function saveContact() {
+  const d = document.getElementById('s-discord');
+  const i = document.getElementById('s-instagram');
+  const p = document.getElementById('s-phone');
+  contact = {discord: d?d.value.trim():'', instagram: i?i.value.trim():'', phone: p?p.value.trim():''};
+  localStorage.setItem('ticketdesk_contact', JSON.stringify(contact));
+}
+function autoArchiveExpired() {
+  const today = new Date().toISOString().substring(0, 10);
+  let changed = false;
+  transactions.forEach(t => {
+    if (t.statut === 'Réservé' && t.date && t.date < today) {
+      t.statut = 'Archivé';
+      changed = true;
+    }
+  });
+  if (changed) saveTx();
+}
 function toggleTxPay(id) {
   const t = transactions.find(x => x.id === id);
   if (!t) return;
@@ -1956,26 +1996,48 @@ function renderWTS(){
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
     });
-  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
+  const el = document.getElementById('wtsPreview');
+  if(!stock.length){el.innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
+
+  // Raw text for clipboard (Discord)
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
-    if(t.event!==lastEv){
-      lines.push('');
-      lines.push(`**${t.event}**`);
-      lastEv=t.event;lastDt=null;
-    }
+    if(t.event!==lastEv){lines.push('');lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null;}
     const ds=fmtDate(t.date);
-    if(ds!==lastDt){
-      lines.push('');
-      lines.push(`**${ds}**`);
-      lastDt=ds;
-    }
+    if(ds!==lastDt){lines.push('');lines.push(`**${ds}**`);lastDt=ds;}
     const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
-    lines.push(`${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' - '+price+'€ each':''}`);
+    lines.push(`● ${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' — '+price+'€/place':''}`);
   });
-  const raw=lines.join('\n');
-  document.getElementById('wtsPreview').innerHTML=lines.map(l=>l.replace(/\*\*(.+?)\*\*/g,'<span class="wts-b">$1</span>')).join('\n');
-  document.getElementById('wtsPreview').dataset.raw=raw;
+
+  // Visual HTML
+  const totalPlaces=stock.reduce((s,t)=>s+(t.qty||1),0);
+  const byEvent={};
+  stock.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
+  const evPalette=['#00b4ff','#00ff88','#ff9f43','#a29bfe','#fd79a8'];
+  let evIdx=0;
+  const evHTML=Object.entries(byEvent).map(([ev,byDate])=>{
+    const col=evPalette[evIdx++%evPalette.length];
+    const datesHTML=Object.entries(byDate).map(([date,tickets])=>{
+      const ticketsHTML=tickets.map(t=>{
+        const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <span style="color:${col};font-size:10px;flex-shrink:0">●</span>
+          <span style="font-size:13px;color:var(--text-primary);flex:1">${t.qty}x <strong>${t.cat||'—'}</strong>${t.place?` <span style="color:var(--text-secondary);font-size:12px">(${t.place})</span>`:''}</span>
+          ${price?`<span style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap">${price}€<span style="font-size:11px;font-weight:400;color:var(--text-secondary)">/place</span></span>`:`<span style="font-size:12px;color:var(--text-secondary);font-style:italic">Prix sur demande</span>`}
+        </div>`;
+      }).join('');
+      return `<div style="padding:8px 0">${date?`<div style="font-size:11px;color:${col};font-weight:600;letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase">${fmtDate(date)}</div>`:''}${ticketsHTML}</div>`;
+    }).join('');
+    return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${col};border-radius:12px;margin-bottom:8px;overflow:hidden">
+      <div style="padding:10px 14px;background:#131f35;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:700;color:var(--text-primary)">${ev}</span></div>
+      <div style="padding:4px 14px 8px">${datesHTML}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid var(--border)">
+    <span style="font-size:13px;color:var(--text-secondary)">${stock.length} ligne${stock.length>1?'s':''} · <strong style="color:var(--text-primary)">${totalPlaces} place${totalPlaces>1?'s':''}</strong></span>
+  </div>${evHTML}`;
+  el.dataset.raw=lines.join('\n');
 }
 
 function copyWTS(){
@@ -2279,9 +2341,10 @@ function renderSettings(){
   if(el) el.textContent = creds ? 'Identifiant actuel : ' + creds.user : 'Aucun identifiant défini — crée-en un ci-dessous.';
   const gi = document.getElementById('settings-gmail-info');
   if(gi) gi.textContent = gmailToken ? 'Connecté : ' + (localStorage.getItem('ticketdesk_gmail_email')||'') : 'Non connecté';
-  if(creds) {
-    document.getElementById('s-user').value = creds.user;
-  }
+  if(creds) { document.getElementById('s-user').value = creds.user; }
+  const sd = document.getElementById('s-discord'); if(sd) sd.value = contact.discord || '';
+  const si = document.getElementById('s-instagram'); if(si) si.value = contact.instagram || '';
+  const sp = document.getElementById('s-phone'); if(sp) sp.value = contact.phone || '';
 }
 
 function _saveSettings(){
@@ -2435,6 +2498,7 @@ function checkAuth() {
   const loginScreen = document.getElementById('loginScreen');
   if (!loginScreen) return;
 
+  autoArchiveExpired();
   if (sessionStorage.getItem('td_unlocked')) {
     loginScreen.style.display = 'none';
     if (gmailToken) {
@@ -2518,7 +2582,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">ICKETDESK</span></div>
-    <div class="login-tagline">Gestion de revente · Privé</div>
+    <div class="login-tagline">Gestion de revente privée</div>
     <div class="login-error" id="loginError"></div>
     <label class="login-field-label">Identifiant</label>
     <input class="login-field" type="text" id="loginUser" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off">
