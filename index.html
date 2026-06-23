@@ -13,7 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 html,body{overscroll-behavior:none;overflow-x:hidden;touch-action:pan-y;-webkit-text-size-adjust:100%}
-*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent;touch-action:manipulation;box-sizing:border-box}
 :root {
   --bg-nav:        #0d1424;
   --bg-main:       #111827;
@@ -67,11 +67,11 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 #syncIndicator{font-size:11px;color:var(--text-secondary);padding:0 6px}
 
 /* Main content */
-.main-content{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg-main)}
+.main-content{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden;background:var(--bg-main)}
 .topbar-mobile{display:none;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 12px) 16px 12px;background:var(--bg-nav);border-bottom:1px solid var(--border);flex-shrink:0}
 .topbar-title{font-size:15px;font-weight:800;letter-spacing:3px;color:var(--text-primary);text-transform:uppercase}
 #syncIndicatorMobile{font-size:11px;color:var(--text-secondary)}
-.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 20px calc(18px + var(--safe-bottom))}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:18px 20px calc(18px + var(--safe-bottom))}
 .page{display:none}.page.active{display:block}
 .bottomnav{display:none}
 
@@ -100,7 +100,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .bottomnav{display:none}
   .topbar-mobile{display:flex;height:56px}
   .content{padding-bottom:calc(24px + var(--safe-bottom))}
-  .journal-header{display:none}
+  .journal-header{display:none!important}
+  .po-header-desktop{display:none!important}
   .tx-summary{display:none!important}
   .tx-card-mobile{display:block}
   .po-row-desktop{display:none!important}
@@ -910,7 +911,7 @@ function renderPreorders() {
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const GRID = '100px 16px 140px 95px 25px 16px 110px 1fr 100px 100px 85px 85px';
   const CS = 'padding:0 6px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-  const header = `<div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
+  const header = `<div class="po-header-desktop" style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
     <span style="${CS};padding-right:8px">Statut</span><span></span><span style="${CS}">Événement</span><span style="${CS};padding-right:8px">Date</span><span></span><span></span><span style="${CS}">Catégorie</span><span></span><span style="${CS}">Lieu</span><span style="${CS}">Acheteur</span><span style="${CS};text-align:right">Budget</span><span style="${CS};text-align:right">Payé</span>
   </div>`;
   const cards = sorted.map(p => {
@@ -1990,10 +1991,9 @@ function renderJournalList() {
         <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span style="font-size:13px;color:var(--accent-blue)">${fmtDate(t.date)}${t.qty>1?' · '+t.qty+'x':''}${t.cat?' · '+t.cat:''}</span>
-          <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
-            ${t.pay==='Payé'?`<span class="badge b-paye" style="font-size:10px;padding:3px 7px;cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Payé</span>`:''}
-            ${t.pay==='En attente'?`<span class="badge b-attente" style="font-size:10px;padding:3px 7px;cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Att.</span>`:''}
-            ${t.livraison==='Non livré'?`<span class="badge b-nonlivre" style="font-size:10px;padding:3px 7px">Non livré</span>`:''}
+          <div style="display:flex;gap:4px;flex-wrap:nowrap;flex-shrink:0">
+            ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}" style="cursor:pointer;font-size:10px;padding:2px 6px" onclick="event.stopPropagation();toggleTxPay(${t.id})">${t.pay}</span>`:''}
+            ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}" style="cursor:pointer;font-size:10px;padding:2px 6px" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">${t.livraison}</span>`:''}
           </div>
         </div>
         ${t.buyer?`<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
