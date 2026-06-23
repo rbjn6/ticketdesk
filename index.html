@@ -80,7 +80,12 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .drawer-overlay.open{display:block}
 .drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
-.drawer-head{height:90px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
+.drawer-head{height:160px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
+#journalFab{display:none;position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,180,255,0.4);z-index:150}
+.mobile-charts-btn{display:none;width:100%;padding:12px;background:#1a2540;border:1px solid #2d3d55;border-radius:10px;color:#8b9ab0;font-size:14px;font-family:inherit;cursor:pointer;margin-top:8px}
+#pullRefreshInd{display:none;position:fixed;top:78px;left:0;right:0;background:#1a2540;border-bottom:1px solid #2d3d55;padding:10px;align-items:center;justify-content:center;gap:8px;font-size:13px;color:#8b9ab0;z-index:100}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-icon{animation:spin 1s linear infinite}
 .drawer-logo{font-size:13px;font-weight:800;letter-spacing:3px;color:#f9fafb;text-transform:uppercase;flex:1}
 .drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
 .drawer-close:hover{color:#f9fafb}
@@ -98,7 +103,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 @media(max-width:768px){
   .sidebar{display:none}
   .bottomnav{display:none}
-  .topbar-mobile{display:flex;height:68px;padding:calc(var(--safe-top) + 16px) 20px 16px}
+  .topbar-mobile{display:flex;height:78px;padding:calc(var(--safe-top) + 20px) 24px 20px}
   .content{padding-bottom:calc(24px + var(--safe-bottom))}
   .journal-header{display:none!important}
   .po-header-desktop{display:none!important}
@@ -110,10 +115,15 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .filters-mobile{display:flex!important;flex-direction:column;gap:8px;margin-bottom:10px}
   #metricsGrid > div{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
   .metric-card{padding:10px 12px!important}
-  .metric-value{font-size:18px!important}
+  .metric-label{font-size:12px!important}
+  .metric-value{font-size:22px!important}
   .tx-detail-actions{flex-wrap:wrap}
   .modal input,.modal select,.modal textarea{font-size:16px!important}
   .wts-box{font-size:12px;padding:12px}
+  .alert-item{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px!important;padding:8px 12px!important}
+  #dashCharts{display:none}
+  .mobile-charts-btn{display:block!important}
+  #journalFab.fab-active{display:flex!important}
 }
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;border:none;background:none;color:var(--text-secondary);font-size:10px;font-weight:500;font-family:inherit;cursor:pointer;gap:3px;transition:color .15s}
 .bnav.active{color:var(--accent-blue)}
@@ -317,14 +327,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
   <div class="main-content">
     <div class="topbar-mobile">
-      <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:6px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:4px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
       </button>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span id="syncIndicatorMobile" style="font-size:11px"></span>
-        <span style="font-size:18px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
-      </div>
+      <span style="font-size:20px;font-weight:800;letter-spacing:4px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
     </div>
 
   <div class="content">
@@ -340,15 +347,18 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <div id="dashAlerts"></div>
       <div id="dashFilters"></div>
       <div id="metricsGrid"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Bénéfice par événement</span></div>
-      <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
-      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Répartition</span></div>
-      <div class="card" style="padding:12px;display:flex;align-items:center;gap:20px">
-        <div style="position:relative;width:100px;height:100px;flex-shrink:0">
-          <canvas id="chartPie" role="img" aria-label="Vendus vs stock"></canvas>
-          <div id="pieCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"></div>
+      <button class="mobile-charts-btn" id="mobileChartsBtn" onclick="toggleMobileCharts()">Voir les graphiques ▾</button>
+      <div id="dashCharts">
+        <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Bénéfice par événement</span></div>
+        <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Répartition</span></div>
+        <div class="card" style="padding:12px;display:flex;align-items:center;gap:20px">
+          <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+            <canvas id="chartPie" role="img" aria-label="Vendus vs stock"></canvas>
+            <div id="pieCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"></div>
+          </div>
+          <div id="pieLegend" style="flex:1;font-size:12px;line-height:2;color:var(--text2)"></div>
         </div>
-        <div id="pieLegend" style="flex:1;font-size:12px;line-height:2;color:var(--text2)"></div>
       </div>
     </div>
 
@@ -485,6 +495,13 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
   </div>
 </div>
 
+<button id="journalFab" onclick="openAddModal()" aria-label="Ajouter">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+<div id="pullRefreshInd">
+  <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-18 0"/></svg>
+  Synchronisation…
+</div>
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
@@ -863,6 +880,7 @@ function autoArchive() {
 function archiveTransaction(id) {
   const t = transactions.find(x => x.id === id);
   if (!t) return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   t.statut = 'Archivé';
   saveTx(); renderJournal(); renderDashboard(); renderWTS();
   showToast('Archivé');
@@ -883,6 +901,7 @@ function savePreorders() {
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function cyclePOStatus(id){
   const p=preorders.find(x=>x.id===id);if(!p)return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
   p.statut=cycle[p.statut]||'En recherche';
   savePreorders();renderPreorders();
@@ -1095,6 +1114,7 @@ function openSellModal(id) {
 function confirmSale() {
   const t = transactions.find(x => x.id === sellingId);
   if (!t) return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   const buyer    = document.getElementById('sm-buyer').value.trim();
   const platform = document.getElementById('sm-platform').value.trim();
   const sellPrice= parseFloat(document.getElementById('sm-sell').value)||0;
@@ -1181,6 +1201,7 @@ function openReserveModal(id) {
 function confirmReserve() {
   const t = transactions.find(x => x.id === reservingId);
   if (!t) return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   t.statut = 'Réservé';
   t.buyer = document.getElementById('rm-buyer').value.trim();
   t.platform = document.getElementById('rm-platform').value.trim();
@@ -1239,6 +1260,8 @@ function showPage(name) {
   if (bnav) bnav.classList.add('active');
   const dnav = document.getElementById('dnav-' + name);
   if (dnav) dnav.classList.add('active');
+  const fab = document.getElementById('journalFab');
+  if (fab) fab.classList.toggle('fab-active', name === 'journal');
   if (name === 'dashboard') renderDashboard();
   if (name === 'journal')   renderJournal();
   if (name === 'preorders') renderPreorders();
@@ -1890,7 +1913,6 @@ function renderFilters() {
           <input id="buyer-input-m" type="text" placeholder="Acheteur…" oninput="setFilter('buyer',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb">
         </div>
       </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openAddModal()">+ Ajouter</button>
     </div>
   `;
 }
@@ -2009,7 +2031,7 @@ function renderJournalList() {
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
     return `<div class="tx-card is-${cardClass}">
-      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="toggleDetail('${did}')">
+      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="if(!_didLongPress)toggleDetail('${did}')" ontouchstart="mPressStart(event,${t.id})" ontouchend="mPressEnd(event)" ontouchmove="mPressEnd(null)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <span style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}</span>
@@ -2119,6 +2141,7 @@ function autoArchiveExpired() {
 function toggleTxPay(id) {
   const t = transactions.find(x => x.id === id);
   if (!t) return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   t.pay = t.pay === 'Payé' ? 'En attente' : 'Payé';
   saveTx(); renderJournalList(); renderDashboard();
   showToast(t.pay === 'Payé' ? 'Marqué Payé' : 'Marqué En attente');
@@ -2126,6 +2149,7 @@ function toggleTxPay(id) {
 function toggleTxLivraison(id) {
   const t = transactions.find(x => x.id === id);
   if (!t) return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   t.livraison = t.livraison === 'Livré' ? 'Non livré' : 'Livré';
   saveTx(); renderJournalList();
   showToast(t.livraison === 'Livré' ? 'Marqué Livré' : 'Marqué Non livré');
@@ -2452,14 +2476,82 @@ function updateSyncIndicator(state) {
   if (elD) { elD.innerHTML = html; elD.style.color = col; }
 }
 function openDrawer() {
-  document.getElementById('drawer').classList.add('open');
+  const d = document.getElementById('drawer');
+  d.classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  let _swX = 0;
+  d.ontouchstart = e => { _swX = e.touches[0].clientX; };
+  d.ontouchend = e => { if (_swX - e.changedTouches[0].clientX > 60) closeDrawer(); };
 }
 function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+let _pressTimer, _didLongPress = false;
+function mPressStart(e, id) {
+  _didLongPress = false;
+  const tx = e.touches[0].clientX, ty = e.touches[0].clientY;
+  _pressTimer = setTimeout(() => {
+    _didLongPress = true;
+    if('vibrate' in navigator) navigator.vibrate(10);
+    showCtxMenu(id, tx, ty);
+  }, 500);
+}
+function mPressEnd(e) {
+  clearTimeout(_pressTimer);
+  if (_didLongPress) {
+    if (e) e.preventDefault();
+    _didLongPress = false;
+  }
+}
+function showCtxMenu(id, x, y) {
+  document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
+  const t = transactions.find(t => t.id === id);
+  if (!t) return;
+  const menu = document.createElement('div');
+  menu.className = 'ctx-menu';
+  menu.style.cssText = `position:fixed;left:${Math.min(x, window.innerWidth-164)}px;top:${Math.min(y, window.innerHeight-130)}px;background:#1a2540;border:1px solid #2d3d55;border-radius:10px;z-index:200;min-width:152px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.6)`;
+  const items = [];
+  if (t.statut === 'En stock') items.push(['Vendre', () => openSellModal(id)]);
+  if (t.statut === 'En stock') items.push(['Réserver', () => openReserveModal(id)]);
+  if (t.statut !== 'Archivé') items.push(['Archiver', () => archiveTransaction(id)]);
+  items.push(['Supprimer', () => deleteTransaction(id)]);
+  items.forEach(([label, fn], i) => {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.style.cssText = `display:block;width:100%;padding:13px 16px;border:none;${i<items.length-1?'border-bottom:1px solid #2d3d55;':''}background:none;color:${label==='Supprimer'?'#ff6b6b':'#f9fafb'};font-size:14px;font-family:inherit;cursor:pointer;text-align:left`;
+    btn.onclick = () => { menu.remove(); fn(); };
+    menu.appendChild(btn);
+  });
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener('touchstart', () => menu.remove(), {once:true}), 0);
+}
+function toggleMobileCharts() {
+  const c = document.getElementById('dashCharts');
+  const btn = document.getElementById('mobileChartsBtn');
+  if (!c) return;
+  const showing = c.style.display === 'block';
+  c.style.display = showing ? '' : 'block';
+  if (btn) btn.textContent = showing ? 'Voir les graphiques ▾' : 'Masquer les graphiques ▴';
+}
+function initPullToRefresh() {
+  let ptStartY = 0;
+  const content = document.querySelector('.content');
+  if (!content) return;
+  content.addEventListener('touchstart', e => { ptStartY = e.touches[0].clientY; }, {passive:true});
+  content.addEventListener('touchend', e => {
+    const delta = e.changedTouches[0].clientY - ptStartY;
+    if (delta > 80 && content.scrollTop === 0) {
+      const ind = document.getElementById('pullRefreshInd');
+      if (ind) ind.style.display = 'flex';
+      (typeof driveLoad === 'function' ? driveLoad() : Promise.resolve()).then(() => {
+        renderDashboard(); renderJournal(); renderWTS(); renderCosts();
+        setTimeout(() => { if (ind) ind.style.display = 'none'; }, 1500);
+      });
+    }
+  }, {passive:true});
 }
 
 // COSTS
@@ -2528,6 +2620,7 @@ function _logout(){
 function toggleCostStatus(id){
   const c=costs.find(x=>x.id===id);
   if(!c)return;
+  if('vibrate' in navigator) navigator.vibrate(10);
   c.status=c.status==='Payé'?'À payer':'Payé';
   saveCosts();renderCosts();renderDashboard();
   showToast(c.status==='Payé'?'Marqué Payé':'Marqué À payer');
@@ -2694,6 +2787,7 @@ if (_hash.includes('access_token')) {
 
 checkAuth();
 renderGmail();
+initPullToRefresh();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 function applyModalStyles(root) {
