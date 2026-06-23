@@ -73,12 +73,44 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .page{display:none}.page.active{display:block}
 .bottomnav{display:none}
 
+/* ── MOBILE DRAWER ─────────────────────────────────── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:290}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+.drawer.open{transform:translateX(0)}
+.drawer-head{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
+.drawer-logo{font-size:13px;font-weight:800;letter-spacing:3px;color:#f9fafb;text-transform:uppercase;flex:1}
+.drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
+.drawer-close:hover{color:#f9fafb}
+.drawer-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.drawer-bottom{padding:12px 16px;border-top:1px solid #2d3d55;font-size:11px;color:#8b9ab0;flex-shrink:0}
+.dnav{width:100%;display:flex;align-items:center;gap:11px;padding:11px 12px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;border-radius:8px;transition:background .15s,color .15s;text-align:left;margin-bottom:2px}
+.dnav:hover{background:rgba(255,255,255,.05);color:var(--text-primary)}
+.dnav.active{background:rgba(0,180,255,.12);color:var(--accent-blue)}
+.dnav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tx-card-mobile{display:none;padding:14px}
+.po-card-mobile{display:none;padding:14px}
+.filters-desktop{display:block}
+.filters-mobile{display:none}
 /* ── MOBILE ────────────────────────────────────────── */
 @media(max-width:768px){
   .sidebar{display:none}
-  .topbar-mobile{display:flex}
-  .bottomnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg-nav);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);z-index:100}
-  .content{padding-bottom:calc(64px + var(--safe-bottom) + 16px)}
+  .bottomnav{display:none}
+  .topbar-mobile{display:flex;height:56px}
+  .content{padding-bottom:calc(24px + var(--safe-bottom))}
+  .journal-header{display:none}
+  .tx-summary{display:none!important}
+  .tx-card-mobile{display:block}
+  .po-row-desktop{display:none!important}
+  .po-card-mobile{display:block}
+  .filters-desktop{display:none!important}
+  .filters-mobile{display:flex!important;flex-direction:column;gap:8px;margin-bottom:10px}
+  #metricsGrid > div{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
+  .metric-card{padding:10px 12px!important}
+  .metric-value{font-size:18px!important}
+  .tx-detail-actions{flex-wrap:wrap}
+  .modal input,.modal select,.modal textarea{font-size:16px!important}
+  .wts-box{font-size:12px;padding:12px}
 }
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;border:none;background:none;color:var(--text-secondary);font-size:10px;font-weight:500;font-family:inherit;cursor:pointer;gap:3px;transition:color .15s}
 .bnav.active{color:var(--accent-blue)}
@@ -283,7 +315,13 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
   <div class="main-content">
     <div class="topbar-mobile">
       <span class="topbar-title">TICKETDESK</span>
-      <span id="syncIndicatorMobile"></span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="syncIndicatorMobile" style="font-size:11px"></span>
+        <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:6px;display:flex;align-items:center;position:relative;border-radius:8px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
+        </button>
+      </div>
     </div>
 
   <div class="content">
@@ -442,6 +480,24 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
   </div>
   </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="drawer-logo">TICKETDESK</span>
+    <button class="drawer-close" onclick="closeDrawer()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <nav class="drawer-nav">
+    <button class="dnav active" id="dnav-dashboard" onclick="showPage('dashboard');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard</button>
+    <button class="dnav" id="dnav-journal" onclick="showPage('journal');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
+    <button class="dnav" id="dnav-preorders" onclick="showPage('preorders');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
+    <button class="dnav" id="dnav-wts" onclick="showPage('wts');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>WTS</button>
+    <button class="dnav" id="dnav-gmail" onclick="showPage('gmail');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>Gmail</button>
+    <button class="dnav" id="dnav-costs" onclick="showPage('costs');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Coûts</button>
+    <button class="dnav" id="dnav-settings" onclick="showPage('settings');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Réglages</button>
+  </nav>
+  <div class="drawer-bottom" id="drawerSyncStatus"></div>
 </div>
 
 <nav class="bottomnav">
@@ -861,7 +917,21 @@ function renderPreorders() {
     const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
     return `<div class="tx-card ${statusClass}" style="border-left:3px solid ${borderColor}" onclick="togglePODetail('${did}')">
-      <div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
+      <div class="po-card-mobile">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex}">${p.statut||'En recherche'}</span>
+          ${p.budget?`<span style="font-size:16px;font-weight:700;color:var(--text-primary)">${fmtFull(p.budget)}</span>`:''}
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event||'—'}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span style="font-size:13px;color:var(--accent-blue)">${p.date?fmtDate(p.date):'—'}${p.cat?' · '+p.cat:''}</span>
+          <div onclick="event.stopPropagation();togglePOPay(${p.id})" style="cursor:pointer;flex-shrink:0">
+            ${p.pay==='Payé'?`<span class="badge b-paye" style="font-size:10px;padding:3px 7px">Payé</span>`:`<span class="badge b-nonlivre" style="font-size:10px;padding:3px 7px">Non payé</span>`}
+          </div>
+        </div>
+        ${p.buyer?`<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">${p.buyer}</div>`:''}
+      </div>
+      <div class="po-row-desktop" style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
         <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="${CS};display:inline-flex;align-items:center;padding:4px 12px 4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};box-shadow:0 2px 8px rgba(0,0,0,0.2);padding-right:8px">${p.statut||'En recherche'}</span>
         <span></span>
         <span style="${CS};font-size:18px;font-weight:600;color:var(--text-primary);display:flex;align-items:center">${p.event||'—'}</span>
@@ -1157,12 +1227,15 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.snav').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.bnav').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.dnav').forEach(n => n.classList.remove('active'));
   const page = document.getElementById('page-' + name);
   if (page) page.classList.add('active');
   const snav = document.getElementById('snav-' + name);
   if (snav) snav.classList.add('active');
   const bnav = document.getElementById('bnav-' + name);
   if (bnav) bnav.classList.add('active');
+  const dnav = document.getElementById('dnav-' + name);
+  if (dnav) dnav.classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'journal')   renderJournal();
   if (name === 'preorders') renderPreorders();
@@ -1521,7 +1594,7 @@ function renderDashAlerts() {
       </div>`;
     }
   }
-  [document.getElementById('dashBadge'), document.getElementById('dashBadgeMobile')].forEach(badge => {
+  [document.getElementById('dashBadge'), document.getElementById('dashBadgeMobile'), document.getElementById('dashBadgeHamburger')].forEach(badge => {
     if (badge) {
       badge.textContent = alerts.length || '';
       badge.style.display = alerts.length ? 'inline-flex' : 'none';
@@ -1710,60 +1783,80 @@ function toggleFullscreen() {
 // JOURNAL
 function renderFilters() {
   document.getElementById('filterChips').innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div style="position:relative;flex-shrink:0">
-          <select id="sel-statut" onchange="setFilter('statut',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
-            <option value="">Statut</option>
-            <option value="Vendu">Vendus</option>
-            <option value="En stock">En stock</option>
-            <option value="Réservé">Réservés</option>
-            <option value="Archivé">Archivés</option>
-          </select>
-          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+    <div class="filters-desktop">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="position:relative;flex-shrink:0">
+            <select id="sel-statut" onchange="setFilter('statut',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+              <option value="">Statut</option>
+              <option value="Vendu">Vendus</option>
+              <option value="En stock">En stock</option>
+              <option value="Réservé">Réservés</option>
+              <option value="Archivé">Archivés</option>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+          </div>
+          <div style="position:relative;flex-shrink:0">
+            <select id="sel-pay" onchange="setFilter('pay',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+              <option value="">Paiement</option>
+              <option value="Payé">Payé</option>
+              <option value="En attente">En attente</option>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+          </div>
+          <div style="position:relative;flex-shrink:0">
+            <select id="sel-livraison" onchange="setFilter('livraison',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+              <option value="">Livraison</option>
+              <option value="Livré">Livré</option>
+              <option value="Non livré">Non livré</option>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+          </div>
+          <div style="position:relative;flex-shrink:0">
+            <select id="sel-sort" onchange="setFilter('sort',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+              <option value="date">Date</option>
+              <option value="event">A – Z</option>
+              <option value="profit">Bénéfice</option>
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+          </div>
+          <div style="position:relative;flex-shrink:0">
+            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="search-input" type="text" placeholder="Rechercher événement…"
+              oninput="setFilter('search',this.value)"
+              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+              style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:220px">
+          </div>
+          <div style="position:relative;flex-shrink:0">
+            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input id="buyer-input" type="text" placeholder="Acheteur…"
+              oninput="setFilter('buyer',this.value)"
+              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+              style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
+          </div>
         </div>
-        <div style="position:relative;flex-shrink:0">
-          <select id="sel-pay" onchange="setFilter('pay',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
-            <option value="">Paiement</option>
-            <option value="Payé">Payé</option>
-            <option value="En attente">En attente</option>
-          </select>
-          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
-        </div>
-        <div style="position:relative;flex-shrink:0">
-          <select id="sel-livraison" onchange="setFilter('livraison',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
-            <option value="">Livraison</option>
-            <option value="Livré">Livré</option>
-            <option value="Non livré">Non livré</option>
-          </select>
-          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
-        </div>
-        <div style="position:relative;flex-shrink:0">
-          <select id="sel-sort" onchange="setFilter('sort',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
-            <option value="date">Date</option>
-            <option value="event">A – Z</option>
-            <option value="profit">Bénéfice</option>
-          </select>
-          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
-        </div>
-        <div style="position:relative;flex-shrink:0">
-          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="search-input" type="text" placeholder="Rechercher événement…"
-            oninput="setFilter('search',this.value)"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
-            style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:220px">
-        </div>
-        <div style="position:relative;flex-shrink:0">
-          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input id="buyer-input" type="text" placeholder="Acheteur…"
-            oninput="setFilter('buyer',this.value)"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
-            style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="btn btn-sm" onclick="toggleFullscreen()" title="Plein écran" style="padding:6px 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0">
-        <button class="btn btn-sm" onclick="toggleFullscreen()" title="Plein écran" style="padding:6px 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
-        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
+    </div>
+    <div class="filters-mobile">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="fchip${!filterStatut?' active':''}" id="mchip-all" onclick="setFilter('statut','')">Tous</button>
+          <button class="fchip${filterStatut==='Vendu'?' active':''}" id="mchip-Vendu" onclick="setFilter('statut','Vendu')">Vendus</button>
+          <button class="fchip${filterStatut==='En stock'?' active':''}" id="mchip-stock" onclick="setFilter('statut','En stock')">Stock</button>
+          <button class="fchip${filterStatut==='Réservé'?' active':''}" id="mchip-reserve" onclick="setFilter('statut','Réservé')">Réservés</button>
+          <button class="fchip${filterStatut==='Archivé'?' active':''}" id="mchip-archive" onclick="setFilter('statut','Archivé')">Archivés</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()" style="flex-shrink:0">+ Ajouter</button>
+      </div>
+      <div style="position:relative">
+        <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input-m" type="search" placeholder="Rechercher événement…"
+          oninput="setFilter('search',this.value)"
+          style="padding:10px 12px 10px 34px;font-size:16px;border-radius:8px;width:100%;box-sizing:border-box">
       </div>
     </div>
   `;
@@ -1775,6 +1868,11 @@ function syncFilterUI() {
   const sl = document.getElementById('sel-livraison'); if(sl) sl.value = filterLivraison;
   const so = document.getElementById('sel-sort'); if(so) so.value = filterSort;
   const sb = document.getElementById('buyer-input'); if(sb) sb.value = filterBuyer;
+  [['mchip-all',''],['mchip-Vendu','Vendu'],['mchip-stock','En stock'],['mchip-reserve','Réservé'],['mchip-archive','Archivé']].forEach(([id,v])=>{
+    const c=document.getElementById(id); if(c) c.classList.toggle('active', filterStatut===v);
+  });
+  const sm = document.getElementById('search-input-m');
+  if(sm && sm !== document.activeElement) sm.value = filterSearch;
 }
 
 function renderJournal() {
@@ -1876,6 +1974,22 @@ function renderJournalList() {
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
     return `<div class="tx-card is-${cardClass}">
+      <div class="tx-card-mobile" onclick="toggleDetail('${did}')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
+          <span style="font-size:16px;font-weight:700;color:${pc}">${fmt(profit)}</span>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span style="font-size:13px;color:var(--accent-blue)">${fmtDate(t.date)}${t.qty>1?' · '+t.qty+'x':''}${t.cat?' · '+t.cat:''}</span>
+          <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+            ${t.pay==='Payé'?`<span class="badge b-paye" style="font-size:10px;padding:3px 7px;cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Payé</span>`:''}
+            ${t.pay==='En attente'?`<span class="badge b-attente" style="font-size:10px;padding:3px 7px;cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Att.</span>`:''}
+            ${t.livraison==='Non livré'?`<span class="badge b-nonlivre" style="font-size:10px;padding:3px 7px">Non livré</span>`:''}
+          </div>
+        </div>
+        ${t.buyer?`<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
+      </div>
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <span class="badge ${badgeClass}">${badgeLabel}</span>
         <span class="tx-event">${t.event}</span>
@@ -2300,6 +2414,18 @@ function updateSyncIndicator(state) {
   if (el)  { el.innerHTML = html; el.style.cssText = wrap; el.style.color = col; }
   const elM = document.getElementById('syncIndicatorMobile');
   if (elM) { elM.innerHTML = html; elM.style.color = col; }
+  const elD = document.getElementById('drawerSyncStatus');
+  if (elD) { elD.innerHTML = html; elD.style.color = col; }
+}
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // COSTS
