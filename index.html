@@ -177,7 +177,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .fchip.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
 
 /* ── WTS ───────────────────────────────────────────── */
-.wts-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.6;color:var(--text-primary);min-height:100px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.wts-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;font-family:monospace;font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text-primary);word-break:break-word;min-height:100px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .wts-b{font-weight:700;color:var(--text-primary)}
 
 /* ── GMAIL ─────────────────────────────────────────── */
@@ -857,7 +857,7 @@ function renderPreorders() {
     const badgeHex    = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
     const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
-    return `<div class="${statusClass}" style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-sizing:border-box" onclick="togglePODetail('${did}')">
+    return `<div class="tx-card ${statusClass}" style="border-left:3px solid ${borderColor}" onclick="togglePODetail('${did}')">
       <div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
         <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.2);margin-right:16px">${p.statut||'En recherche'}</span>
         <span style="font-size:18px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;padding-right:4px">${p.event||'—'}</span>
@@ -1995,48 +1995,18 @@ function renderWTS(){
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
     });
-  const el = document.getElementById('wtsPreview');
-  if(!stock.length){el.innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
-
-  // Raw text for clipboard (Discord)
+  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){lines.push('');lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null;}
     const ds=fmtDate(t.date);
     if(ds!==lastDt){lines.push('');lines.push(`**${ds}**`);lastDt=ds;}
     const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
-    lines.push(`● ${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' — '+price+'€/place':''}`);
+    lines.push(`${t.qty}x ${t.cat}${t.place?' ('+t.place+')':''}${price?' - '+price+'€ each':''}`);
   });
-
-  // Visual HTML
-  const totalPlaces=stock.reduce((s,t)=>s+(t.qty||1),0);
-  const byEvent={};
-  stock.forEach(t=>{const ev=t.event||'—';if(!byEvent[ev])byEvent[ev]={};const d=t.date||'';if(!byEvent[ev][d])byEvent[ev][d]=[];byEvent[ev][d].push(t);});
-  const evPalette=['#00b4ff','#00ff88','#ff9f43','#a29bfe','#fd79a8'];
-  let evIdx=0;
-  const evHTML=Object.entries(byEvent).map(([ev,byDate])=>{
-    const col=evPalette[evIdx++%evPalette.length];
-    const datesHTML=Object.entries(byDate).map(([date,tickets])=>{
-      const ticketsHTML=tickets.map(t=>{
-        const price=(t.wanted||t.sell)?Math.round((t.wanted||t.sell)/t.qty):null;
-        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <span style="color:${col};font-size:10px;flex-shrink:0">●</span>
-          <span style="font-size:13px;color:var(--text-primary);flex:1">${t.qty}x <strong>${t.cat||'—'}</strong>${t.place?` <span style="color:var(--text-secondary);font-size:12px">(${t.place})</span>`:''}</span>
-          ${price?`<span style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap">${price}€<span style="font-size:11px;font-weight:400;color:var(--text-secondary)">/place</span></span>`:`<span style="font-size:12px;color:var(--text-secondary);font-style:italic">Prix sur demande</span>`}
-        </div>`;
-      }).join('');
-      return `<div style="padding:8px 0">${date?`<div style="font-size:11px;color:${col};font-weight:600;letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase">${fmtDate(date)}</div>`:''}${ticketsHTML}</div>`;
-    }).join('');
-    return `<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${col};border-radius:12px;margin-bottom:8px;overflow:hidden">
-      <div style="padding:10px 14px;background:#131f35;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:700;color:var(--text-primary)">${ev}</span></div>
-      <div style="padding:4px 14px 8px">${datesHTML}</div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid var(--border)">
-    <span style="font-size:13px;color:var(--text-secondary)">${stock.length} ligne${stock.length>1?'s':''} · <strong style="color:var(--text-primary)">${totalPlaces} place${totalPlaces>1?'s':''}</strong></span>
-  </div>${evHTML}`;
-  el.dataset.raw=lines.join('\n');
+  const raw=lines.join('\n');
+  document.getElementById('wtsPreview').innerHTML=lines.map(l=>l.replace(/\*\*(.+?)\*\*/g,'<span class="wts-b">$1</span>')).join('\n');
+  document.getElementById('wtsPreview').dataset.raw=raw;
 }
 
 function copyWTS(){
