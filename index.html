@@ -1763,6 +1763,7 @@ function renderDashMetrics() {
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
       <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} en attente · ${fmtFull(reservedAmt)} réservé</div>`:''}</div>
+      ${(()=>{const roiG=tBuy>0?Math.round(((tSell-tBuy)/tBuy)*100):null;const rc=roiG!==null?(roiG>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI global</div><div class="metric-value" style="color:${rc}">${roiG!==null?(roiG>=0?'+':'')+roiG+'%':'—'}</div></div>`;})()}
       <div class="metric-card hover-card" style="border-top:2px solid #00b4ff;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
     </div>
   `;
@@ -2027,7 +2028,7 @@ function renderJournalList() {
       <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="toggleDetail('${did}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
-          <span style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}</span>
+          <span style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}${margin!==null?`<span style="font-size:11px;color:${margin>=0?'#00ff88':'#ff6b6b'};margin-left:4px">${margin>=0?'+':''}${margin}%</span>`:''}</span>
         </div>
         <div style="font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
@@ -2045,7 +2046,7 @@ function renderJournalList() {
         <span class="tx-date">${fmtDate(t.date)}</span>
         <span class="tx-info">${t.qty}x${t.cat?' · '+t.cat:''}</span>
         <span class="tx-buyer">${t.buyer||''}</span>
-        <span class="tx-profit" style="color:${pc}">${fmt(profit)}</span>
+        <span class="tx-profit" style="flex-direction:column;align-items:flex-end;color:${pc}">${fmt(profit)}${margin!==null?`<span style="font-size:11px;color:${margin>=0?'#00ff88':'#ff6b6b'};font-weight:500">${margin>=0?'+':''}${margin}%</span>`:''}</span>
         <div class="tx-badges">
           ${t.pay==='Payé'?`<span class="badge b-paye" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Payé</span>`:''}
           ${t.pay==='En attente'?`<span class="badge b-attente" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">En attente</span>`:''}
