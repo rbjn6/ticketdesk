@@ -207,7 +207,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 /* ── LOGIN ─────────────────────────────────────────── */
 .login-screen{position:fixed;inset:0;background:var(--bg-main);display:flex;align-items:center;justify-content:center;z-index:500}
-.login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 60px rgba(0,180,255,0.08)}
+@keyframes loginFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 60px rgba(0,180,255,0.08);animation:loginFadeIn 0.4s ease forwards}
 .login-logo{font-size:32px;font-weight:800;letter-spacing:6px;margin-bottom:6px}
 .login-logo-t{color:var(--accent-blue)}.login-logo-d{color:var(--text-primary)}
 .login-tagline{font-size:12px;color:var(--text-secondary);margin-bottom:28px}
@@ -250,7 +251,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .alert-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-bottom:1px solid rgba(255,107,107,.1);font-size:13px;line-height:1.4;transition:background .1s}
 .alert-item:last-child{border-bottom:none}
 .alert-item:hover{background:rgba(255,107,107,.08)}
-.nav-badge{display:none;align-items:center;justify-content:center;background:var(--accent-red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle}
+@keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,107,107,0.4)}50%{transform:scale(1.1);box-shadow:0 0 0 4px rgba(255,107,107,0)}}
+.nav-badge{display:none;align-items:center;justify-content:center;background:var(--accent-red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle;animation:badgePulse 2s infinite}
 .share-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
 .share-item:last-child{border-bottom:none}
 .share-item:hover{background:var(--bg-card-hover);border-color:var(--accent-blue)}
@@ -1614,6 +1616,7 @@ function renderDashMetrics() {
     ? stockBase
     : stockBase.filter(t => { const bd = t.buyDate || t.purchaseDate; return !to || !bd || bd <= to; });
   const sQty = stockInPeriod.reduce((s,t) => s + (t.qty||0), 0);
+  const totalWanted = stockInPeriod.filter(t => t.wanted > 0).reduce((s,t) => s + (t.wanted||0), 0);
 
   const paidC = costs
     .filter(c => c.status === 'Payé' && (isAll ? true : filterByPeriod(c.date, from, to)))
@@ -1652,6 +1655,7 @@ function renderDashMetrics() {
       <div class="metric-card hover-card ${_sc(netP)}" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}">${_fmt(netP)}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid #00b4ff;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
     </div>
   `;
 
@@ -1688,6 +1692,19 @@ function renderDashMetrics() {
     <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,255,136,.75);margin-right:6px"></span>Vendus — ${soldInPeriod.length}</div>
     <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,107,107,.75);margin-right:6px"></span>En stock — ${stockInPeriod.length} (${sQty} places)</div>
   `;
+}
+
+function toggleFullscreen() {
+  const sidebar = document.querySelector('.sidebar');
+  const main = document.querySelector('.main-content');
+  const isFullscreen = sidebar.style.display === 'none';
+  if (isFullscreen) {
+    sidebar.style.display = '';
+    if (main) main.style.marginLeft = '';
+  } else {
+    sidebar.style.display = 'none';
+    if (main) main.style.marginLeft = '0';
+  }
 }
 
 // JOURNAL
@@ -1745,6 +1762,7 @@ function renderFilters() {
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-sm" onclick="toggleFullscreen()" title="Plein écran" style="padding:6px 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
         <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
       </div>
     </div>
