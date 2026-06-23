@@ -851,7 +851,7 @@ function renderPreorders() {
   const GRID = '100px 150px 95px 110px 1fr 100px 100px 85px 85px';
   const CS = 'padding:0 6px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
   const header = `<div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
-    <span style="${CS}">Statut</span><span style="${CS}">Événement</span><span style="${CS}">Date</span><span style="${CS}">Catégorie</span><span></span><span style="${CS}">Lieu</span><span style="${CS}">Acheteur</span><span style="${CS};text-align:right">Budget</span><span style="${CS};text-align:right">Payé</span>
+    <span style="${CS};padding-right:8px">Statut</span><span style="${CS}">Événement</span><span style="${CS};padding-right:8px">Date</span><span style="${CS}">Catégorie</span><span></span><span style="${CS}">Lieu</span><span style="${CS}">Acheteur</span><span style="${CS};text-align:right">Budget</span><span style="${CS};text-align:right">Payé</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
@@ -860,9 +860,9 @@ function renderPreorders() {
     const did = 'pod-'+p.id;
     return `<div class="tx-card ${statusClass}" style="border-left:3px solid ${borderColor}" onclick="togglePODetail('${did}')">
       <div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="${CS};display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};box-shadow:0 2px 8px rgba(0,0,0,0.2)">${p.statut||'En recherche'}</span>
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="${CS};display:inline-flex;align-items:center;padding:4px 12px 4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};box-shadow:0 2px 8px rgba(0,0,0,0.2);padding-right:8px">${p.statut||'En recherche'}</span>
         <span style="${CS};font-size:18px;font-weight:600;color:var(--text-primary);display:flex;align-items:center">${p.event||'—'}</span>
-        <span style="${CS};font-size:16px;color:#00b4ff;display:flex;align-items:center">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="${CS};padding-right:8px;font-size:16px;color:#00b4ff;display:flex;align-items:center">${p.date?fmtDate(p.date):'—'}</span>
         <span style="${CS};font-size:16px;color:var(--text-primary);display:flex;align-items:center">${p.cat||'—'}</span>
         <span></span>
         <span style="${CS};font-size:16px;color:var(--text-secondary);display:flex;align-items:center">${p.lieu||'—'}</span>
