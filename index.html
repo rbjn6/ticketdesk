@@ -2453,7 +2453,10 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 function checkAuth() {
   const loginScreen = document.getElementById('loginScreen');
   if (!loginScreen) return;
-  // Toujours afficher l'écran de login — sauf si session active (flag sessionStorage)
+
+  const lgw = document.getElementById('loginGoogleWarning');
+  if (lgw) lgw.style.display = gmailToken ? 'none' : 'block';
+
   if (sessionStorage.getItem('td_unlocked')) {
     loginScreen.style.display = 'none';
     if (gmailToken) {
@@ -2466,8 +2469,6 @@ function checkAuth() {
     }
   } else {
     loginScreen.style.display = 'flex';
-    const lgw = document.getElementById('loginGoogleWarning');
-    if (lgw) lgw.style.display = gmailToken ? 'none' : 'block';
   }
 }
 
