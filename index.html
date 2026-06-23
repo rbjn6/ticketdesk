@@ -812,7 +812,7 @@ function savePreorders() {
   localStorage.setItem(PREORDER_KEY, JSON.stringify(preorders));
   driveSyncDebounced();
 }
-function togglePODetail(did){const el=document.getElementById(did);if(el)el.classList.toggle('open');}
+function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function cyclePOStatus(id){
   const p=preorders.find(x=>x.id===id);if(!p)return;
   const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
@@ -841,60 +841,40 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const COLS = '85px minmax(0,200px) 100px 1fr 110px 100px 90px 90px';
-  const hc = 'display:flex;align-items:center';
-  const header = `<div style="display:grid;grid-template-columns:${COLS};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px">
-    <span style="${hc}">Statut</span><span style="${hc}">Événement</span><span style="${hc}">Date</span><span style="${hc}">Catégorie</span><span style="${hc};padding-left:20px">Lieu</span><span style="${hc}">Acheteur</span><span style="${hc};justify-content:flex-end;padding-right:14px">Budget</span><span style="${hc};justify-content:flex-end;padding-right:14px">Payé</span>
+  const GRID = '85px minmax(0,200px) 100px 1fr 110px 100px 90px 90px';
+  const header = `<div style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
+    <span>Statut</span><span>Événement</span><span>Date</span><span>Catégorie</span><span>Lieu</span><span>Acheteur</span><span style="text-align:right">Budget</span><span style="text-align:right">Payé</span>
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
-    const badgeBg     = p.statut==='Trouvé' ? 'rgba(0,255,136,.15)' : 'rgba(0,180,255,.15)';
-    const badgeColor  = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
+    const badgeHex    = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
     const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
-    const colL = [
-      {l:'Lieu',       v: p.lieu     || '—'},
-      {l:'Catégorie',  v: p.cat      || '—'},
-      {l:'Quantité',   v: (p.qty||1)+'x'},
-      {l:'Notes',      v: p.notes    || '—'},
-    ];
-    const colR = [
-      {l:'Date',       v: p.date ? fmtDate(p.date) : '—'},
-      {l:'Budget max', v: p.budget ? fmtFull(p.budget) : '—'},
-      {l:'Acheteur',   v: p.buyer    || '—'},
-      {l:'Paiement',   v: p.pay      || 'Non payé'},
-    ];
-    if (p.platform) colR.push({l:'Plateforme', v: p.platform});
-    const maxRows = Math.max(colL.length, colR.length);
-    let rows = '';
-    for (let i=0; i<maxRows; i++) {
-      const l=colL[i]||null, r=colR[i]||null;
-      rows += `<div style="display:contents">
-        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div><div class="tx-drow-val">${l.v}</div>`:''}</div>
-        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div><div class="tx-drow-val">${r.v}</div>`:''}</div>
-      </div>`;
-    }
-    return `<div class="tx-card ${statusClass}">
-      <div class="tx-summary" onclick="togglePODetail('${did}')">
-        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${badgeBg};color:${badgeColor};cursor:pointer;white-space:nowrap;overflow:hidden;box-sizing:border-box">${p.statut||'En recherche'}</span>
-        <span class="tx-event">${p.event||'—'}</span>
-        <span class="tx-date" style="overflow:hidden;box-sizing:border-box">${p.date?fmtDate(p.date):'—'}</span>
-        <span class="tx-info">${p.cat||'—'}</span>
-        <span class="tx-buyer">${p.lieu||'—'}</span>
-        <span style="font-size:16px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center">${p.buyer||'—'}</span>
-        <span style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;box-sizing:border-box">${p.budget?fmtFull(p.budget):'—'}</span>
-        <div style="display:flex;align-items:center;justify-content:flex-end;padding-right:14px;white-space:nowrap">
+    return `<div class="${statusClass}" style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:12px;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;box-sizing:border-box" onclick="togglePODetail('${did}')">
+      <div style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;padding:0 14px;min-height:60px;box-sizing:border-box">
+        <span onclick="event.stopPropagation();cyclePOStatus(${p.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${badgeHex}22;color:${badgeHex};white-space:nowrap;overflow:hidden">${p.statut||'En recherche'}</span>
+        <span style="font-size:18px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.event||'—'}</span>
+        <span style="font-size:16px;color:#00b4ff;white-space:nowrap;overflow:hidden;display:flex;align-items:center">${p.date?fmtDate(p.date):'—'}</span>
+        <span style="font-size:16px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.cat||'—'}</span>
+        <span style="font-size:16px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.lieu||'—'}</span>
+        <span style="font-size:16px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center">${p.buyer||'—'}</span>
+        <span style="font-size:18px;font-weight:600;color:var(--text-primary);white-space:nowrap;display:flex;align-items:center;justify-content:flex-end">${p.budget?fmtFull(p.budget):'—'}</span>
+        <div style="display:flex;align-items:center;justify-content:flex-end" onclick="event.stopPropagation();togglePOPay(${p.id})">
           ${p.pay==='Payé'
-            ?`<span class="badge b-paye" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Payé</span>`
-            :`<span class="badge b-nonlivre" style="cursor:pointer;font-size:11px;padding:4px 10px" onclick="event.stopPropagation();togglePOPay(${p.id})">Non payé</span>`}
+            ?`<span class="badge b-paye" style="cursor:pointer">Payé</span>`
+            :`<span class="badge b-nonlivre" style="cursor:pointer">Non payé</span>`}
         </div>
       </div>
-      <div class="tx-detail" id="${did}">
-        <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
-        <div class="tx-detail-actions">
-          <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="openPreorderModal(${p.id})">Modifier</button>
-          <button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="transferPreorderToJournal(${p.id})">Transférer</button>
-          <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'" onclick="deletePreorder(${p.id})">Supprimer</button>
+      <div id="${did}" style="display:none;border-top:1px solid var(--border);padding:20px 24px;background:#131f35">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px">
+          ${p.notes?`<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Notes</div><div style="font-size:14px;color:var(--text-primary)">${p.notes}</div></div>`:''}
+          ${p.platform?`<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Plateforme</div><div style="font-size:14px;color:var(--text-primary)">${p.platform}</div></div>`:''}
+          ${p.qty?`<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Quantité</div><div style="font-size:14px;color:var(--text-primary)">${p.qty}x</div></div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;padding-top:14px;border-top:1px solid var(--border)">
+          <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'">Modifier</button>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'">Transférer</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'">Supprimer</button>
         </div>
       </div>
     </div>`;
@@ -2548,7 +2528,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <input class="login-field" type="password" id="loginPin" name="pin" placeholder="••••" maxlength="6" style="letter-spacing:.4em;font-size:18px">
     <button class="login-btn" onclick="_doLogin()">Accéder</button>
     <div class="login-divider"><div class="login-divider-line"></div><div class="login-divider-text">ou</div><div class="login-divider-line"></div></div>
-    <div id="loginGoogleWarning" style="display:none;font-size:12px;color:#ff9f43;margin-top:12px;padding:10px 12px;background:rgba(255,159,67,0.08);border:1px solid rgba(255,159,67,0.3);border-radius:8px;line-height:1.5">
+    <div id="loginGoogleWarning" style="display:block;font-size:12px;color:#ff9f43;margin-top:12px;padding:10px 12px;background:rgba(255,159,67,0.08);border:1px solid rgba(255,159,67,0.3);border-radius:8px;line-height:1.5">
       Pour ne pas perdre tes données, connecte ton compte Google avant de te connecter.
     </div>
     <button class="login-google-btn" onclick="_googleLogin()" style="margin-top:10px">
