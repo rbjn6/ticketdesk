@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TicketDesk">
@@ -12,6 +12,8 @@
 <title>TicketDesk</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+html,body{overscroll-behavior:none;overflow-x:hidden;touch-action:pan-y;-webkit-text-size-adjust:100%}
+*{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :root {
   --bg-nav:        #0d1424;
   --bg-main:       #111827;
@@ -1691,6 +1693,11 @@ function renderDashMetrics() {
   const sQty = stockInPeriod.reduce((s,t) => s + (t.qty||0), 0);
   const totalWanted = stockInPeriod.filter(t => t.wanted > 0).reduce((s,t) => s + (t.wanted||0), 0);
 
+  // À RECEVOIR
+  const pendingPay = soldInPeriod.filter(t => t.pay === 'En attente').reduce((s,t) => s + (t.sell||0), 0);
+  const reservedAmt = stockInPeriod.filter(t => t.statut === 'Réservé' && (t.reservedPrice||0) > 0).reduce((s,t) => s + (t.reservedPrice||0), 0);
+  const totalARecevoir = pendingPay + reservedAmt;
+
   const paidC = costs
     .filter(c => c.status === 'Payé' && (isAll ? true : filterByPeriod(c.date, from, to)))
     .reduce((s,c) => s + c.amount, 0);
@@ -1728,6 +1735,7 @@ function renderDashMetrics() {
       <div class="metric-card hover-card ${_sc(netP)}" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}">${_fmt(netP)}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} en attente · ${fmtFull(reservedAmt)} réservé</div>`:''}</div>
       <div class="metric-card hover-card" style="border-top:2px solid #00b4ff;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
     </div>
   `;
