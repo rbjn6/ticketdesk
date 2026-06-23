@@ -848,7 +848,7 @@ function renderPreorders() {
   });
   if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
-  const GRID = '12% 15% 11% 11% 1fr 10% 11% 10% 10%';
+  const GRID = '100px 150px 95px 110px 1fr 100px 100px 85px 85px';
   const CS = 'padding:0 6px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
   const header = `<div style="display:grid;grid-template-columns:${GRID};gap:0;align-items:center;padding:8px 14px;background:var(--bg-nav);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:8px;box-sizing:border-box">
     <span style="${CS}">Statut</span><span style="${CS}">Événement</span><span style="${CS}">Date</span><span style="${CS}">Catégorie</span><span></span><span style="${CS}">Lieu</span><span style="${CS}">Acheteur</span><span style="${CS};text-align:right">Budget</span><span style="${CS};text-align:right">Payé</span>
