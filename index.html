@@ -1789,7 +1789,7 @@ function renderDashMetrics() {
   const soldInPeriod = isAll
     ? base.filter(wasSold)
     : base.filter(t => wasSold(t) && filterByPeriod(t.saleDate, from, to));
-  const soldPaid = soldInPeriod.filter(t => t.pay === 'Payé');
+  const soldPaid = base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && t.pay === 'Payé');
   const tSell  = soldPaid.reduce((s,t) => s + (t.sell||0), 0);
   let grossP = soldPaid.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
   const soldQty = soldPaid.reduce((s,t) => s + (t.qty||0), 0);
@@ -1818,7 +1818,9 @@ function renderDashMetrics() {
   const stockBuyInPeriod = isAll
     ? unsoldBase
     : unsoldBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
-  let profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0) - paidC;
+  const _stockBuy = stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+  let profitWithStock = tSell - tBuy - paidC;
+  console.log('[DashMetrics] grossP:', grossP, '| tSell:', tSell, '| tBuy:', tBuy, '| buy invendus:', _stockBuy, '| paidC:', paidC, '| profitWithStock:', profitWithStock);
   grossP = grossP || 0;
   netP = netP || 0;
   profitWithStock = profitWithStock || 0;
@@ -2069,9 +2071,9 @@ function renderJournalList() {
   document.getElementById('journalList').style.cssText='margin-top:6px';
   const isMobile = window.innerWidth <= 768;
   document.getElementById('journalList').innerHTML=list.map(t=>{
-    const profit = Math.round((((t.sell||0) - (t.buy||0)) + Number.EPSILON) * 100) / 100 || 0;
-    const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
-    const isPos  = Math.round(profit) >= 0;
+    const profit = ((t.sell||0) - (t.buy||0)) || 0;
+    const margin = t.buy && t.sell ? (t.sell - t.buy) / t.buy * 100 : null;
+    const isPos  = profit >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
 
@@ -2091,7 +2093,7 @@ function renderJournalList() {
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
-      {l:'Marge',       v: margin !== null ? (Math.round(margin) >= 0?'+':'')+margin+'%' : '—', c: margin !== null ? (Math.round(margin) >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
+      {l:'Marge',       v: margin !== null ? (margin >= 0?'+':'')+margin.toFixed(1)+'%' : '—', c: margin !== null ? (margin >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
       {l:'Prix voulu',  html: `<div style="display:flex;align-items:center;gap:8px"><input type="number" value="${t.wanted||0}" min="0" step="1" onchange="updateWanted(${t.id},this.value)" onclick="event.stopPropagation()" style="width:90px;padding:4px 8px;font-size:13px;border-radius:6px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;text-align:right"><span style="font-size:12px;color:#8b9ab0">€</span></div>`},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
