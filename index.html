@@ -76,9 +76,9 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .bottomnav{display:none}
 
 /* ── MOBILE DRAWER ─────────────────────────────────── */
-.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:290}
-.drawer-overlay.open{display:block}
-.drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+.drawer-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:290;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
 .drawer-head{height:20px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
 #journalFab{display:none;position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
@@ -464,24 +464,42 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     </div>
 
     <div class="page" id="page-settings">
-      <p class="stitle">Sécurité</p>
-      <div class="card" style="padding:16px">
-        <div id="settings-creds-status" style="font-size:14px;color:var(--text2);margin-bottom:16px"></div>
+      <!-- Sécurité -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Sécurité</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,180,255,0.3),transparent)"></div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-left:3px solid #00b4ff;margin-bottom:20px">
+        <div id="settings-creds-status" style="font-size:13px;color:var(--text2);margin-bottom:16px;padding:10px 12px;background:rgba(0,180,255,0.06);border-radius:8px;border:1px solid rgba(0,180,255,0.12)"></div>
         <div class="fgroup"><label class="flabel">Identifiant</label><input type="text" id="s-user" placeholder="Ton identifiant" autocomplete="off" autocapitalize="off"></div>
         <div class="fgroup"><label class="flabel">Code PIN</label><input type="password" id="s-pin" placeholder="••••" maxlength="6"></div>
         <div class="fgroup"><label class="flabel">Confirmer le PIN</label><input type="password" id="s-pin2" placeholder="••••" maxlength="6"></div>
-        <div id="settings-error" style="font-size:13px;color:var(--red);margin-bottom:8px;min-height:18px"></div>
-        <button class="btn btn-primary" onclick="_saveSettings()" style="width:100%;justify-content:center">Enregistrer</button>
+        <div id="settings-error" style="font-size:13px;color:var(--red);margin-bottom:10px;min-height:18px"></div>
+        <button onclick="_saveSettings()" style="width:100%;padding:11px;background:#00b4ff;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='#007aa3'" onmouseleave="this.style.background='#00b4ff'">Enregistrer</button>
       </div>
-      <p class="stitle">Compte Google</p>
-      <div class="card" style="padding:16px">
-        <div style="font-size:14px;color:var(--text2);margin-bottom:12px" id="settings-gmail-info"></div>
-        <button class="btn" onclick="gmailConnect()" style="width:100%;justify-content:center">Reconnecter Gmail + Drive</button>
-        <button class="btn btn-danger" onclick="_logout()" style="width:100%;justify-content:center;margin-top:8px;color:var(--red);border-color:rgba(255,107,107,.3)">Se déconnecter</button>
+      <!-- Compte Google -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2H3v16h5l3 3 3-3h7V2z"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Compte Google</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,255,136,0.3),transparent)"></div>
       </div>
-      <p class="stitle">Informations de contact</p>
-      <div class="card" style="padding:16px">
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Ces informations apparaissent sur la page publique partagée avec les clients.</div>
+      <div class="card" style="padding:18px 20px;border-left:3px solid #00ff88;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span id="settings-gmail-dot" style="width:7px;height:7px;border-radius:50%;background:#484f58;flex-shrink:0"></span>
+          <span id="settings-gmail-info" style="font-size:13px;color:var(--text2)"></span>
+        </div>
+        <button onclick="gmailConnect()" style="width:100%;padding:10px;background:transparent;color:#00ff88;border:1px solid rgba(0,255,136,0.3);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s;margin-bottom:8px" onmouseenter="this.style.background='rgba(0,255,136,0.07)';this.style.borderColor='rgba(0,255,136,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(0,255,136,0.3)'">Reconnecter Gmail + Drive</button>
+        <button onclick="_logout()" style="width:100%;padding:10px;background:transparent;color:#ff6b6b;border:1px solid rgba(255,107,107,0.25);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s" onmouseenter="this.style.background='rgba(255,107,107,0.07)';this.style.borderColor='rgba(255,107,107,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(255,107,107,0.25)'">Se déconnecter</button>
+      </div>
+      <!-- Contact -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Informations de contact</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(139,154,176,0.3),transparent)"></div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-left:3px solid rgba(139,154,176,0.4);margin-bottom:20px">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5">Ces informations apparaissent sur la page publique partagée avec les clients.</div>
         <div class="fgroup"><label class="flabel">Discord</label><input type="text" id="s-discord" placeholder="@username" oninput="saveContact()"></div>
         <div class="fgroup"><label class="flabel">Instagram</label><input type="text" id="s-instagram" placeholder="@handle" oninput="saveContact()"></div>
         <div class="fgroup"><label class="flabel">Téléphone</label><input type="text" id="s-phone" placeholder="+33 6 00 00 00 00" oninput="saveContact()"></div>
@@ -852,10 +870,12 @@ function unlockApp() {
       autoArchive();
       if (loaded) { renderDashboard(); renderJournal(); renderWTS(); renderCosts(); }
       else { driveSync(); renderDashboard(); }
+      if('vibrate' in navigator && computeAlerts().length > 0) navigator.vibrate([50,30,50]);
     });
   } else {
     autoArchive();
     renderDashboard();
+    if('vibrate' in navigator && computeAlerts().length > 0) navigator.vibrate([50,30,50]);
   }
 }
 
@@ -1795,8 +1815,8 @@ function renderDashMetrics() {
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
-        x:{ticks:{color:'#8b9ab0',font:{size:10},maxRotation:30,autoSkip:false},grid:{display:false}},
-        y:{ticks:{color:'#8b9ab0',font:{size:10},callback:v=>fmtFull(v)},grid:{color:'rgba(45,61,85,0.6)'}}
+        x:{ticks:{color:'#484f58',font:{size:10},maxRotation:30,autoSkip:false},grid:{display:false},border:{display:false}},
+        y:{ticks:{color:'#484f58',font:{size:10},callback:v=>fmtFull(v)},grid:{color:'rgba(45,61,85,0.3)'},border:{display:false}}
       }}
   });
 
@@ -2587,10 +2607,14 @@ function openDrawer() {
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  const mc = document.querySelector('.main-content');
+  if(mc) { mc.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)'; mc.style.transform='scale(0.98)'; }
 }
 function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
+  const mc = document.querySelector('.main-content');
+  if(mc) { mc.style.transform='scale(1)'; }
   document.body.style.overflow = '';
 }
 let touchStartX = 0, touchStartY = 0;
@@ -2664,7 +2688,9 @@ function renderSettings(){
   const el = document.getElementById('settings-creds-status');
   if(el) el.textContent = creds ? 'Identifiant actuel : ' + creds.user : 'Aucun identifiant défini — crée-en un ci-dessous.';
   const gi = document.getElementById('settings-gmail-info');
+  const gd = document.getElementById('settings-gmail-dot');
   if(gi) gi.textContent = gmailToken ? 'Connecté : ' + (localStorage.getItem('ticketdesk_gmail_email')||'') : 'Non connecté';
+  if(gd) gd.style.background = gmailToken ? '#00ff88' : '#484f58';
   if(creds) { document.getElementById('s-user').value = creds.user; }
   const sd = document.getElementById('s-discord'); if(sd) sd.value = contact.discord || '';
   const si = document.getElementById('s-instagram'); if(si) si.value = contact.instagram || '';
