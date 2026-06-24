@@ -2105,7 +2105,7 @@ function renderJournalList() {
           <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
-    </div>${isMobile ? '<div style="height:10px"></div>' : ''}`;
+    </div>${isMobile ? '<div style="height:12px"></div>' : ''}`;
   }).join('');
   if(window.innerWidth <= 768) initSwipeCards();
 }
