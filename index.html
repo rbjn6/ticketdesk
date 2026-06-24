@@ -121,7 +121,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .wts-box{font-size:12px;padding:12px}
   .alert-item{white-space:normal;overflow:visible;text-overflow:unset;font-size:13px!important;padding:10px 16px!important}
   #journalFab.fab-active{display:flex!important}
-  .tx-card{margin-bottom:14px!important}
+  .tx-card{margin-bottom:6px!important}
   .tx-card-mobile{padding:14px 16px!important;min-height:unset!important;height:140px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
   .tx-card-mobile > div:nth-child(2){font-size:18px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px}
   .tx-card-mobile > div:nth-child(3) > div:first-child{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2105,7 +2105,7 @@ function renderJournalList() {
           <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
-    </div>${isMobile ? '<div style="height:9px"></div>' : ''}`;
+    </div>${isMobile ? '<div style="height:4px"></div>' : ''}`;
   }).join('');
   if(window.innerWidth <= 768) initSwipeCards();
 }
