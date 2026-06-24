@@ -815,7 +815,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     <div class="modal-handle"></div>
     <div class="modal-title">Mot de passe maître</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Nécessaire pour chiffrer ou déchiffrer les identifiants de compte.</div>
-    <div class="fgroup"><label class="flabel">Mot de passe maître</label><input type="password" id="masterKeyInput" placeholder="••••••••" autocomplete="off"></div>
+    <div class="fgroup"><label class="flabel">Mot de passe maître</label><input type="password" id="masterKeyInput" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')_submitMasterKey()"></div>
+    <div class="fgroup" id="masterKeyConfirmWrap" style="display:none"><label class="flabel">Confirmer le mot de passe</label><input type="password" id="masterKeyConfirm" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')_submitMasterKey()"></div>
+    <div id="masterKeyError" style="font-size:13px;color:var(--red);min-height:18px;margin-bottom:10px"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('masterKeyModal')">Annuler</button>
       <button class="btn btn-primary" onclick="_submitMasterKey()">Valider</button>
@@ -845,6 +847,7 @@ localStorage.removeItem(TX_KEY);
 localStorage.removeItem(PREORDER_KEY);
 localStorage.removeItem('ticketdesk_drive_fid');
 let masterKey       = null;
+let masterKeyHash   = null;
 let csvParsed       = [];
 let _masterKeyCallback = null;
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
@@ -910,6 +913,7 @@ function doLogin() {
 function unlockApp() {
   sessionStorage.setItem('td_unlocked', '1');
   document.getElementById('loginScreen').style.display = 'none';
+  getMasterKey();
   initNotifPermission();
   if (gmailToken) {
     driveLoad().then(loaded => {
@@ -2607,7 +2611,7 @@ async function driveSync(){
   if(!gmailToken||driveSyncing)return;
   driveSyncing=true;updateSyncIndicator('syncing');
   try{
-    const payload=JSON.stringify({transactions,costs,preorders,updatedAt:new Date().toISOString()});
+    const payload=JSON.stringify({transactions,costs,preorders,masterKeyHash,updatedAt:new Date().toISOString()});
     if(driveFileId){
       await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gmailToken,'Content-Type':'application/json'},body:payload});
     }else{
@@ -2630,6 +2634,7 @@ async function driveLoad(){
     if(c.transactions){transactions=c.transactions;localStorage.setItem(TX_KEY,JSON.stringify(transactions));}
     if(c.costs){costs=c.costs;localStorage.setItem(COST_KEY,JSON.stringify(costs));}
     if(c.preorders){preorders=c.preorders;localStorage.setItem(PREORDER_KEY,JSON.stringify(preorders));}
+    masterKeyHash = c.masterKeyHash || null;
     localStorage.setItem('ticketdesk_last_sync',c.updatedAt||new Date().toISOString());
     return true;
   }catch(e){return false;}
@@ -2780,6 +2785,7 @@ function toggleCostStatus(id){
 }
 
 // CRYPTO
+function hashKey(pwd) { return CryptoJS.SHA256(pwd).toString(); }
 function getMasterKey() {
   const mk = sessionStorage.getItem('td_mk');
   if (mk) masterKey = mk;
@@ -2798,15 +2804,37 @@ function decryptField(val) {
 function openMasterKeyModal(callback) {
   _masterKeyCallback = callback || null;
   document.getElementById('masterKeyInput').value = '';
+  document.getElementById('masterKeyConfirm').value = '';
+  document.getElementById('masterKeyError').textContent = '';
+  const isFirst = !masterKeyHash;
+  document.getElementById('masterKeyConfirmWrap').style.display = isFirst ? 'block' : 'none';
   document.getElementById('masterKeyModal').classList.add('open');
 }
 function _submitMasterKey() {
   const val = document.getElementById('masterKeyInput').value.trim();
+  const err = document.getElementById('masterKeyError');
+  err.textContent = '';
   if (!val) return;
-  masterKey = val;
-  sessionStorage.setItem('td_mk', val);
-  closeModal('masterKeyModal');
-  if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
+  if (!masterKeyHash) {
+    const conf = document.getElementById('masterKeyConfirm').value.trim();
+    if (val !== conf) { err.textContent = 'Les mots de passe ne correspondent pas'; return; }
+    masterKeyHash = hashKey(val);
+    masterKey = val;
+    sessionStorage.setItem('td_mk', val);
+    closeModal('masterKeyModal');
+    driveSync();
+    if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
+  } else {
+    if (hashKey(val) !== masterKeyHash) {
+      err.textContent = 'Mot de passe incorrect';
+      document.getElementById('masterKeyInput').value = '';
+      return;
+    }
+    masterKey = val;
+    sessionStorage.setItem('td_mk', val);
+    closeModal('masterKeyModal');
+    if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
+  }
 }
 function _toggleReveal(spanId, encVal) {
   getMasterKey();
@@ -2986,11 +3014,11 @@ function loadCSV() {
       let compte = g(hi('Compte')), mdp = g(hi('Mot de passe'));
       if (masterKey) { if (compte) compte = encryptField(compte); if (mdp) mdp = encryptField(mdp); }
       return {
-        id: Date.now() + Math.random() + idx,
+        id:        Date.now() + Math.random() + idx,
         statut:    g(hi('Statut')) || 'En stock',
         event:     g(hi('Événement')),
         date:      _csvDate(g(hi('Date'))),
-        lieu:      g(hi('Lieu')),
+        lieu:      '',
         cat:       g(hi('Catégorie')),
         place:     placeParts.join(', '),
         site:      g(hi("Site d'achat")),
@@ -3002,9 +3030,9 @@ function loadCSV() {
         platform:  g(hi('Plateforme revente')),
         pay:       g(hi('Paiement')),
         livraison: g(hi('Livraison')),
-        buyDate:   _csvDate(g(hi('Date achat'))),
-        saleDate:  g(hi('Date vente')),
-        ordernum:  g(hi("N° commande")),
+        buyDate:   '',
+        saleDate:  '',
+        ordernum:  '',
         wanted:    parseFloat(g(hi('Prix voulu')).replace(',','.')) || 0,
       };
     }).filter(t => t.event);
