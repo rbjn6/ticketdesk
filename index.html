@@ -2031,21 +2031,21 @@ function renderJournalList() {
     const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':t.statut==='Réservé'?'reserve':'stock';
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
-    const _btn = (onclick, bg, ico, label, dark) => `<button onclick="${onclick}" style="width:52px;height:52px;border-radius:50%;background:${bg};border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${ico}<span style="font-size:9px;color:${dark?'#0d1424':'#fff'};font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px">${label}</span></button>`;
-    const _svg = (d, dark) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${dark?'#0d1424':'#fff'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-    const _bVendre  = _btn(`openSellModal(${t.id})`,         'rgba(0,180,255,0.92)',  _svg('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'),                                                            'Vendre');
-    const _bReserve = _btn(`openReserveModal(${t.id})`,      'rgba(255,159,67,0.92)', _svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'),                                                                                         'Rés.');
-    const _bAnnuler = _btn(`annulerReservation(${t.id})`,    'rgba(72,79,88,0.92)',   _svg('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'),                                            'Annuler');
-    const _bArchive = _btn(`archiveTransaction(${t.id})`,    'rgba(72,79,88,0.92)',   _svg('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'),                               'Archiver');
-    const _bUnarc   = _btn(`unarchiveTransaction(${t.id})`,  'rgba(0,255,136,0.92)', _svg('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>', true),                                                                         'Désarc.', true);
-    const _bDel     = _btn(`deleteTransaction(${t.id})`,     'rgba(255,107,107,0.92)',_svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'),                          'Suppr.');
+    const _btn = (onclick, bg, border, ico) => `<button onclick="${onclick}" style="width:54px;height:54px;border-radius:50%;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s" onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'" ontouchstart="this.style.opacity='.75'" ontouchend="this.style.opacity='1'">${ico}</button>`;
+    const _svg = (d, stroke) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    const _bVendre  = _btn(`openSellModal(${t.id})`,          '#0a2a3d', 'rgba(0,180,255,0.35)',  _svg('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                              '#00b4ff'));
+    const _bReserve = _btn(`openReserveModal(${t.id})`,       '#2d1f0a', 'rgba(255,159,67,0.35)', _svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',                                                          '#ff9f43'));
+    const _bAnnuler = _btn(`annulerReservation(${t.id})`,     '#1a1f28', 'rgba(139,154,176,0.35)',_svg('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',             '#8b9ab0'));
+    const _bArchive = _btn(`archiveTransaction(${t.id})`,     '#1a1f28', 'rgba(139,154,176,0.35)',_svg('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>','#8b9ab0'));
+    const _bUnarc   = _btn(`unarchiveTransaction(${t.id})`,   '#0a2d1a', 'rgba(0,255,136,0.35)',  _svg('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>',                                               '#00ff88'));
+    const _bDel     = _btn(`deleteTransaction(${t.id})`,      '#2d0f0f', 'rgba(255,107,107,0.35)',_svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>','#ff6b6b'));
     const swipeBtns = t.statut==='En stock' ? _bVendre+_bReserve+_bDel
       : t.statut==='Réservé' ? _bVendre+_bAnnuler+_bDel
       : t.statut==='Vendu'   ? _bArchive+_bDel
       : _bUnarc+_bDel;
     return `<div class="tx-card is-${cardClass}">
       <div class="swipe-wrapper" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px;height:140px">
-        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 12px;background:transparent;transform:translateX(100%);transition:transform .2s ease;opacity:0">${swipeBtns}</div>
+        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 16px;background:#0d1117;transform:translateX(100%);transition:transform .2s ease;opacity:0">${swipeBtns}</div>
         <div class="tx-card-mobile" data-detail="${did}" style="position:absolute;inset:0;transform:translateX(0);transition:transform .2s ease;border-radius:12px;padding:14px 16px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
