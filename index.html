@@ -119,8 +119,8 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .wts-box{font-size:12px;padding:12px}
   .alert-item{white-space:normal;overflow:visible;text-overflow:unset;font-size:13px!important;padding:10px 16px!important}
   #journalFab.fab-active{display:flex!important}
-  .tx-card-mobile{padding:12px 16px!important;min-height:unset!important;height:110px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
-  .tx-card-mobile > div:nth-child(2){font-size:18px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tx-card-mobile{padding:14px 16px!important;min-height:unset!important;height:130px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+  .tx-card-mobile > div:nth-child(2){font-size:18px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px}
   .tx-card-mobile > div:nth-child(3) > div:first-child{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tx-card-mobile > div:nth-child(4){font-size:14px!important}
   .tx-card-mobile > div:first-child > span:last-child{font-size:17px!important}
@@ -2031,25 +2031,9 @@ function renderJournalList() {
     const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':t.statut==='Réservé'?'reserve':'stock';
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
-    const _bs = 'background:#1e2a3f;width:72px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:none;border-left:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:background .15s;font-size:11px;font-weight:600;letter-spacing:0.3px';
-    const _iSell  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
-    const _iRsrv  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
-    const _iDel   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>';
-    const _iArc   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>';
-    const _iUnarc = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>';
-    const _bSell  = `<button onclick="openSellModal(${t.id})" style="color:#00b4ff;${_bs}" onmouseenter="this.style.background='rgba(0,180,255,0.12)'" onmouseleave="this.style.background='#1e2a3f'">${_iSell}Vendre</button>`;
-    const _bRsrv  = `<button onclick="openReserveModal(${t.id})" style="color:#ff9f43;${_bs}" onmouseenter="this.style.background='rgba(255,159,67,0.12)'" onmouseleave="this.style.background='#1e2a3f'">${_iRsrv}Réserver</button>`;
-    const _bDel   = `<button onclick="deleteTransaction(${t.id})" style="color:#ff6b6b;${_bs}" onmouseenter="this.style.background='rgba(255,107,107,0.12)'" onmouseleave="this.style.background='#1e2a3f'">${_iDel}Suppr.</button>`;
-    const _bArc   = `<button onclick="archiveTransaction(${t.id})" style="color:#8b9ab0;${_bs}" onmouseenter="this.style.background='rgba(139,154,176,0.12)'" onmouseleave="this.style.background='#1e2a3f'">${_iArc}Archiver</button>`;
-    const _bUnarc = `<button onclick="unarchiveTransaction(${t.id})" style="color:#00ff88;${_bs}" onmouseenter="this.style.background='rgba(0,255,136,0.12)'" onmouseleave="this.style.background='#1e2a3f'">${_iUnarc}Désarchiver</button>`;
-    const swipeActions = t.statut==='En stock' ? _bSell+_bRsrv+_bDel
-      : t.statut==='Réservé' ? _bSell+_bDel
-      : t.statut==='Vendu'   ? _bArc+_bDel
-      : _bUnarc+_bDel;
     return `<div class="tx-card is-${cardClass}">
-      <div class="swipe-container" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px">
-        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;transform:translateX(100%)">${swipeActions}</div>
-        <div class="tx-card-mobile" data-detail="${did}" style="padding:14px 16px;min-height:90px;position:relative;transform:translateX(0);will-change:transform">
+      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px;position:relative" onclick="toggleDetail('${did}')">
+        <button onclick="event.stopPropagation();toggleCardMenu(${t.id},this)" style="position:absolute;top:10px;right:10px;background:none;border:none;color:#8b9ab0;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;z-index:10" onmouseenter="this.style.color='#f9fafb';this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.color='#8b9ab0';this.style.background='none'">⋯</button>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <div style="text-align:right">
@@ -2066,7 +2050,6 @@ function renderJournalList() {
           </div>
         </div>
         ${t.buyer?`<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
-      </div>
       </div>
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <span class="badge ${badgeClass}">${badgeLabel}</span>
@@ -2102,69 +2085,36 @@ function renderJournalList() {
       </div>
     </div>`;
   }).join('');
-  if(window.innerWidth <= 768) initSwipeCards();
 }
-
-function closeAllSwipes() {
-  document.querySelectorAll('.swipe-container .tx-card-mobile').forEach(c => {
-    c.style.transition = 'transform 0.2s ease';
-    c.style.transform = 'translateX(0)';
-  });
-  document.querySelectorAll('.swipe-container .swipe-actions').forEach(a => {
-    a.style.transition = 'transform 0.2s ease';
-    a.style.transform = 'translateX(100%)';
-  });
-}
-function initSwipeCards() {
-  document.querySelectorAll('.swipe-container').forEach(container => {
-    const card = container.querySelector('.tx-card-mobile');
-    const actions = container.querySelector('.swipe-actions');
-    if (!card || !actions) return;
-    const actionsWidth = actions.offsetWidth || 180;
-    let startX = 0, currentX = 0, isDragging = false, isOpen = false;
-    card.addEventListener('touchstart', e => {
-      closeAllSwipes();
-      isOpen = false;
-      startX = e.touches[0].clientX;
-      isDragging = true;
-      card.style.transition = 'none';
-      actions.style.transition = 'none';
-    }, {passive:true});
-    card.addEventListener('touchmove', e => {
-      if (!isDragging) return;
-      const deltaX = e.touches[0].clientX - startX;
-      currentX = isOpen ? deltaX - actionsWidth : deltaX;
-      currentX = Math.min(0, Math.max(-actionsWidth, currentX));
-      card.style.transform = `translateX(${currentX}px)`;
-      actions.style.transform = `translateX(${100 + (currentX / actionsWidth * 100)}%)`;
-    }, {passive:true});
-    card.addEventListener('touchend', () => {
-      isDragging = false;
-      card.style.transition = 'transform 0.2s ease';
-      actions.style.transition = 'transform 0.2s ease';
-      if (currentX < -actionsWidth / 2) {
-        card.style.transform = `translateX(-${actionsWidth}px)`;
-        actions.style.transform = 'translateX(0%)';
-        isOpen = true;
-      } else {
-        card.style.transform = 'translateX(0)';
-        actions.style.transform = 'translateX(100%)';
-        isOpen = false;
-      }
-    }, {passive:true});
-    card.addEventListener('click', () => {
-      if (isOpen) {
-        card.style.transition = 'transform 0.2s ease';
-        card.style.transform = 'translateX(0)';
-        actions.style.transition = 'transform 0.2s ease';
-        actions.style.transform = 'translateX(100%)';
-        isOpen = false;
-      } else {
-        const did = card.dataset.detail;
-        if (did) toggleDetail(did);
-      }
-    });
-  });
+function toggleCardMenu(id, btn) {
+  if('vibrate' in navigator) navigator.vibrate(8);
+  const existing = document.getElementById('cardActionMenu');
+  if (existing) { existing.remove(); return; }
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
+  const rect = btn.getBoundingClientRect();
+  const actions = [];
+  if (t.statut === 'En stock') {
+    actions.push({label:'Vendre',       icon:'<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                                                                                                      color:'#00b4ff', fn:`openSellModal(${id})`});
+    actions.push({label:'Réserver',     icon:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',                                                                                                                                    color:'#ff9f43', fn:`openReserveModal(${id})`});
+    actions.push({label:'Archiver',     icon:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',                                                                           color:'#8b9ab0', fn:`archiveTransaction(${id})`});
+  } else if (t.statut === 'Réservé') {
+    actions.push({label:'Vendre',       icon:'<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                                                                                                      color:'#00b4ff', fn:`openSellModal(${id})`});
+    actions.push({label:'Annuler résa', icon:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',                                                                                       color:'#8b9ab0', fn:`annulerReservation(${id})`});
+  } else if (t.statut === 'Vendu') {
+    actions.push({label:'Archiver',     icon:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',                                                                           color:'#8b9ab0', fn:`archiveTransaction(${id})`});
+  } else if (t.statut === 'Archivé') {
+    actions.push({label:'Désarchiver',  icon:'<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>',                                                                                                                           color:'#00ff88', fn:`unarchiveTransaction(${id})`});
+  }
+  actions.push({label:'Modifier',     icon:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',                                                     color:'#f9fafb', fn:`editTransaction(${id})`});
+  actions.push({label:'Supprimer',    icon:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',                                                                    color:'#ff6b6b', fn:`deleteTransaction(${id})`});
+  const menu = document.createElement('div');
+  menu.id = 'cardActionMenu';
+  menu.style.cssText = `position:fixed;top:${rect.bottom+4}px;right:${window.innerWidth-rect.right}px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;padding:6px;z-index:500;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:menuFadeIn .15s ease`;
+  menu.innerHTML = `<style>@keyframes menuFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}</style>`
+    + actions.map((a,i) => `<div onclick="${a.fn};document.getElementById('cardActionMenu')?.remove()" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:${a.color};font-size:14px;font-weight:500;${i<actions.length-1?'border-bottom:1px solid rgba(255,255,255,0.05)':''}" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='none'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${a.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${a.icon}</svg>${a.label}</div>`).join('');
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener('touchstart', () => document.getElementById('cardActionMenu')?.remove(), {once:true, passive:true}), 100);
 }
 
 function setFilter(type,v){
