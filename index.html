@@ -914,7 +914,6 @@ function doLogin() {
 function unlockApp() {
   sessionStorage.setItem('td_unlocked', '1');
   document.getElementById('loginScreen').style.display = 'none';
-  getMasterKey();
   initNotifPermission();
   if (gmailToken) {
     driveLoad().then(loaded => {
@@ -1785,21 +1784,23 @@ function renderDashMetrics() {
   const buyInPeriod = isAll ? base : base.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
   const tBuy = buyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
 
-  // CA + BÉNÉFICE BRUT + PLACES VENDUES — Vendu OU Archivé avec saleDate
+  // CA + BÉNÉFICE BRUT + PLACES VENDUES — Vendu OU Archivé avec saleDate, encaissé uniquement
   const wasSold = t => t.statut === 'Vendu' || (t.statut === 'Archivé' && t.saleDate);
   const soldInPeriod = isAll
     ? base.filter(wasSold)
     : base.filter(t => wasSold(t) && filterByPeriod(t.saleDate, from, to));
-  const tSell  = soldInPeriod.reduce((s,t) => s + (t.sell||0), 0);
-  let grossP = soldInPeriod.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
-  const soldQty = soldInPeriod.reduce((s,t) => s + (t.qty||0), 0);
+  const soldPaid = soldInPeriod.filter(t => t.pay === 'Payé');
+  const tSell  = soldPaid.reduce((s,t) => s + (t.sell||0), 0);
+  let grossP = soldPaid.reduce((s,t) => s + ((t.sell||0) - (t.buy||0)), 0);
+  const soldQty = soldPaid.reduce((s,t) => s + (t.qty||0), 0);
 
   // PLACES EN STOCK (inventaire courant uniquement)
   const stockBase = base.filter(t => t.statut === 'En stock' || t.statut === 'Réservé');
   const stockInPeriod = isAll
     ? stockBase
     : stockBase.filter(t => { const bd = t.buyDate || t.purchaseDate; return !to || !bd || bd <= to; });
-  const sQty = stockInPeriod.reduce((s,t) => s + (t.qty||0), 0);
+  const sQty = stockInPeriod.filter(t => t.statut === 'En stock').reduce((s,t) => s + (t.qty||0), 0);
+  const reservedQty = stockInPeriod.filter(t => t.statut === 'Réservé').reduce((s,t) => s + (t.qty||0), 0);
   const totalWanted = stockInPeriod.filter(t => t.wanted > 0).reduce((s,t) => s + (t.wanted||0), 0);
 
   // À RECEVOIR
@@ -1812,12 +1813,12 @@ function renderDashMetrics() {
     .reduce((s,c) => s + c.amount, 0);
   let netP  = grossP - paidC;
 
-  // BÉNÉFICE AVEC INVENDUS — inclut En stock + Archivés jamais vendus (pas de saleDate)
+  // BÉNÉFICE AVEC INVENDUS NET — grossP encaissé - buy invendus - coûts fixes
   const unsoldBase = base.filter(t => t.statut === 'En stock' || t.statut === 'Réservé' || (t.statut === 'Archivé' && !t.saleDate));
   const stockBuyInPeriod = isAll
     ? unsoldBase
     : unsoldBase.filter(t => filterByPeriod(t.buyDate || t.purchaseDate, from, to));
-  let profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0);
+  let profitWithStock = grossP - stockBuyInPeriod.reduce((s,t) => s + (t.buy||0), 0) - paidC;
   grossP = grossP || 0;
   netP = netP || 0;
   profitWithStock = profitWithStock || 0;
@@ -1838,11 +1839,12 @@ function renderDashMetrics() {
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value">${fmtFull(tBuy)}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value">${fmtFull(tSell)}</div></div>
-      <div class="metric-card hover-card ${_sc(profitWithStock)}" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${_cls(profitWithStock)}">${_fmt(profitWithStock)}</div></div>
+      <div class="metric-card hover-card ${_sc(profitWithStock)}" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus net</div><div class="metric-value ${_cls(profitWithStock)}">${_fmt(profitWithStock)}</div></div>
       <div class="metric-card hover-card ${_sc(grossP)}" style="${_csB(grossP)}"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${_cls(grossP)}">${_fmt(grossP)}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
       <div class="metric-card hover-card ${_sc(netP)}" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}">${_fmt(netP)}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" style="color:#ff9f43">${reservedQty||'—'}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
       <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} en attente · ${fmtFull(reservedAmt)} réservé</div>`:''}</div>
       ${(()=>{const roiG=tBuy>0?Math.round(((tSell-tBuy)/tBuy)*100):null;const rc=roiG!==null?(roiG>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI global</div><div class="metric-value" style="color:${rc}">${roiG!==null?(roiG>=0?'+':'')+roiG+'%':'—'}</div></div>`;})()}
@@ -3136,6 +3138,8 @@ if (_hash.includes('access_token')) {
   }
 }
 
+sessionStorage.removeItem('td_mk');
+masterKey = null;
 checkAuth();
 renderGmail();
 initPullToRefresh();
