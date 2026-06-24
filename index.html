@@ -2031,21 +2031,21 @@ function renderJournalList() {
     const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':t.statut==='Réservé'?'reserve':'stock';
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
-    const _btnRound = (onclick, bg, ico, label) => `<button onclick="${onclick}" style="width:56px;height:56px;border-radius:50%;background:${bg};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0">${ico}<span style="font-size:9px;color:#fff;font-weight:600">${label}</span></button>`;
-    const _svgW = (d) => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-    const _bVendre  = _btnRound(`openSellModal(${t.id})`,    '#00b4ff', _svgW('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'),                                                                       'Vendre');
-    const _bReserve = _btnRound(`openReserveModal(${t.id})`, '#ff9f43', _svgW('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'),                                                                                                    'Réserver');
-    const _bAnnuler = _btnRound(`annulerReservation(${t.id})`,'#8b9ab0',_svgW('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'),                                                        'Annuler');
-    const _bArchive = _btnRound(`archiveTransaction(${t.id})`,'#484f58', _svgW('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'),                                          'Archiver');
-    const _bUnarc   = _btnRound(`unarchiveTransaction(${t.id})`,'#00ff88',_svgW('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>'),                                                                                        'Désarchiver');
-    const _bDel     = _btnRound(`deleteTransaction(${t.id})`, '#ff6b6b', _svgW('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'),                                    'Suppr.');
+    const _btn = (onclick, bg, ico, label, dark) => `<button onclick="${onclick}" style="width:52px;height:52px;border-radius:50%;background:${bg};border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${ico}<span style="font-size:9px;color:${dark?'#0d1424':'#fff'};font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px">${label}</span></button>`;
+    const _svg = (d, dark) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${dark?'#0d1424':'#fff'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    const _bVendre  = _btn(`openSellModal(${t.id})`,         'rgba(0,180,255,0.92)',  _svg('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'),                                                            'Vendre');
+    const _bReserve = _btn(`openReserveModal(${t.id})`,      'rgba(255,159,67,0.92)', _svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'),                                                                                         'Rés.');
+    const _bAnnuler = _btn(`annulerReservation(${t.id})`,    'rgba(72,79,88,0.92)',   _svg('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'),                                            'Annuler');
+    const _bArchive = _btn(`archiveTransaction(${t.id})`,    'rgba(72,79,88,0.92)',   _svg('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'),                               'Archiver');
+    const _bUnarc   = _btn(`unarchiveTransaction(${t.id})`,  'rgba(0,255,136,0.92)', _svg('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>', true),                                                                         'Désarc.', true);
+    const _bDel     = _btn(`deleteTransaction(${t.id})`,     'rgba(255,107,107,0.92)',_svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'),                          'Suppr.');
     const swipeBtns = t.statut==='En stock' ? _bVendre+_bReserve+_bDel
       : t.statut==='Réservé' ? _bVendre+_bAnnuler+_bDel
       : t.statut==='Vendu'   ? _bArchive+_bDel
       : _bUnarc+_bDel;
     return `<div class="tx-card is-${cardClass}">
       <div class="swipe-wrapper" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px;height:140px">
-        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;gap:12px;padding:0 16px;background:transparent;transform:translateX(100%);transition:transform .2s ease;opacity:0">${swipeBtns}</div>
+        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 12px;background:transparent;transform:translateX(100%);transition:transform .2s ease;opacity:0">${swipeBtns}</div>
         <div class="tx-card-mobile" data-detail="${did}" style="position:absolute;inset:0;transform:translateX(0);transition:transform .2s ease;border-radius:12px;padding:14px 16px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
@@ -2101,15 +2101,13 @@ function renderJournalList() {
   }).join('');
   if(window.innerWidth <= 768) initSwipeCards();
 }
-function closeAllSwipes() {
-  document.querySelectorAll('.swipe-wrapper .tx-card-mobile').forEach(c => {
-    c.style.transition = 'transform .25s ease';
-    c.style.transform = 'translateX(0)';
-  });
-  document.querySelectorAll('.swipe-wrapper .swipe-actions').forEach(a => {
-    a.style.transition = 'transform .25s ease, opacity .25s ease';
-    a.style.transform = 'translateX(100%)';
-    a.style.opacity = '0';
+function closeAllSwipes(exceptWrapper) {
+  document.querySelectorAll('.swipe-wrapper').forEach(w => {
+    if (w === exceptWrapper) return;
+    const c = w.querySelector('.tx-card-mobile');
+    const a = w.querySelector('.swipe-actions');
+    if (c) { c.style.transition = 'transform .22s ease'; c.style.transform = 'translateX(0)'; }
+    if (a) { a.style.transition = 'transform .22s ease, opacity .22s ease'; a.style.transform = 'translateX(100%)'; a.style.opacity = '0'; }
   });
 }
 function initSwipeCards() {
@@ -2117,50 +2115,61 @@ function initSwipeCards() {
     const card = wrapper.querySelector('.tx-card-mobile');
     const actions = wrapper.querySelector('.swipe-actions');
     if (!card || !actions) return;
-    let startX = 0, startY = 0, isDragging = false, isOpen = false;
-    const maxSwipe = 220;
+    const SNAP_WIDTH = actions.scrollWidth || 200;
+    let startX = 0, startY = 0, currentX = 0, isOpen = false, tracking = false, isHorizontal = null;
     card.addEventListener('touchstart', e => {
-      closeAllSwipes(); isOpen = false;
+      closeAllSwipes(wrapper);
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      isDragging = true;
+      currentX = isOpen ? -SNAP_WIDTH : 0;
+      tracking = true;
+      isHorizontal = null;
       card.style.transition = 'none';
       actions.style.transition = 'none';
     }, {passive:true});
     card.addEventListener('touchmove', e => {
-      if (!isDragging) return;
-      const deltaX = e.touches[0].clientX - startX;
-      const deltaY = Math.abs(e.touches[0].clientY - startY);
-      if (deltaY > 10 && !isOpen) { isDragging = false; return; }
-      let newX = isOpen ? -maxSwipe + deltaX : deltaX;
-      newX = Math.min(0, Math.max(-maxSwipe, newX));
+      if (!tracking) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (isHorizontal === null) {
+        if (Math.abs(dx) > 5 || dy > 5) isHorizontal = Math.abs(dx) > dy;
+        return;
+      }
+      if (!isHorizontal) { tracking = false; return; }
+      let newX = Math.min(0, Math.max(-SNAP_WIDTH, currentX + dx));
       card.style.transform = `translateX(${newX}px)`;
-      const progress = Math.abs(newX) / maxSwipe;
-      actions.style.transform = `translateX(${100 - progress * 100}%)`;
-      actions.style.opacity = progress;
+      const p = Math.abs(newX) / SNAP_WIDTH;
+      actions.style.opacity = p.toString();
+      actions.style.transform = `translateX(${(1 - p) * 100}%)`;
     }, {passive:true});
     card.addEventListener('touchend', e => {
-      if (!isDragging) return;
-      isDragging = false;
-      const deltaX = e.changedTouches[0].clientX - startX;
-      card.style.transition = 'transform .25s ease';
-      actions.style.transition = 'transform .25s ease, opacity .25s ease';
-      if (!isOpen && deltaX < -60) {
-        card.style.transform = `translateX(-${maxSwipe}px)`;
+      if (!tracking || !isHorizontal) { tracking = false; return; }
+      tracking = false;
+      const dx = e.changedTouches[0].clientX - startX;
+      card.style.transition = 'transform .22s cubic-bezier(.25,.46,.45,.94)';
+      actions.style.transition = 'transform .22s cubic-bezier(.25,.46,.45,.94), opacity .22s ease';
+      if (dx < -40) {
+        card.style.transform = `translateX(-${SNAP_WIDTH}px)`;
         actions.style.transform = 'translateX(0%)';
         actions.style.opacity = '1';
         isOpen = true;
-      } else {
+      } else if (dx > 20 || !isOpen) {
         card.style.transform = 'translateX(0)';
         actions.style.transform = 'translateX(100%)';
         actions.style.opacity = '0';
         isOpen = false;
+      } else {
+        card.style.transform = `translateX(-${SNAP_WIDTH}px)`;
+        actions.style.transform = 'translateX(0%)';
+        actions.style.opacity = '1';
+        isOpen = true;
       }
     }, {passive:true});
-    card.addEventListener('click', () => {
+    card.addEventListener('click', e => {
       if (isOpen) {
-        card.style.transition = 'transform .25s ease';
-        actions.style.transition = 'transform .25s ease, opacity .25s ease';
+        e.stopPropagation();
+        card.style.transition = 'transform .22s cubic-bezier(.25,.46,.45,.94)';
+        actions.style.transition = 'transform .22s cubic-bezier(.25,.46,.45,.94), opacity .22s ease';
         card.style.transform = 'translateX(0)';
         actions.style.transform = 'translateX(100%)';
         actions.style.opacity = '0';
