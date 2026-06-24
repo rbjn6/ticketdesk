@@ -417,6 +417,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <span style="font-size:13px;color:#ff6b6b;font-weight:600">FONCTION TEMPORAIRE — À supprimer après import</span>
       </div>
+      <button class="btn btn-danger" onclick="resetAllData()" style="width:100%;justify-content:center;margin-bottom:16px;color:#ff6b6b;border-color:rgba(255,107,107,0.4)">🗑 Tout supprimer (journal + précos)</button>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Import CSV</span>
@@ -3000,6 +3001,20 @@ function _csvDate(s) {
   if (!s) return '';
   const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   return m ? `${m[3]}-${m[2]}-${m[1]}` : s;
+}
+async function resetAllData() {
+  if (!confirm('Supprimer toutes les transactions et précommandes ? Cette action est irréversible.')) return;
+  transactions = [];
+  preorders = [];
+  localStorage.removeItem(TX_KEY);
+  localStorage.removeItem(PREORDER_KEY);
+  driveFileId = null;
+  localStorage.removeItem('ticketdesk_drive_fid');
+  await driveSync();
+  renderDashboard();
+  renderJournal();
+  renderPreorders();
+  showToast('Données supprimées');
 }
 function loadCSV() {
   const file = document.getElementById('csvFileInput').files[0];
