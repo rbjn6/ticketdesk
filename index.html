@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -312,7 +312,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 <div class="app">
 
   <aside class="sidebar">
-    <div class="sidebar-logo">TICKETDESK</div>
+    <div class="sidebar-logo"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></div>
     <nav class="sidebar-nav">
       <button class="snav active" id="snav-dashboard" onclick="showPage('dashboard')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard<span class="nav-badge" id="dashBadge"></span></button>
       <button class="snav" id="snav-journal" onclick="showPage('journal')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
@@ -2031,8 +2031,17 @@ function renderJournalList() {
     const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':t.statut==='Réservé'?'reserve':'stock';
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
+    const swipeActions = t.statut==='En stock'
+      ? `<button onclick="openSellModal(${t.id})" style="background:#00b4ff;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Vendre</button><button onclick="openReserveModal(${t.id})" style="background:#ff9f43;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Réserver</button><button onclick="deleteTransaction(${t.id})" style="background:#ff6b6b;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Suppr.</button>`
+      : t.statut==='Réservé'
+      ? `<button onclick="openSellModal(${t.id})" style="background:#00b4ff;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Vendre</button><button onclick="deleteTransaction(${t.id})" style="background:#ff6b6b;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Suppr.</button>`
+      : t.statut==='Vendu'
+      ? `<button onclick="archiveTransaction(${t.id})" style="background:#484f58;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Archiver</button><button onclick="deleteTransaction(${t.id})" style="background:#ff6b6b;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Suppr.</button>`
+      : `<button onclick="unarchiveTransaction(${t.id})" style="background:#00ff88;color:#0d1424;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Désarchiver</button><button onclick="deleteTransaction(${t.id})" style="background:#ff6b6b;color:#fff;border:none;padding:0 20px;font-size:13px;font-weight:600;cursor:pointer">Suppr.</button>`;
     return `<div class="tx-card is-${cardClass}">
-      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px" onclick="toggleDetail('${did}')">
+      <div class="swipe-container" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px">
+        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;transform:translateX(100%)">${swipeActions}</div>
+        <div class="tx-card-mobile" data-detail="${did}" style="padding:14px 16px;min-height:90px;position:relative;transform:translateX(0);will-change:transform">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <div style="text-align:right">
@@ -2049,6 +2058,7 @@ function renderJournalList() {
           </div>
         </div>
         ${t.buyer?`<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
+      </div>
       </div>
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <span class="badge ${badgeClass}">${badgeLabel}</span>
@@ -2084,6 +2094,69 @@ function renderJournalList() {
       </div>
     </div>`;
   }).join('');
+  if(window.innerWidth <= 768) initSwipeCards();
+}
+
+function closeAllSwipes() {
+  document.querySelectorAll('.swipe-container .tx-card-mobile').forEach(c => {
+    c.style.transition = 'transform 0.2s ease';
+    c.style.transform = 'translateX(0)';
+  });
+  document.querySelectorAll('.swipe-container .swipe-actions').forEach(a => {
+    a.style.transition = 'transform 0.2s ease';
+    a.style.transform = 'translateX(100%)';
+  });
+}
+function initSwipeCards() {
+  document.querySelectorAll('.swipe-container').forEach(container => {
+    const card = container.querySelector('.tx-card-mobile');
+    const actions = container.querySelector('.swipe-actions');
+    if (!card || !actions) return;
+    const actionsWidth = actions.offsetWidth || 180;
+    let startX = 0, currentX = 0, isDragging = false, isOpen = false;
+    card.addEventListener('touchstart', e => {
+      closeAllSwipes();
+      isOpen = false;
+      startX = e.touches[0].clientX;
+      isDragging = true;
+      card.style.transition = 'none';
+      actions.style.transition = 'none';
+    }, {passive:true});
+    card.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const deltaX = e.touches[0].clientX - startX;
+      currentX = isOpen ? deltaX - actionsWidth : deltaX;
+      currentX = Math.min(0, Math.max(-actionsWidth, currentX));
+      card.style.transform = `translateX(${currentX}px)`;
+      actions.style.transform = `translateX(${100 + (currentX / actionsWidth * 100)}%)`;
+    }, {passive:true});
+    card.addEventListener('touchend', () => {
+      isDragging = false;
+      card.style.transition = 'transform 0.2s ease';
+      actions.style.transition = 'transform 0.2s ease';
+      if (currentX < -actionsWidth / 2) {
+        card.style.transform = `translateX(-${actionsWidth}px)`;
+        actions.style.transform = 'translateX(0%)';
+        isOpen = true;
+      } else {
+        card.style.transform = 'translateX(0)';
+        actions.style.transform = 'translateX(100%)';
+        isOpen = false;
+      }
+    }, {passive:true});
+    card.addEventListener('click', () => {
+      if (isOpen) {
+        card.style.transition = 'transform 0.2s ease';
+        card.style.transform = 'translateX(0)';
+        actions.style.transition = 'transform 0.2s ease';
+        actions.style.transform = 'translateX(100%)';
+        isOpen = false;
+      } else {
+        const did = card.dataset.detail;
+        if (did) toggleDetail(did);
+      }
+    });
+  });
 }
 
 function setFilter(type,v){
