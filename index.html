@@ -119,7 +119,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .wts-box{font-size:12px;padding:12px}
   .alert-item{white-space:normal;overflow:visible;text-overflow:unset;font-size:13px!important;padding:10px 16px!important}
   #journalFab.fab-active{display:flex!important}
-  .tx-card-mobile{padding:14px 16px!important;min-height:unset!important;height:130px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+  .tx-card-mobile{padding:14px 16px!important;min-height:unset!important;height:140px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
   .tx-card-mobile > div:nth-child(2){font-size:18px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px}
   .tx-card-mobile > div:nth-child(3) > div:first-child{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tx-card-mobile > div:nth-child(4){font-size:14px!important}
@@ -2031,9 +2031,22 @@ function renderJournalList() {
     const cardClass = t.statut==='Vendu'?'vendu':t.statut==='Archivé'?'archive':t.statut==='Réservé'?'reserve':'stock';
     const badgeClass = t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock';
     const badgeLabel = t.statut==='Vendu'?'Vendu':t.statut==='Archivé'?'Archivé':t.statut==='Réservé'?'Réservé':'Stock';
+    const _btnRound = (onclick, bg, ico, label) => `<button onclick="${onclick}" style="width:56px;height:56px;border-radius:50%;background:${bg};border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0">${ico}<span style="font-size:9px;color:#fff;font-weight:600">${label}</span></button>`;
+    const _svgW = (d) => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    const _bVendre  = _btnRound(`openSellModal(${t.id})`,    '#00b4ff', _svgW('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'),                                                                       'Vendre');
+    const _bReserve = _btnRound(`openReserveModal(${t.id})`, '#ff9f43', _svgW('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'),                                                                                                    'Réserver');
+    const _bAnnuler = _btnRound(`annulerReservation(${t.id})`,'#8b9ab0',_svgW('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'),                                                        'Annuler');
+    const _bArchive = _btnRound(`archiveTransaction(${t.id})`,'#484f58', _svgW('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'),                                          'Archiver');
+    const _bUnarc   = _btnRound(`unarchiveTransaction(${t.id})`,'#00ff88',_svgW('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>'),                                                                                        'Désarchiver');
+    const _bDel     = _btnRound(`deleteTransaction(${t.id})`, '#ff6b6b', _svgW('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'),                                    'Suppr.');
+    const swipeBtns = t.statut==='En stock' ? _bVendre+_bReserve+_bDel
+      : t.statut==='Réservé' ? _bVendre+_bAnnuler+_bDel
+      : t.statut==='Vendu'   ? _bArchive+_bDel
+      : _bUnarc+_bDel;
     return `<div class="tx-card is-${cardClass}">
-      <div class="tx-card-mobile" style="padding:14px 16px;min-height:90px;position:relative" onclick="toggleDetail('${did}')">
-        <button onclick="event.stopPropagation();toggleCardMenu(${t.id},this)" style="position:absolute;top:10px;right:10px;background:none;border:none;color:#8b9ab0;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;z-index:10" onmouseenter="this.style.color='#f9fafb';this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.color='#8b9ab0';this.style.background='none'">⋯</button>
+      <div class="swipe-wrapper" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:8px;height:140px">
+        <div class="swipe-actions" style="position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;gap:12px;padding:0 16px;background:transparent;transform:translateX(100%);transition:transform .2s ease;opacity:0">${swipeBtns}</div>
+        <div class="tx-card-mobile" data-detail="${did}" style="position:absolute;inset:0;transform:translateX(0);transition:transform .2s ease;border-radius:12px;padding:14px 16px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <div style="text-align:right">
@@ -2050,6 +2063,7 @@ function renderJournalList() {
           </div>
         </div>
         ${t.buyer?`<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${t.buyer}</div>`:''}
+      </div>
       </div>
       <div class="tx-summary" onclick="toggleDetail('${did}')">
         <span class="badge ${badgeClass}">${badgeLabel}</span>
@@ -2085,36 +2099,78 @@ function renderJournalList() {
       </div>
     </div>`;
   }).join('');
+  if(window.innerWidth <= 768) initSwipeCards();
 }
-function toggleCardMenu(id, btn) {
-  if('vibrate' in navigator) navigator.vibrate(8);
-  const existing = document.getElementById('cardActionMenu');
-  if (existing) { existing.remove(); return; }
-  const t = transactions.find(x => x.id === id);
-  if (!t) return;
-  const rect = btn.getBoundingClientRect();
-  const actions = [];
-  if (t.statut === 'En stock') {
-    actions.push({label:'Vendre',       icon:'<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                                                                                                      color:'#00b4ff', fn:`openSellModal(${id})`});
-    actions.push({label:'Réserver',     icon:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',                                                                                                                                    color:'#ff9f43', fn:`openReserveModal(${id})`});
-    actions.push({label:'Archiver',     icon:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',                                                                           color:'#8b9ab0', fn:`archiveTransaction(${id})`});
-  } else if (t.statut === 'Réservé') {
-    actions.push({label:'Vendre',       icon:'<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                                                                                                      color:'#00b4ff', fn:`openSellModal(${id})`});
-    actions.push({label:'Annuler résa', icon:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',                                                                                       color:'#8b9ab0', fn:`annulerReservation(${id})`});
-  } else if (t.statut === 'Vendu') {
-    actions.push({label:'Archiver',     icon:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',                                                                           color:'#8b9ab0', fn:`archiveTransaction(${id})`});
-  } else if (t.statut === 'Archivé') {
-    actions.push({label:'Désarchiver',  icon:'<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>',                                                                                                                           color:'#00ff88', fn:`unarchiveTransaction(${id})`});
-  }
-  actions.push({label:'Modifier',     icon:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',                                                     color:'#f9fafb', fn:`editTransaction(${id})`});
-  actions.push({label:'Supprimer',    icon:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',                                                                    color:'#ff6b6b', fn:`deleteTransaction(${id})`});
-  const menu = document.createElement('div');
-  menu.id = 'cardActionMenu';
-  menu.style.cssText = `position:fixed;top:${rect.bottom+4}px;right:${window.innerWidth-rect.right}px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;padding:6px;z-index:500;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:menuFadeIn .15s ease`;
-  menu.innerHTML = `<style>@keyframes menuFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}</style>`
-    + actions.map((a,i) => `<div onclick="${a.fn};document.getElementById('cardActionMenu')?.remove()" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:${a.color};font-size:14px;font-weight:500;${i<actions.length-1?'border-bottom:1px solid rgba(255,255,255,0.05)':''}" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='none'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${a.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${a.icon}</svg>${a.label}</div>`).join('');
-  document.body.appendChild(menu);
-  setTimeout(() => document.addEventListener('touchstart', () => document.getElementById('cardActionMenu')?.remove(), {once:true, passive:true}), 100);
+function closeAllSwipes() {
+  document.querySelectorAll('.swipe-wrapper .tx-card-mobile').forEach(c => {
+    c.style.transition = 'transform .25s ease';
+    c.style.transform = 'translateX(0)';
+  });
+  document.querySelectorAll('.swipe-wrapper .swipe-actions').forEach(a => {
+    a.style.transition = 'transform .25s ease, opacity .25s ease';
+    a.style.transform = 'translateX(100%)';
+    a.style.opacity = '0';
+  });
+}
+function initSwipeCards() {
+  document.querySelectorAll('.swipe-wrapper').forEach(wrapper => {
+    const card = wrapper.querySelector('.tx-card-mobile');
+    const actions = wrapper.querySelector('.swipe-actions');
+    if (!card || !actions) return;
+    let startX = 0, startY = 0, isDragging = false, isOpen = false;
+    const maxSwipe = 220;
+    card.addEventListener('touchstart', e => {
+      closeAllSwipes(); isOpen = false;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+      card.style.transition = 'none';
+      actions.style.transition = 'none';
+    }, {passive:true});
+    card.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const deltaX = e.touches[0].clientX - startX;
+      const deltaY = Math.abs(e.touches[0].clientY - startY);
+      if (deltaY > 10 && !isOpen) { isDragging = false; return; }
+      let newX = isOpen ? -maxSwipe + deltaX : deltaX;
+      newX = Math.min(0, Math.max(-maxSwipe, newX));
+      card.style.transform = `translateX(${newX}px)`;
+      const progress = Math.abs(newX) / maxSwipe;
+      actions.style.transform = `translateX(${100 - progress * 100}%)`;
+      actions.style.opacity = progress;
+    }, {passive:true});
+    card.addEventListener('touchend', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      const deltaX = e.changedTouches[0].clientX - startX;
+      card.style.transition = 'transform .25s ease';
+      actions.style.transition = 'transform .25s ease, opacity .25s ease';
+      if (!isOpen && deltaX < -60) {
+        card.style.transform = `translateX(-${maxSwipe}px)`;
+        actions.style.transform = 'translateX(0%)';
+        actions.style.opacity = '1';
+        isOpen = true;
+      } else {
+        card.style.transform = 'translateX(0)';
+        actions.style.transform = 'translateX(100%)';
+        actions.style.opacity = '0';
+        isOpen = false;
+      }
+    }, {passive:true});
+    card.addEventListener('click', () => {
+      if (isOpen) {
+        card.style.transition = 'transform .25s ease';
+        actions.style.transition = 'transform .25s ease, opacity .25s ease';
+        card.style.transform = 'translateX(0)';
+        actions.style.transform = 'translateX(100%)';
+        actions.style.opacity = '0';
+        isOpen = false;
+      } else {
+        const did = card.dataset.detail;
+        if (did) toggleDetail(did);
+      }
+    });
+  });
 }
 
 function setFilter(type,v){
