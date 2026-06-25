@@ -1857,7 +1857,11 @@ function renderDashMetrics() {
   const evMap={};
   tx.forEach(t=>{
     if(!evMap[t.event])evMap[t.event]=0;
-    evMap[t.event]+=(t.statut==='Vendu'||(t.statut==='Archivé'&&t.saleDate))?((t.sell||0)-(t.buy||0)):-(t.buy||0);
+    if((t.statut==='Vendu'||t.statut==='Archivé') && t.pay==='Payé'){
+      evMap[t.event]+=(t.sell||0)-(t.buy||0);
+    } else if(t.statut==='En stock'||t.statut==='Réservé'||(t.statut==='Archivé'&&!t.saleDate&&t.pay!=='Payé')){
+      evMap[t.event]-=(t.buy||0);
+    }
   });
   const labels=Object.keys(evMap), data=labels.map(e=>Math.round(evMap[e]));
 
