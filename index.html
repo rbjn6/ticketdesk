@@ -1802,13 +1802,13 @@ function renderDashMetrics() {
   // BÉNÉFICE NET — bénéfice brut - coûts fixes
   const netP = grossP - paidC;
 
-  // À RECEVOIR — Vendus En attente + Réservés avec reservedPrice
+  // À RECEVOIR — Vendus En attente + Réservés (tous, avec ou sans paiement)
   const pendingPay = base
     .filter(t => t.statut === 'Vendu' && t.pay === 'En attente')
     .reduce((s,t) => s + (t.sell||0), 0);
   const reservedAmt = base
-    .filter(t => t.statut === 'Réservé' && (t.reservedPrice||0) > 0)
-    .reduce((s,t) => s + (t.reservedPrice||0), 0);
+    .filter(t => t.statut === 'Réservé')
+    .reduce((s,t) => s + (t.reservedPrice || t.sell || t.wanted || 0), 0);
   const totalARecevoir = pendingPay + reservedAmt;
 
   // PLACES VENDUES — Vendus/Archivés Payés
@@ -1848,7 +1848,7 @@ function renderDashMetrics() {
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value">${soldQty}</div></div>
       <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" style="color:#ff9f43">${reservedQty||'—'}</div></div>
       <div class="metric-card hover-card" style="${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value">${sQty}</div></div>
-      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} en attente · ${fmtFull(reservedAmt)} réservé</div>`:''}</div>
+      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
       ${(()=>{const rc=roi!==null?(roi>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI global</div><div class="metric-value" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}</div></div>`;})()}
       <div class="metric-card hover-card" style="border-top:2px solid #00b4ff;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
     </div>
@@ -2094,7 +2094,7 @@ function renderJournalList() {
       {l:'Acheteur',    v: t.buyer    || '—'},
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
-      {l:'Marge',       v: margin !== null ? (margin >= 0?'+':'')+margin.toFixed(1)+'%' : '—', c: margin !== null ? (margin >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
+      {l:'Marge',       v: margin !== null ? (margin >= 0?'+':'')+Math.round(margin)+'%' : '—', c: margin !== null ? (margin >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
       {l:'Prix voulu',  html: `<div style="display:flex;align-items:center;gap:8px"><input type="number" value="${t.wanted||0}" min="0" step="1" onchange="updateWanted(${t.id},this.value)" onclick="event.stopPropagation()" style="width:90px;padding:4px 8px;font-size:13px;border-radius:6px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;text-align:right"><span style="font-size:12px;color:#8b9ab0">€</span></div>`},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
