@@ -854,12 +854,9 @@ const COST_KEY     = 'ticketdesk_costs';
 const GMAIL_KEY    = 'ticketdesk_gmail';
 const PREORDER_KEY = 'ticketdesk_preorders';
 
-let transactions    = [];
+let transactions    = JSON.parse(localStorage.getItem(TX_KEY)         || '[]');
 let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
-let preorders       = [];
-localStorage.removeItem(TX_KEY);
-localStorage.removeItem(PREORDER_KEY);
-localStorage.removeItem('ticketdesk_drive_fid');
+let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
 let masterKey       = null;
 let masterKeyHash   = null;
 let _masterKeyCallback = null;
