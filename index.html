@@ -323,6 +323,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <button class="snav" id="snav-preorders" onclick="showPage('preorders')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
       <button class="snav" id="snav-import" onclick="showPage('import')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>Import CSV</button>
       <button class="snav" id="snav-wts" onclick="showPage('wts')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>WTS</button>
+      <button class="snav" id="snav-reservations" onclick="showPage('reservations')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>Réservations</button>
       <button class="snav" id="snav-gmail" onclick="showPage('gmail')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>Gmail</button>
       <button class="snav" id="snav-costs" onclick="showPage('costs')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Coûts</button>
       <button class="snav" id="snav-settings" onclick="showPage('settings')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Paramètres</button>
@@ -447,6 +448,37 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       </div>
     </div>
 
+    <div class="page" id="page-reservations">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="position:relative;flex-shrink:0">
+          <select id="resa-filter-buyer" onchange="renderReservations()" style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);font-family:inherit">
+            <option value="">Tous les acheteurs</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+        <div style="position:relative;flex-shrink:0">
+          <select id="resa-filter-event" onchange="renderReservations()" style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);font-family:inherit">
+            <option value="">Tous les événements</option>
+          </select>
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="resa-show-rib" onchange="renderReservations()" style="width:16px;height:16px;cursor:pointer;-webkit-appearance:checkbox;appearance:checkbox">
+          Inclure RIB + bénéficiaire
+        </label>
+      </div>
+      <div id="resa-rib-fields" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div class="fgroup" style="margin-bottom:8px"><label class="flabel">IBAN</label><input type="text" id="resa-iban" placeholder="FR76..." oninput="renderReservations()"></div>
+        <div class="fgroup" style="margin-bottom:0"><label class="flabel">Bénéficiaire</label><input type="text" id="resa-beneficiaire" placeholder="Prénom Nom" oninput="renderReservations()"></div>
+      </div>
+      <div class="wts-box" id="resaPreview"></div>
+      <div style="margin-top:10px">
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="copyReservations()">Copier pour Discord</button>
+      </div>
+    </div>
+
     <div class="page" id="page-gmail">
       <div class="gmail-card">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -562,6 +594,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     <button class="dnav" id="dnav-preorders" onclick="showPage('preorders');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
     <button class="dnav" id="dnav-import" onclick="showPage('import');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>Import CSV</button>
     <button class="dnav" id="dnav-wts" onclick="showPage('wts');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>WTS</button>
+    <button class="dnav" id="dnav-reservations" onclick="showPage('reservations');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>Réservations</button>
     <button class="dnav" id="dnav-gmail" onclick="showPage('gmail');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>Gmail</button>
     <button class="dnav" id="dnav-costs" onclick="showPage('costs');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Coûts</button>
     <button class="dnav" id="dnav-settings" onclick="showPage('settings');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Réglages</button>
@@ -938,7 +971,7 @@ if (!costs.length) {
   costs = [];
 }
 
-function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); }
+function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); if(document.getElementById('page-reservations')?.classList.contains('active')) renderReservations(); }
 function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs)); driveSyncDebounced(); }
 function autoArchive() {
   const today = new Date().toISOString().substring(0, 10);
@@ -1337,7 +1370,8 @@ function showPage(name) {
   if (name === 'dashboard') renderDashboard();
   if (name === 'journal')   renderJournal();
   if (name === 'preorders') renderPreorders();
-  if (name === 'wts')       renderWTS();
+  if (name === 'wts')          renderWTS();
+  if (name === 'reservations') renderReservations();
   if (name === 'import')    { /* page is static, nothing to render */ }
   if (name === 'gmail')     renderGmail();
   if (name === 'costs')     renderCosts();
@@ -2399,6 +2433,95 @@ function copyWTS(){
   navigator.clipboard.writeText(raw)
     .then(()=>showToast('Copié — colle sur Discord'))
     .catch(()=>{const ta=document.createElement('textarea');ta.value=raw;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copié');});
+}
+
+// RÉSERVATIONS
+function renderReservations() {
+  const showRib = document.getElementById('resa-show-rib')?.checked;
+  const ribFields = document.getElementById('resa-rib-fields');
+  if (ribFields) ribFields.style.display = showRib ? 'block' : 'none';
+
+  const allReserved = transactions.filter(t => t.statut === 'Réservé');
+
+  const buyerSel = document.getElementById('resa-filter-buyer');
+  const eventSel = document.getElementById('resa-filter-event');
+  const selectedBuyer = buyerSel?.value || '';
+  const selectedEvent = eventSel?.value || '';
+
+  if (buyerSel) {
+    const buyers = [...new Set(allReserved.map(t => t.buyer).filter(Boolean))].sort();
+    buyerSel.innerHTML = '<option value="">Tous les acheteurs</option>' +
+      buyers.map(b => `<option value="${b}" ${selectedBuyer===b?'selected':''}>${b}</option>`).join('');
+  }
+  if (eventSel) {
+    const events = [...new Set(allReserved.map(t => t.event).filter(Boolean))].sort();
+    eventSel.innerHTML = '<option value="">Tous les événements</option>' +
+      events.map(e => `<option value="${e}" ${selectedEvent===e?'selected':''}>${e}</option>`).join('');
+  }
+
+  let reserved = allReserved
+    .filter(t => !selectedBuyer || t.buyer === selectedBuyer)
+    .filter(t => !selectedEvent || t.event === selectedEvent)
+    .sort((a,b) => (a.event||'').localeCompare(b.event||'') || (a.date||'').localeCompare(b.date||''));
+
+  if (!reserved.length) {
+    document.getElementById('resaPreview').innerHTML = '<div style="text-align:center;padding:40px 20px;color:#4a5568">Aucune réservation</div>';
+    return;
+  }
+
+  const byEvent = {};
+  reserved.forEach(t => {
+    const ev = t.event || '—';
+    if (!byEvent[ev]) byEvent[ev] = [];
+    byEvent[ev].push(t);
+  });
+
+  let total = 0;
+  let lines = [];
+
+  Object.entries(byEvent).forEach(([eventName, tickets]) => {
+    lines.push(`**${eventName}**`);
+    tickets.forEach(t => {
+      const prix = t.reservedPrice || t.wanted || t.sell || 0;
+      total += prix;
+      const date = t.date ? fmtDate(t.date) : '—';
+      const infos = [t.cat, t.place, prix ? fmtFull(prix) : null].filter(Boolean).join(' · ');
+      lines.push(`**${date}** — ${infos}`);
+    });
+    lines.push('');
+  });
+
+  lines.push(`**Total : ${fmtFull(total)}**`);
+
+  if (showRib) {
+    const iban = document.getElementById('resa-iban')?.value.trim();
+    const benef = document.getElementById('resa-beneficiaire')?.value.trim();
+    if (iban || benef) {
+      lines.push('');
+      if (iban) lines.push(`IBAN : ${iban}`);
+      if (benef) lines.push(`Bénéficiaire : ${benef}`);
+    }
+  }
+
+  const raw = lines.join('\n');
+  document.getElementById('resaPreview').innerHTML = lines
+    .map(l => l.replace(/\*\*(.+?)\*\*/g, '<span class="wts-b">$1</span>'))
+    .join('\n');
+  document.getElementById('resaPreview').dataset.raw = raw;
+}
+
+function copyReservations() {
+  const raw = document.getElementById('resaPreview').dataset.raw || '';
+  if (!raw) return;
+  navigator.clipboard.writeText(raw)
+    .then(() => showToast('Copié — colle sur Discord'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copié');
+    });
 }
 
 // GMAIL
