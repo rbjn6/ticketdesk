@@ -2073,7 +2073,7 @@ function renderJournalList() {
   const isMobile = window.innerWidth <= 768;
   document.getElementById('journalList').innerHTML=list.map(t=>{
     const profit = ((t.sell||0) - (t.buy||0)) || 0;
-    const margin = t.buy && t.sell ? (t.sell - t.buy) / t.buy * 100 : null;
+    const margin = t.buy && t.sell ? Math.round((t.sell - t.buy) / t.buy * 100) : null;
     const isPos  = profit >= 0;
     const pc     = t.pay==='En attente' ? 'var(--yellow)' : isPos ? 'var(--green)' : 'var(--red)';
     const did    = 'td-'+t.id;
