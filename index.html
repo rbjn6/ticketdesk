@@ -2470,7 +2470,7 @@ function renderReservations() {
       const prix = t.reservedPrice || t.wanted || t.sell || 0;
       total += prix;
       const date = t.date ? fmtDate(t.date) : '—';
-      const infos = [t.cat, t.place, prix ? fmtFull(prix) : null].filter(Boolean).join(' · ');
+      const infos = [t.qty ? t.qty+'x' : null, t.cat, t.place, prix ? fmtFull(prix) : null].filter(Boolean).join(' · ');
       lines.push(`**${date}** — ${infos}`);
     });
     lines.push('');
