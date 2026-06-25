@@ -2099,8 +2099,8 @@ function renderJournalList() {
       {l:'Lieu',         v: t.lieu    || '—'},
       {l:'Placement',    v: t.place   || '—'},
       {l:'Site achat',   v: t.site    || '—'},
-      {l:'Compte',       html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-compte-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.compte?'••••••••':'—'}</span>${t.compte?`<button onclick="event.stopPropagation();_toggleReveal('reveal-compte-${t.id}','${(t.compte||'').replace(/'/g,"\\'")}','compte')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>`:''}</div>`},
-      {l:'Mot de passe', html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-mdp-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.mdp?'••••••••':'—'}</span>${t.mdp?`<button onclick="event.stopPropagation();_toggleReveal('reveal-mdp-${t.id}','${(t.mdp||'').replace(/'/g,"\\'")}','mdp')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>`:''}</div>`},
+      {l:'Compte',       html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-compte-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.compte?'••••••••':'—'}</span>${t.compte?`<button onclick="event.stopPropagation();_toggleReveal('reveal-compte-${t.id}','${(t.compte||'').replace(/'/g,"\\'")}','compte')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.compte||'').replace(/'/g,"\\'")}','Compte copié')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
+      {l:'Mot de passe', html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-mdp-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.mdp?'••••••••':'—'}</span>${t.mdp?`<button onclick="event.stopPropagation();_toggleReveal('reveal-mdp-${t.id}','${(t.mdp||'').replace(/'/g,"\\'")}','mdp')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.mdp||'').replace(/'/g,"\\'")}','Mot de passe copié')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
       {l:'Prix achat',   v: t.buy  ? fmtFull(t.buy)  : '—', c:'var(--text-primary)'},
       {l:'Prix revente', v: t.sell ? fmtFull(t.sell) : '—'},
     ];
@@ -2973,6 +2973,24 @@ function _toggleReveal(spanId, encVal) {
   };
   if (masterKey) doReveal();
   else openMasterKeyModal(doReveal);
+}
+function _copyField(encVal, successMsg) {
+  getMasterKey();
+  const doCopy = () => {
+    const plain = decryptField(encVal) || (isEncrypted(encVal) ? null : encVal);
+    if (!plain) { showToast('Impossible de déchiffrer', 'err'); return; }
+    navigator.clipboard.writeText(plain)
+      .then(() => showToast(successMsg))
+      .catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = plain; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(successMsg);
+      });
+  };
+  if (masterKey) doCopy();
+  else openMasterKeyModal(doCopy);
 }
 
 // MODALS
