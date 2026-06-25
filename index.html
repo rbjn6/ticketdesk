@@ -1792,6 +1792,19 @@ function renderDashMetrics() {
   console.log('Nombre soldPaid:', soldPaid.length);
   soldPaid.forEach(t => console.log(t.event, t.statut, t.pay, 'sell:', t.sell, 'saleDate:', t.saleDate));
   console.log('tSell total:', tSell);
+  console.log('=== VENDUS/ARCHIVES SANS PAY ===');
+  base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && !t.pay)
+    .forEach(t => console.log(t.event, '|', t.statut, '|', 'pay:', JSON.stringify(t.pay), '| sell:', t.sell));
+  console.log('=== VENDUS/ARCHIVES PAYES ===');
+  base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && t.pay === 'Payé')
+    .forEach(t => console.log(t.event, '|', t.statut, '|', JSON.stringify(t.pay), '| sell:', t.sell));
+  console.log('=== VENDUS/ARCHIVES AVEC AUTRE PAY ===');
+  base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && t.pay !== 'Payé' && t.pay !== 'En attente')
+    .forEach(t => console.log(t.event, '|', t.statut, '|', JSON.stringify(t.pay), '| sell:', t.sell));
+  console.log('=== TOUS VENDUS/ARCHIVES AVEC SELL > 0 ===');
+  base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && (t.sell||0) > 0)
+    .forEach(t => console.log(t.event, '|', t.statut, '|', 'pay:', JSON.stringify(t.pay), '| sell:', t.sell, '| id:', t.id));
+  console.log('Total count:', base.filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && (t.sell||0) > 0).length);
 
   // BÉNÉFICE AVEC INVENDUS — CA - Coût total achats
   const profitWithStock = tSell - tBuy;
