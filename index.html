@@ -51,7 +51,11 @@ html,body{overscroll-behavior:none;overflow-x:hidden;touch-action:pan-y;-webkit-
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;overflow:hidden}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#1f2d4a;border-radius:10px;transition:background .2s}
+::-webkit-scrollbar-thumb:hover{background:#2d3d55}
+*{scrollbar-width:thin;scrollbar-color:#1f2d4a transparent}
 
 /* ── LAYOUT ────────────────────────────────────────── */
 .app{display:flex;height:100vh;height:100dvh;overflow:hidden}
@@ -130,6 +134,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .tx-card-mobile > div:first-child > span:last-child{font-size:17px!important}
   .tx-card-mobile > div:first-child > span:last-child > span{font-size:12px!important}
   .tx-card-mobile .badge{font-size:12px!important}
+  .tx-card-mobile .badge{font-size:13px!important;padding:4px 12px!important}
 }
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;border:none;background:none;color:var(--text-secondary);font-size:10px;font-weight:500;font-family:inherit;cursor:pointer;gap:3px;transition:color .15s}
 .bnav.active{color:var(--accent-blue)}
@@ -177,7 +182,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .stitle::before{content:'';width:3px;height:14px;background:var(--accent-blue);border-radius:2px;flex-shrink:0;display:inline-block}
 
 /* ── JOURNAL ───────────────────────────────────────── */
-.journal-header{background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:85px minmax(0,200px) 100px 1fr 160px 100px 160px;gap:12px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;margin-top:8px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;align-items:center;font-weight:600}
+.journal-header{background:var(--bg-nav);padding:8px 14px;display:grid;grid-template-columns:85px minmax(0,200px) 100px 1fr 160px 100px 160px;gap:12px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;margin-top:8px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;align-items:center;font-weight:600;position:sticky;top:0;z-index:10}
 .journal-header span:nth-child(5){text-align:left;padding-left:0px;margin-left:-20px}
 .journal-header span:nth-child(6){justify-content:flex-end;padding-right:14px}
 .journal-header span:nth-child(7){justify-content:flex-end;padding-right:14px}
@@ -262,6 +267,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 .login-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid #00b4ff;border-radius:20px;padding:40px 36px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 60px rgba(0,180,255,0.08);animation:loginFadeIn 0.4s ease forwards}
 .login-logo{font-size:32px;font-weight:800;letter-spacing:6px;margin-bottom:6px}
 .login-logo-t{color:var(--accent-blue)}.login-logo-d{color:var(--text-primary)}
+.logo-t-glow{color:#00b4ff;text-shadow:0 0 20px rgba(0,180,255,0.7),0 0 40px rgba(0,180,255,0.3)}
 .login-tagline{font-size:12px;color:var(--text-secondary);margin-bottom:28px}
 .login-field-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;text-align:left;margin-bottom:6px;display:block;font-weight:600}
 .login-field{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg-main);color:var(--text-primary);font-size:14px;margin-bottom:14px;font-family:inherit;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
@@ -316,7 +322,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 <div class="app">
 
   <aside class="sidebar">
-    <div class="sidebar-logo"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></div>
+    <div class="sidebar-logo"><span class="logo-t-glow">T</span><span style="color:#f9fafb">ICKETDESK</span></div>
     <nav class="sidebar-nav">
       <button class="snav active" id="snav-dashboard" onclick="showPage('dashboard')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard<span class="nav-badge" id="dashBadge"></span></button>
       <button class="snav" id="snav-journal" onclick="showPage('journal')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
@@ -338,7 +344,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
       </button>
-      <span style="font-size:17px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
+      <span style="font-size:17px;font-weight:800;letter-spacing:3px;text-transform:uppercase"><span class="logo-t-glow">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
     </div>
 
   <div class="content">
@@ -566,7 +572,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 <div class="drawer" id="drawer">
   <div style="height:90px;flex-shrink:0"></div>
   <div class="drawer-head">
-    <span class="drawer-logo"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
+    <span class="drawer-logo"><span class="logo-t-glow">T</span><span style="color:#f9fafb">ICKETDESK</span></span>
     <button class="drawer-close" onclick="closeDrawer()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <nav class="drawer-nav">
@@ -1008,7 +1014,7 @@ function renderPreorders() {
     if (poBuyer  && !(p.buyer||'').toLowerCase().includes(poBuyer))  return false;
     return true;
   });
-  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucune précommande</div><div style="font-size:12px;color:#4a5568">Ajoute une demande client pour la suivre ici</div></div>'; return; }
+  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucune précommande</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Suis les demandes de tes clients ici</div><button onclick="openPreorderModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter une précommande</button></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const GRID = '100px 16px 140px 95px 25px 16px 110px 1fr 100px 100px 85px 85px';
   const CS = 'padding:0 6px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
@@ -1321,6 +1327,24 @@ function fmtFull(n) {
   n = Math.round(n);
   return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
 }
+function animateMetric(el, targetValue, isCurrency = true, prefix = '', suffix = '') {
+  if (!el) return;
+  const duration = 600;
+  const start = performance.now();
+  const startVal = 0;
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(startVal + (targetValue - startVal) * ease);
+    if (isCurrency) {
+      el.textContent = new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(current);
+    } else {
+      el.textContent = prefix + current + suffix;
+    }
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
 function fmtDate(d) { if(!d)return'—'; return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 function showToast(msg,type='ok',duration=2500) {
   const t=document.getElementById('toast');
@@ -1334,7 +1358,16 @@ function showPage(name) {
   document.querySelectorAll('.bnav').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.dnav').forEach(n => n.classList.remove('active'));
   const page = document.getElementById('page-' + name);
-  if (page) page.classList.add('active');
+  if (page) {
+    page.classList.add('active');
+    page.style.opacity = '0';
+    page.style.transform = 'translateY(6px)';
+    requestAnimationFrame(() => {
+      page.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+      page.style.opacity = '1';
+      page.style.transform = 'translateY(0)';
+    });
+  }
   const snav = document.getElementById('snav-' + name);
   if (snav) snav.classList.add('active');
   const bnav = document.getElementById('bnav-' + name);
@@ -1854,28 +1887,43 @@ function renderDashMetrics() {
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
 
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value" style="color:#f9fafb">${fmtFull(tBuy)}</div></div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value" style="color:#f9fafb">${fmtFull(tSell)}</div></div>
-      <div class="metric-card hover-card" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${_cls(profitWithStock)}">${_fmt(profitWithStock)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value" data-metric="tBuy" style="color:#f9fafb">${fmtFull(tBuy)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value" data-metric="tSell" style="color:#f9fafb">${fmtFull(tSell)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${_cls(profitWithStock)}" data-metric="profitWithStock">${_fmt(profitWithStock)}</div></div>
 
-      <div class="metric-card hover-card" style="${_csB(grossP)}"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${_cls(grossP)}">${_fmt(grossP)}</div></div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value" style="color:#f9fafb">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
-      <div class="metric-card hover-card" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}">${_fmt(netP)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(grossP)}"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${_cls(grossP)}" data-metric="grossP">${_fmt(grossP)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value" data-metric="paidC" style="color:#f9fafb">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
+      <div class="metric-card hover-card" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}" data-metric="netP">${_fmt(netP)}</div></div>
 
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Prix d'achat stock</div><div class="metric-value" style="color:#f9fafb">${stockBuyTotal>0?fmtFull(stockBuyTotal):'—'}</div></div>
-      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Prix d'achat stock</div><div class="metric-value" data-metric="stockBuyTotal" style="color:#f9fafb">${stockBuyTotal>0?fmtFull(stockBuyTotal):'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" data-metric="totalARecevoir" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" data-metric="totalWanted" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
 
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value" style="color:#f9fafb">${soldQty}</div></div>
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" style="color:#f9fafb">${reservedQty||'—'}</div></div>
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value" style="color:#f9fafb">${sQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value" data-metric="soldQty" style="color:#f9fafb">${soldQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" data-metric="reservedQty" style="color:#f9fafb">${reservedQty||'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value" data-metric="sQty" style="color:#f9fafb">${sQty}</div></div>
 
       <div></div>
-      ${(()=>{const rc=roi!==null?(roi>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI Global</div><div class="metric-value" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+Math.round(roi)+'%':'—'}</div></div>`;})()}
+      ${(()=>{const rc=roi!==null?(roi>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI Global</div><div class="metric-value" data-metric="roi" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+Math.round(roi)+'%':'—'}</div></div>`;})()}
       <div></div>
 
     </div>
   `;
+  setTimeout(() => {
+    animateMetric(document.querySelector('[data-metric="tBuy"]'), tBuy);
+    animateMetric(document.querySelector('[data-metric="tSell"]'), tSell);
+    animateMetric(document.querySelector('[data-metric="grossP"]'), grossP);
+    animateMetric(document.querySelector('[data-metric="netP"]'), netP);
+    animateMetric(document.querySelector('[data-metric="profitWithStock"]'), profitWithStock);
+    animateMetric(document.querySelector('[data-metric="paidC"]'), -paidC);
+    animateMetric(document.querySelector('[data-metric="totalARecevoir"]'), totalARecevoir);
+    animateMetric(document.querySelector('[data-metric="totalWanted"]'), totalWanted);
+    animateMetric(document.querySelector('[data-metric="stockBuyTotal"]'), stockBuyTotal);
+    animateMetric(document.querySelector('[data-metric="soldQty"]'), soldQty, false);
+    animateMetric(document.querySelector('[data-metric="reservedQty"]'), reservedQty, false);
+    animateMetric(document.querySelector('[data-metric="sQty"]'), sQty, false);
+    animateMetric(document.querySelector('[data-metric="roi"]'), roi !== null ? Math.round(roi) : 0, false, roi >= 0 ? '+' : '', '%');
+  }, 50);
 
   const evMap={};
   tx.forEach(t=>{
@@ -1896,11 +1944,12 @@ function renderDashMetrics() {
     type:'bar',
     data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?_gPos:_gNeg),borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2540',borderColor:'#2d3d55',borderWidth:1,padding:12,callbacks:{label:ctx=>' Bénéfice : '+new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(ctx.raw)}},datalabels:false},
       scales:{
         x:{ticks:{color:'#484f58',font:{size:10},maxRotation:30,autoSkip:false},grid:{display:false},border:{display:false}},
-        y:{ticks:{color:'#484f58',font:{size:10},callback:v=>fmtFull(v)},grid:{color:'rgba(45,61,85,0.3)'},border:{display:false}}
-      }}
+        y:{ticks:{color:'#484f58',font:{size:10},callback:v=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v)},grid:{color:'rgba(45,61,85,0.3)'},border:{display:false}}
+      },
+      animation:{duration:800,easing:'easeOutQuart'}}
   });
 
   if(chartPie)chartPie.destroy();
@@ -2092,7 +2141,7 @@ function renderJournalList() {
   }
 
   if(!list.length){
-    document.getElementById('journalList').innerHTML='<div style="text-align:center;padding:60px 20px;color:#4a5568"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div style="font-size:15px;font-weight:600;color:#8b9ab0;margin-bottom:6px">Aucune transaction</div><div style="font-size:13px;color:#4a5568">Ajoute un billet ou importe depuis Gmail</div></div>';
+    document.getElementById('journalList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucune transaction</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Ajoute ton premier billet pour commencer</div><button onclick="openAddModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un billet</button></div>';
     return;
   }
 
@@ -2411,7 +2460,7 @@ function renderWTS(){
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
     });
-  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:40px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun billet en stock</div><div style="font-size:12px;color:#4a5568">Importe des billets depuis Gmail ou ajoute-en manuellement</div></div>';return;}
+  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucun billet en stock</div><div style="font-size:13px;color:#2d3d55">Tes billets en stock apparaîtront ici</div></div>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){lines.push('');lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null;}
@@ -2842,7 +2891,7 @@ function initPullToRefresh() {
 
 // COSTS
 function renderCosts(){
-  if(!costs.length){document.getElementById('costsList').innerHTML='<div style="text-align:center;padding:48px 20px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2d3d55" stroke-width="1.5" style="margin-bottom:12px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div style="font-size:14px;font-weight:600;color:#8b9ab0;margin-bottom:4px">Aucun coût fixe</div><div style="font-size:12px;color:#4a5568">Ajoute tes abonnements, frais de plateforme…</div></div>';document.getElementById('costsTotal').innerHTML='';return;}
+  if(!costs.length){document.getElementById('costsList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucun coût fixe</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Ajoute tes abonnements et frais de plateforme</div><button onclick="openCostModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un coût</button></div>';document.getElementById('costsTotal').innerHTML='';return;}
   document.getElementById('costsList').innerHTML=costs.map(c=>`
     <div class="card hover-card ${c.status==='Payé'?'is-vendu':'is-stock'}" style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px">
       <div style="flex:1;min-width:0">
@@ -3219,7 +3268,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo"><span class="login-logo-t">T</span><span class="login-logo-d">ICKETDESK</span></div>
+    <div class="login-logo"><span class="logo-t-glow">T</span><span class="login-logo-d">ICKETDESK</span></div>
     <div class="login-tagline">Gestion de revente privée</div>
     <div class="login-error" id="loginError"></div>
     <label class="login-field-label">Identifiant</label>
