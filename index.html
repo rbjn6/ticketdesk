@@ -1833,6 +1833,11 @@ function renderDashMetrics() {
   // VALEUR STOCK VOULUE
   const totalWanted = base.filter(t => t.statut === 'En stock' && (t.wanted||0) > 0).reduce((s,t) => s + (t.wanted||0), 0);
 
+  // PRIX D'ACHAT STOCK — somme des buy des billets En stock et Réservés
+  const stockBuyTotal = base
+    .filter(t => t.statut === 'En stock' || t.statut === 'Réservé')
+    .reduce((s,t) => s + (t.buy||0), 0);
+
   // ROI — bénéfice brut / buy des vendus payés
   const buyOfSoldPaid = soldPaid.reduce((s,t) => s + (t.buy||0), 0);
   const roi = buyOfSoldPaid > 0 ? (grossP / buyOfSoldPaid) * 100 : null;
@@ -1863,6 +1868,7 @@ function renderDashMetrics() {
       <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
       ${(()=>{const rc=roi!==null?(roi>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI global</div><div class="metric-value" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}</div></div>`;})()}
       <div class="metric-card hover-card" style="border-top:2px solid #00b4ff;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid #bc8cff;${_cs}"><div class="metric-label">Prix d'achat stock</div><div class="metric-value" style="color:#bc8cff">${stockBuyTotal>0?fmtFull(stockBuyTotal):'—'}</div></div>
     </div>
   `;
 
