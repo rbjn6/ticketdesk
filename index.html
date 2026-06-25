@@ -321,7 +321,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <button class="snav active" id="snav-dashboard" onclick="showPage('dashboard')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard<span class="nav-badge" id="dashBadge"></span></button>
       <button class="snav" id="snav-journal" onclick="showPage('journal')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
       <button class="snav" id="snav-preorders" onclick="showPage('preorders')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
-      <button class="snav" id="snav-import" onclick="showPage('import')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>Import CSV</button>
       <button class="snav" id="snav-wts" onclick="showPage('wts')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>WTS</button>
       <button class="snav" id="snav-reservations" onclick="showPage('reservations')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>Réservations</button>
       <button class="snav" id="snav-gmail" onclick="showPage('gmail')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>Gmail</button>
@@ -413,30 +412,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
       <div id="preordersList"></div>
     </div>
 
-    <div class="page" id="page-import">
-      <div style="background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.4);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span style="font-size:13px;color:#ff6b6b;font-weight:600">FONCTION TEMPORAIRE — À supprimer après import</span>
-      </div>
-      <button class="btn btn-danger" onclick="resetAllData()" style="width:100%;justify-content:center;margin-bottom:16px;color:#ff6b6b;border-color:rgba(255,107,107,0.4)">🗑 Tout supprimer (journal + précos)</button>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Import CSV</span>
-        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,180,255,0.3),transparent)"></div>
-      </div>
-      <div class="card" style="padding:16px;margin-bottom:14px">
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6">Format attendu (première ligne = en-têtes) :<br>
-          <code style="font-size:11px;color:#8b9ab0">Statut, Événement, Date, Lieu, Catégorie, Bloc, Rang, Siège, Site d'achat, Compte, Mot de passe, Quantité, Prix achat total, Prix revente total, Acheteur, Plateforme revente, Paiement, Livraison, Date achat, Date vente, N° commande, Prix voulu</code>
-        </div>
-        <div class="fgroup">
-          <label class="flabel">Fichier CSV</label>
-          <input type="file" id="csvFileInput" accept=".csv" style="font-size:14px;color:var(--text-primary);background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 12px;width:100%;box-sizing:border-box;cursor:pointer">
-        </div>
-        <button onclick="loadCSV()" style="padding:10px 20px;background:#00b4ff;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='#007aa3'" onmouseleave="this.style.background='#00b4ff'">Charger le CSV</button>
-      </div>
-      <div id="csvPreview"></div>
-      <button id="csvImportBtn" onclick="importCSV()" style="display:none;width:100%;padding:12px;background:#00ff88;color:#0d1424;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'"></button>
-    </div>
 
     <div class="page" id="page-wts">
       <p style="font-size:15px;color:var(--text2);margin-bottom:12px">Billets <strong style="color:var(--text)">En stock</strong> — message Discord prêt à coller.</p>
@@ -468,10 +443,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
           <input type="checkbox" id="resa-show-rib" onchange="renderReservations()" style="width:16px;height:16px;cursor:pointer;-webkit-appearance:checkbox;appearance:checkbox">
           Inclure RIB + bénéficiaire
         </label>
-      </div>
-      <div id="resa-rib-fields" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px">
-        <div class="fgroup" style="margin-bottom:8px"><label class="flabel">IBAN</label><input type="text" id="resa-iban" placeholder="FR76..." oninput="renderReservations()"></div>
-        <div class="fgroup" style="margin-bottom:0"><label class="flabel">Bénéficiaire</label><input type="text" id="resa-beneficiaire" placeholder="Prénom Nom" oninput="renderReservations()"></div>
       </div>
       <div class="wts-box" id="resaPreview"></div>
       <div style="margin-top:10px">
@@ -563,6 +534,16 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
         <div class="fgroup"><label class="flabel">Instagram</label><input type="text" id="s-instagram" placeholder="@handle" oninput="saveContact()"></div>
         <div class="fgroup"><label class="flabel">Téléphone</label><input type="text" id="s-phone" placeholder="+33 6 00 00 00 00" oninput="saveContact()"></div>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Coordonnées bancaires</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(255,159,67,0.3),transparent)"></div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-left:3px solid #ff9f43;margin-bottom:20px">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5">Utilisées dans le message de réservation Discord si l'option est cochée.</div>
+        <div class="fgroup"><label class="flabel">IBAN</label><input type="text" id="s-iban" placeholder="FR76..." oninput="saveContact()"></div>
+        <div class="fgroup"><label class="flabel">Bénéficiaire</label><input type="text" id="s-beneficiaire" placeholder="Prénom Nom" oninput="saveContact()"></div>
+      </div>
     </div>
 
     <div class="page" id="page-costs">
@@ -592,7 +573,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     <button class="dnav active" id="dnav-dashboard" onclick="showPage('dashboard');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>Dashboard</button>
     <button class="dnav" id="dnav-journal" onclick="showPage('journal');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg></span>Journal</button>
     <button class="dnav" id="dnav-preorders" onclick="showPage('preorders');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Précommandes</button>
-    <button class="dnav" id="dnav-import" onclick="showPage('import');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>Import CSV</button>
     <button class="dnav" id="dnav-wts" onclick="showPage('wts');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>WTS</button>
     <button class="dnav" id="dnav-reservations" onclick="showPage('reservations');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>Réservations</button>
     <button class="dnav" id="dnav-gmail" onclick="showPage('gmail');closeDrawer()"><span class="dnav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>Gmail</button>
@@ -882,7 +862,6 @@ localStorage.removeItem(PREORDER_KEY);
 localStorage.removeItem('ticketdesk_drive_fid');
 let masterKey       = null;
 let masterKeyHash   = null;
-let csvParsed       = [];
 let _masterKeyCallback = null;
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
@@ -1372,7 +1351,6 @@ function showPage(name) {
   if (name === 'preorders') renderPreorders();
   if (name === 'wts')          renderWTS();
   if (name === 'reservations') renderReservations();
-  if (name === 'import')    { /* page is static, nothing to render */ }
   if (name === 'gmail')     renderGmail();
   if (name === 'costs')     renderCosts();
   if (name === 'settings')  renderSettings();
@@ -2347,7 +2325,15 @@ function saveContact() {
   const d = document.getElementById('s-discord');
   const i = document.getElementById('s-instagram');
   const p = document.getElementById('s-phone');
-  contact = {discord: d?d.value.trim():'', instagram: i?i.value.trim():'', phone: p?p.value.trim():''};
+  const iban = document.getElementById('s-iban');
+  const benef = document.getElementById('s-beneficiaire');
+  contact = {
+    discord: d?d.value.trim():'',
+    instagram: i?i.value.trim():'',
+    phone: p?p.value.trim():'',
+    iban: iban?iban.value.trim():'',
+    beneficiaire: benef?benef.value.trim():''
+  };
   localStorage.setItem('ticketdesk_contact', JSON.stringify(contact));
 }
 function autoArchiveExpired() {
@@ -2438,8 +2424,6 @@ function copyWTS(){
 // RÉSERVATIONS
 function renderReservations() {
   const showRib = document.getElementById('resa-show-rib')?.checked;
-  const ribFields = document.getElementById('resa-rib-fields');
-  if (ribFields) ribFields.style.display = showRib ? 'block' : 'none';
 
   const allReserved = transactions.filter(t => t.statut === 'Réservé');
 
@@ -2494,8 +2478,8 @@ function renderReservations() {
   lines.push(`**Total : ${fmtFull(total)}**`);
 
   if (showRib) {
-    const iban = document.getElementById('resa-iban')?.value.trim();
-    const benef = document.getElementById('resa-beneficiaire')?.value.trim();
+    const iban = contact.iban || '';
+    const benef = contact.beneficiaire || '';
     if (iban || benef) {
       lines.push('');
       if (iban) lines.push(`IBAN : ${iban}`);
@@ -2880,6 +2864,8 @@ function renderSettings(){
   const sd = document.getElementById('s-discord'); if(sd) sd.value = contact.discord || '';
   const si = document.getElementById('s-instagram'); if(si) si.value = contact.instagram || '';
   const sp = document.getElementById('s-phone'); if(sp) sp.value = contact.phone || '';
+  const siban = document.getElementById('s-iban'); if(siban) siban.value = contact.iban || '';
+  const sbenef = document.getElementById('s-beneficiaire'); if(sbenef) sbenef.value = contact.beneficiaire || '';
 }
 
 function _saveSettings(){
@@ -3110,116 +3096,6 @@ function saveCost(){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');editingId=null;}
 
-// CSV IMPORT
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-function _csvDate(s) {
-  if (!s) return '';
-  const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  return m ? `${m[3]}-${m[2]}-${m[1]}` : s;
-}
-async function resetAllData() {
-  if (!confirm('Supprimer toutes les transactions et précommandes ? Cette action est irréversible.')) return;
-  transactions = [];
-  preorders = [];
-  localStorage.removeItem(TX_KEY);
-  localStorage.removeItem(PREORDER_KEY);
-  driveFileId = null;
-  localStorage.removeItem('ticketdesk_drive_fid');
-  await driveSync();
-  renderDashboard();
-  renderJournal();
-  renderPreorders();
-  showToast('Données supprimées');
-}
-function loadCSV() {
-  const file = document.getElementById('csvFileInput').files[0];
-  if (!file) { showToast('Sélectionne un fichier CSV', 'err'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
-    if (lines.length < 2) { showToast('Fichier vide ou invalide', 'err'); return; }
-    const headers = parseCSVLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
-    const hi = h => headers.indexOf(h);
-    getMasterKey();
-    csvParsed = lines.slice(1).map((line, idx) => {
-      const f = parseCSVLine(line);
-      const g = i => (f[i] || '').replace(/^"|"$/g,'').trim();
-      const bloc = g(hi('Bloc')), rang = g(hi('Rang')), siege = g(hi('Siège'));
-      const placeParts = [];
-      if (bloc) placeParts.push('Bloc ' + bloc);
-      if (rang) placeParts.push('Rang ' + rang);
-      if (siege) placeParts.push('Siège ' + siege);
-      let compte = g(hi('Compte')), mdp = g(hi('Mot de passe'));
-      if (masterKey) { if (compte) compte = encryptField(compte); if (mdp) mdp = encryptField(mdp); }
-      return {
-        id:        Date.now() + Math.random() + idx,
-        statut:    g(hi('Statut')) || 'En stock',
-        event:     g(hi('Événement')),
-        date:      _csvDate(g(hi('Date'))),
-        lieu:      '',
-        cat:       g(hi('Catégorie')),
-        place:     placeParts.join(', '),
-        site:      g(hi("Site d'achat")),
-        compte, mdp,
-        qty:       parseInt(g(hi('Quantité'))) || 1,
-        buy:       parseFloat(g(hi('Prix achat total')).replace(',','.')) || 0,
-        sell:      parseFloat(g(hi('Prix revente total')).replace(',','.')) || 0,
-        buyer:     g(hi('Acheteur')),
-        platform:  g(hi('Plateforme revente')),
-        pay:       g(hi('Paiement')),
-        livraison: g(hi('Livraison')),
-        buyDate:   '',
-        saleDate:  '',
-        ordernum:  '',
-        wanted:    parseFloat(g(hi('Prix voulu')).replace(',','.')) || 0,
-      };
-    }).filter(t => t.event);
-    const preview = document.getElementById('csvPreview');
-    preview.innerHTML = `<div style="overflow-x:auto;border-radius:10px;border:1px solid #2d3d55;margin-bottom:4px"><table style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr style="background:#1a2540">${['Événement','Date','Statut','Qté','Prix achat','Prix vente'].map(h=>`<th style="padding:10px 12px;text-align:left;color:#8b9ab0;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap">${h}</th>`).join('')}</tr></thead>
-      <tbody>${csvParsed.map((t,i)=>`<tr style="border-top:1px solid rgba(45,61,85,0.5);background:${i%2?'rgba(255,255,255,0.01)':'transparent'}">
-        <td style="padding:9px 12px;color:var(--text-primary)">${t.event||'—'}</td>
-        <td style="padding:9px 12px;color:#00b4ff">${t.date||'—'}</td>
-        <td style="padding:9px 12px"><span class="badge ${t.statut==='Vendu'?'b-vendu':t.statut==='Archivé'?'b-archive':t.statut==='Réservé'?'b-reserve':'b-stock'}" style="font-size:11px">${t.statut}</span></td>
-        <td style="padding:9px 12px;color:var(--text-primary)">${t.qty}</td>
-        <td style="padding:9px 12px;color:var(--text-primary)">${t.buy?fmtFull(t.buy):'—'}</td>
-        <td style="padding:9px 12px;color:var(--text-primary)">${t.sell?fmtFull(t.sell):'—'}</td>
-      </tr>`).join('')}</tbody></table></div>`;
-    const btn = document.getElementById('csvImportBtn');
-    btn.textContent = `Importer ${csvParsed.length} ligne${csvParsed.length>1?'s':''} dans le Journal`;
-    btn.style.display = 'block';
-  };
-  reader.readAsText(file, 'UTF-8');
-}
-function importCSV() {
-  if (!csvParsed.length) return;
-  transactions.push(...csvParsed);
-  saveTx();
-  renderDashboard(); renderJournal(); renderWTS();
-  showToast(`${csvParsed.length} transaction${csvParsed.length>1?'s':''} importée${csvParsed.length>1?'s':''}`);
-  document.getElementById('csvPreview').innerHTML = '';
-  document.getElementById('csvImportBtn').style.display = 'none';
-  document.getElementById('csvFileInput').value = '';
-  csvParsed = [];
-  showPage('journal');
-}
 document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
 
 function checkAuth() {
