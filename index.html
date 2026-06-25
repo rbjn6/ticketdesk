@@ -1788,6 +1788,10 @@ function renderDashMetrics() {
   const soldPaid = (isAll ? base : base.filter(t => filterByPeriod(t.saleDate, from, to)))
     .filter(t => (t.statut === 'Vendu' || t.statut === 'Archivé') && t.pay === 'Payé');
   const tSell = soldPaid.reduce((s,t) => s + (t.sell||0), 0);
+  console.log('=== DEBUG CA ===');
+  console.log('Nombre soldPaid:', soldPaid.length);
+  soldPaid.forEach(t => console.log(t.event, t.statut, t.pay, 'sell:', t.sell, 'saleDate:', t.saleDate));
+  console.log('tSell total:', tSell);
 
   // BÉNÉFICE AVEC INVENDUS — CA - Coût total achats
   const profitWithStock = tSell - tBuy;
