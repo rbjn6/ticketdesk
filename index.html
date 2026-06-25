@@ -1880,13 +1880,14 @@ function renderDashMetrics() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[soldInPeriod.length,stockInPeriod.length],backgroundColor:['rgba(0,255,136,.75)','rgba(255,107,107,.75)'],borderWidth:0,hoverOffset:4}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[soldPaid.length,base.filter(t=>t.statut==='En stock'||t.statut==='Réservé').length],backgroundColor:['rgba(0,255,136,.75)','rgba(255,107,107,.75)'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
-  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldInPeriod.length + stockInPeriod.length}</span>`;
+  const _stockCount = base.filter(t => t.statut==='En stock' || t.statut==='Réservé').length;
+  document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldPaid.length + _stockCount}</span>`;
   document.getElementById('pieLegend').innerHTML=`
-    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,255,136,.75);margin-right:6px"></span>Vendus — ${soldInPeriod.length}</div>
-    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,107,107,.75);margin-right:6px"></span>En stock — ${stockInPeriod.length} (${sQty} places)</div>
+    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,255,136,.75);margin-right:6px"></span>Vendus — ${soldPaid.length}</div>
+    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,107,107,.75);margin-right:6px"></span>En stock — ${_stockCount} (${sQty} places)</div>
   `;
 }
 
