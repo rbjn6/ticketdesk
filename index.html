@@ -3090,6 +3090,10 @@ function _submitMasterKey() {
   err.textContent = '';
   if (!val) return;
   if (!masterKeyHash) {
+    if (!gmailToken) {
+      err.textContent = 'Connecte-toi à Google Drive pour créer ton mot de passe maître.';
+      return;
+    }
     const conf = document.getElementById('masterKeyConfirm').value.trim();
     if (val !== conf) { err.textContent = 'Les mots de passe ne correspondent pas'; return; }
     masterKeyHash = hashKey(val);
@@ -3111,6 +3115,10 @@ function _submitMasterKey() {
   }
 }
 function _toggleReveal(spanId, encVal) {
+  if (!gmailToken) {
+    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
+    return;
+  }
   getMasterKey();
   const span = document.getElementById(spanId);
   if (!span) return;
@@ -3128,6 +3136,10 @@ function _toggleReveal(spanId, encVal) {
   else openMasterKeyModal(doReveal);
 }
 function _copyField(encVal, successMsg) {
+  if (!gmailToken) {
+    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
+    return;
+  }
   getMasterKey();
   const doCopy = () => {
     const plain = decryptField(encVal) || (isEncrypted(encVal) ? null : encVal);
