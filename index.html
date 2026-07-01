@@ -80,17 +80,18 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .page{display:none}.page.active{display:block}
 .bottomnav{
   position:fixed;
-  bottom:0;
-  left:0;right:0;
-  height:68px;
-  background:#0d1424;
-  border:1px solid rgba(255,255,255,0.10);
-  border-radius:22px 22px 0 0;
+  bottom:8px;
+  left:10px;right:10px;
+  height:65px;
+  background:rgba(13,20,36,0.75);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:22px;
   display:none;
   align-items:center;
   z-index:100;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5);
-  padding-bottom:env(safe-area-inset-bottom, 0px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
 }
 
 /* ── MOBILE DRAWER ─────────────────────────────────── */
@@ -120,7 +121,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .sidebar{display:none}
   .bottomnav{display:flex !important}
   .topbar-mobile{display:flex;height:66px;padding:calc(var(--safe-top) + 16px) 20px 16px}
-  .content{padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px))}
+  .content{padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px))}
   .journal-header{display:none!important}
   .po-header-desktop{display:none!important}
   .tx-summary{display:none!important}
@@ -149,7 +150,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
   .tx-card-mobile .badge{font-size:12px!important}
   .tx-card-mobile .badge{font-size:13px!important;padding:4px 12px!important}
 }
-.bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;border:none;background:none;color:var(--text-secondary);font-size:9px;font-weight:500;font-family:inherit;cursor:pointer;gap:3px;transition:color .15s;text-transform:uppercase;letter-spacing:0.5px;position:relative}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border:none;background:none;color:var(--text-secondary);font-size:9px;font-weight:500;font-family:inherit;cursor:pointer;gap:4px;transition:color .15s;text-transform:uppercase;letter-spacing:0.5px;position:relative;height:100%}
 .bnav.active{color:var(--accent-blue)}
 .bnav.active::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:20px;height:1.5px;background:var(--accent-blue);border-radius:0 0 2px 2px}
 .bnav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center}
@@ -624,7 +625,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 <div id="autresOverlay" onclick="closeAutresMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98"></div>
 
-<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(68px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
+<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
   <button onclick="closeAutresMenu();showPage('preorders')" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:none;background:none;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;text-align:left">
     <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,180,255,0.10);border:1px solid rgba(0,180,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
