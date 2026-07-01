@@ -100,7 +100,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
 .drawer-head{height:20px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
-#journalFab{display:none;position:fixed;bottom:calc(88px + env(safe-area-inset-bottom, 0px));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
+#journalFab{display:none;position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
 @keyframes spin{from{transform:rotate(0deg)} to{transform:rotate(360deg)}}
 .drawer-logo{font-size:13px;font-weight:800;letter-spacing:3px;color:#f9fafb;text-transform:uppercase;flex:1}
 .drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
@@ -625,7 +625,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 <div id="autresOverlay" onclick="closeAutresMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98"></div>
 
-<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(70px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
+<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
   <button onclick="closeAutresMenu();showPage('preorders')" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:none;background:none;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;text-align:left">
     <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,180,255,0.10);border:1px solid rgba(0,180,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -934,7 +934,7 @@ let transactions    = JSON.parse(localStorage.getItem(TX_KEY)         || '[]');
 let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
 let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
 let masterKey       = null;
-let masterKeyHash   = localStorage.getItem('ticketdesk_mkh') || null;
+let masterKeyHash   = null;
 let _masterKeyCallback = null;
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
@@ -1432,7 +1432,6 @@ function toggleAutresMenu() {
     overlay.style.display = 'none';
     btn.classList.remove('active');
   } else {
-    document.querySelectorAll('.bnav').forEach(n => n.classList.remove('active'));
     menu.style.display = 'block';
     overlay.style.display = 'block';
     btn.classList.add('active');
@@ -3047,7 +3046,6 @@ function _logout(){
   localStorage.removeItem('ticketdesk_gmail_email');
   localStorage.removeItem('ticketdesk_drive_fid');
   localStorage.removeItem('ticketdesk_last_sync');
-  localStorage.removeItem('ticketdesk_mkh');
   sessionStorage.removeItem('td_unlocked');
   location.reload();
 }
@@ -3095,7 +3093,6 @@ function _submitMasterKey() {
     const conf = document.getElementById('masterKeyConfirm').value.trim();
     if (val !== conf) { err.textContent = 'Les mots de passe ne correspondent pas'; return; }
     masterKeyHash = hashKey(val);
-    localStorage.setItem('ticketdesk_mkh', masterKeyHash);
     masterKey = val;
     sessionStorage.setItem('td_mk', val);
     closeModal('masterKeyModal');
