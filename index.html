@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TicketDesk">
-<meta name="theme-color" content="#0d1424">
+<meta name="theme-color" content="var(--bg2)">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>TicketDesk</title>
@@ -81,16 +81,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter'
 /* ── MOBILE DRAWER ─────────────────────────────────── */
 .drawer-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:290;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .drawer-overlay.open{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden}
+.drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:var(--bg2);border-right:1px solid var(--border);z-index:295;transform:translateX(-100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
-.drawer-head{height:20px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
+.drawer-head{height:20px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
 #journalFab{display:none;position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
 @keyframes spin{from{transform:rotate(0deg)} to{transform:rotate(360deg)}}
 .drawer-logo{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:5px;color:rgba(255,255,255,0.88);flex:1}
-.drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
-.drawer-close:hover{color:#f9fafb}
+.drawer-close{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
+.drawer-close:hover{color:var(--text)}
 .drawer-nav{flex:1;padding:10px 8px;overflow-y:auto}
-.drawer-bottom{padding:12px 16px;border-top:1px solid #2d3d55;font-size:11px;color:#8b9ab0;flex-shrink:0}
+.drawer-bottom{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);flex-shrink:0}
 .dnav{width:100%;display:flex;align-items:center;gap:11px;padding:11px 12px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;border-radius:8px;transition:background .15s,color .15s;text-align:left;margin-bottom:2px}
 .dnav:hover{background:rgba(255,255,255,.05);color:var(--text-primary)}
 .dnav.active{background:rgba(0,180,255,.12);color:var(--accent-blue)}
@@ -298,7 +298,7 @@ input::placeholder{color:var(--text3)}
 .po-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
 .po-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .po-recherche{background:rgba(0,180,255,.15);color:var(--accent-blue)}
-.po-trouve{background:rgba(0,255,136,.15);color:var(--accent-green)}
+.po-trouve{background:rgba(82,201,138,.15);color:var(--accent-green)}
 .metric-block{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
 .metric-block-title{font-size:11px;color:var(--text-secondary);letter-spacing:.1em;margin-bottom:10px;font-weight:600;text-transform:uppercase}
 .metric-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
@@ -311,7 +311,7 @@ input::placeholder{color:var(--text3)}
 .alert-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-bottom:1px solid rgba(224,107,107,0.06);font-size:13px;line-height:1.4;transition:background 150ms;color:var(--text2)}
 .alert-item:last-child{border-bottom:none}
 .alert-item:hover{background:rgba(224,107,107,0.05)}
-@keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,107,107,0.4)}50%{transform:scale(1.1);box-shadow:0 0 0 4px rgba(255,107,107,0)}}
+@keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(224,107,107,0.4)}50%{transform:scale(1.1);box-shadow:0 0 0 4px rgba(224,107,107,0)}}
 .nav-badge{display:none;align-items:center;justify-content:center;background:var(--accent-red);color:#fff;font-size:10px;font-weight:700;min-width:15px;height:15px;border-radius:8px;padding:0 3px;margin-left:3px;line-height:1;vertical-align:middle;animation:badgePulse 2s infinite}
 .share-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
 .share-item:last-child{border-bottom:none}
@@ -344,7 +344,7 @@ input::placeholder{color:var(--text3)}
 
   <div class="main-content">
     <div class="topbar-mobile">
-      <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:#f9fafb;padding:6px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
+      <button onclick="openDrawer()" style="background:none;border:none;cursor:pointer;color:var(--text);padding:6px;display:flex;align-items:center;position:relative;border-radius:8px;flex-shrink:0">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         <span class="nav-badge" id="dashBadgeHamburger" style="position:absolute;top:2px;right:2px;display:none"></span>
       </button>
@@ -352,25 +352,25 @@ input::placeholder{color:var(--text3)}
     </div>
 
   <div class="content">
-    <div id="pullRefreshIndicator" style="display:none;align-items:center;justify-content:center;gap:8px;padding:12px;color:#8b9ab0;font-size:13px;background:#111827">
+    <div id="pullRefreshIndicator" style="display:none;align-items:center;justify-content:center;gap:8px;padding:12px;color:var(--text2);font-size:13px;background:#111827">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
       Synchronisation...
     </div>
 
     <div class="page active" id="page-dashboard">
-      <div id="driveWarning" style="display:none;background:#1a0f00;border:1px solid #ff9f43;border-radius:12px;padding:12px 16px;margin-bottom:10px;align-items:center;justify-content:space-between;gap:12px">
+      <div id="driveWarning" style="display:none;background:#1a0f00;border:1px solid var(--orange);border-radius:12px;padding:12px 16px;margin-bottom:10px;align-items:center;justify-content:space-between;gap:12px">
         <div style="display:flex;align-items:center;gap:10px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span style="font-size:13px;color:#ff9f43;font-weight:500">Google Drive non connecté — tes données ne sont pas sauvegardées</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span style="font-size:13px;color:var(--orange);font-weight:500">Google Drive non connecté — tes données ne sont pas sauvegardées</span>
         </div>
-        <button onclick="showPage('gmail')" class="btn btn-sm" style="border-color:#ff9f43;color:#ff9f43;flex-shrink:0">Connecter</button>
+        <button onclick="showPage('gmail')" class="btn btn-sm" style="border-color:var(--orange);color:var(--orange);flex-shrink:0">Connecter</button>
       </div>
       <div id="dashAlerts"></div>
       <div id="dashFilters"></div>
       <div id="metricsGrid"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Bénéfice par événement</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Bénéfice par événement</span></div>
       <div class="card" style="padding:12px"><div class="chart-wrap"><canvas id="chartEvents" role="img" aria-label="Bénéfice par événement"></canvas></div></div>
-      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Répartition</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg><span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Répartition</span></div>
       <div class="card" style="padding:12px;display:flex;align-items:center;gap:20px">
         <div style="position:relative;width:100px;height:100px;flex-shrink:0">
           <canvas id="chartPie" role="img" aria-label="Vendus vs stock"></canvas>
@@ -398,7 +398,7 @@ input::placeholder{color:var(--text3)}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
         <div style="position:relative;flex-shrink:0">
           <select id="po-filter-statut" onchange="renderPreorders()"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'"
             style="appearance:none;-webkit-appearance:none;padding:9px 28px 9px 12px;font-size:13px;border-radius:6px">
             <option value="">Tous les statuts</option>
             <option value="En recherche">En recherche</option>
@@ -409,13 +409,13 @@ input::placeholder{color:var(--text3)}
         <div style="position:relative;flex-shrink:0">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input id="po-search" type="text" placeholder="Rechercher événement…" oninput="renderPreorders()"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'"
             style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:200px">
         </div>
         <div style="position:relative;flex-shrink:0">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <input id="po-filter-buyer" type="text" placeholder="Acheteur…" oninput="renderPreorders()"
-            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+            onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'"
             style="padding:9px 12px 9px 32px;font-size:13px;border-radius:6px;width:160px">
         </div>
       </div>
@@ -507,7 +507,7 @@ input::placeholder{color:var(--text3)}
       <!-- Sécurité -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Sécurité</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Sécurité</span>
         <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,180,255,0.3),transparent)"></div>
       </div>
       <div class="card" style="padding:18px 20px;border-left:3px solid #00b4ff;margin-bottom:20px">
@@ -516,26 +516,26 @@ input::placeholder{color:var(--text3)}
         <div class="fgroup"><label class="flabel">Code PIN</label><input type="password" id="s-pin" placeholder="••••" maxlength="6"></div>
         <div class="fgroup"><label class="flabel">Confirmer le PIN</label><input type="password" id="s-pin2" placeholder="••••" maxlength="6"></div>
         <div id="settings-error" style="font-size:13px;color:var(--red);margin-bottom:10px;min-height:18px"></div>
-        <button onclick="_saveSettings()" style="width:100%;padding:11px;background:#00b4ff;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='#007aa3'" onmouseleave="this.style.background='#00b4ff'">Enregistrer</button>
+        <button onclick="_saveSettings()" style="width:100%;padding:11px;background:#00b4ff;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='#19bcff'" onmouseleave="this.style.background='#00b4ff'">Enregistrer</button>
       </div>
       <!-- Compte Google -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2H3v16h5l3 3 3-3h7V2z"/></svg>
-        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Compte Google</span>
-        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,255,136,0.3),transparent)"></div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2H3v16h5l3 3 3-3h7V2z"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Compte Google</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(82,201,138,0.3),transparent)"></div>
       </div>
-      <div class="card" style="padding:18px 20px;border-left:3px solid #00ff88;margin-bottom:20px">
+      <div class="card" style="padding:18px 20px;border-left:3px solid var(--green);margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span id="settings-gmail-dot" style="width:7px;height:7px;border-radius:50%;background:#484f58;flex-shrink:0"></span>
           <span id="settings-gmail-info" style="font-size:13px;color:var(--text2)"></span>
         </div>
-        <button onclick="gmailConnect()" style="width:100%;padding:10px;background:transparent;color:#00ff88;border:1px solid rgba(0,255,136,0.3);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s;margin-bottom:8px" onmouseenter="this.style.background='rgba(0,255,136,0.07)';this.style.borderColor='rgba(0,255,136,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(0,255,136,0.3)'">Reconnecter Gmail + Drive</button>
-        <button onclick="_logout()" style="width:100%;padding:10px;background:transparent;color:#ff6b6b;border:1px solid rgba(255,107,107,0.25);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s" onmouseenter="this.style.background='rgba(255,107,107,0.07)';this.style.borderColor='rgba(255,107,107,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(255,107,107,0.25)'">Se déconnecter</button>
+        <button onclick="gmailConnect()" style="width:100%;padding:10px;background:transparent;color:var(--green);border:1px solid rgba(82,201,138,0.3);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s;margin-bottom:8px" onmouseenter="this.style.background='rgba(82,201,138,0.07)';this.style.borderColor='rgba(82,201,138,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(82,201,138,0.3)'">Reconnecter Gmail + Drive</button>
+        <button onclick="_logout()" style="width:100%;padding:10px;background:transparent;color:var(--red);border:1px solid rgba(224,107,107,0.25);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s" onmouseenter="this.style.background='rgba(224,107,107,0.07)';this.style.borderColor='rgba(224,107,107,0.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(224,107,107,0.25)'">Se déconnecter</button>
       </div>
       <!-- Contact -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Informations de contact</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Informations de contact</span>
         <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(139,154,176,0.3),transparent)"></div>
       </div>
       <div class="card" style="padding:18px 20px;border-left:3px solid rgba(139,154,176,0.4);margin-bottom:20px">
@@ -545,11 +545,11 @@ input::placeholder{color:var(--text3)}
         <div class="fgroup"><label class="flabel">Téléphone</label><input type="text" id="s-phone" placeholder="+33 6 00 00 00 00" oninput="saveContact()"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8b9ab0">Coordonnées bancaires</span>
-        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(255,159,67,0.3),transparent)"></div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)">Coordonnées bancaires</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(201,145,74,0.3),transparent)"></div>
       </div>
-      <div class="card" style="padding:18px 20px;border-left:3px solid #ff9f43;margin-bottom:20px">
+      <div class="card" style="padding:18px 20px;border-left:3px solid var(--orange);margin-bottom:20px">
         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5">Utilisées dans le message de réservation Discord si l'option est cochée.</div>
         <div class="fgroup"><label class="flabel">IBAN</label><input type="text" id="s-iban" placeholder="FR76..." oninput="saveContact()"></div>
         <div class="fgroup"><label class="flabel">Bénéficiaire</label><input type="text" id="s-beneficiaire" placeholder="Prénom Nom" oninput="saveContact()"></div>
@@ -1018,7 +1018,7 @@ function renderPreorders() {
     if (poBuyer  && !(p.buyer||'').toLowerCase().includes(poBuyer))  return false;
     return true;
   });
-  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucune précommande</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Suis les demandes de tes clients ici</div><button onclick="openPreorderModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter une précommande</button></div>'; return; }
+  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--bg4)" stroke-width="1.2" style="margin-bottom:20px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div style="font-size:16px;font-weight:600;color:var(--text3);margin-bottom:8px">Aucune précommande</div><div style="font-size:13px;color:var(--border);margin-bottom:20px">Suis les demandes de tes clients ici</div><button onclick="openPreorderModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter une précommande</button></div>'; return; }
   const sorted = [...filtered].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const GRID = '100px 16px 140px 95px 25px 16px 110px 1fr 100px 100px 85px 85px';
   const CS = 'padding:0 6px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
@@ -1027,7 +1027,7 @@ function renderPreorders() {
   </div>`;
   const cards = sorted.map(p => {
     const borderColor = p.statut==='Trouvé' ? 'var(--accent-green)' : 'var(--accent-blue)';
-    const badgeHex    = p.statut==='Trouvé' ? '#00ff88' : '#00b4ff';
+    const badgeHex    = p.statut==='Trouvé' ? 'var(--green)' : '#00b4ff';
     const statusClass = p.statut==='Trouvé' ? 'is-trouve' : 'is-recherche';
     const did = 'pod-'+p.id;
     return `<div class="tx-card ${statusClass}" style="border-left:3px solid ${borderColor}" onclick="togglePODetail('${did}')">
@@ -1070,9 +1070,9 @@ function renderPreorders() {
           ${p.qty?`<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Quantité</div><div style="font-size:14px;color:var(--text-primary)">${p.qty}x</div></div>`:''}
         </div>
         <div style="display:flex;gap:8px;padding-top:14px;border-top:1px solid var(--border)">
-          <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'">Modifier</button>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'">Transférer</button>
-          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'">Supprimer</button>
+          <button class="btn btn-sm" onclick="event.stopPropagation();openPreorderModal(${p.id})" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'">Modifier</button>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();transferPreorderToJournal(${p.id})" onmouseenter="this.style.background='#19bcff';this.style.borderColor='#19bcff'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'">Transférer</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePreorder(${p.id})" onmouseenter="this.style.borderColor='var(--red)';this.style.background='rgba(224,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(224,107,107,0.4)';this.style.background='transparent'">Supprimer</button>
         </div>
       </div>
     </div>`;
@@ -1463,7 +1463,7 @@ function renderDashFilters() {
     ...transactions.map(t => (t.saleDate||'').substring(0,4)),
     ...costs.map(c => (c.date||'').substring(0,4))
   ].filter(y => y && y.length === 4))].sort();
-  const selStyle = `width:auto !important;min-width:unset !important;flex:none !important;padding:4px 24px 4px 10px;font-size:12px;border-radius:20px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;cursor:pointer;appearance:none;-webkit-appearance:none;height:28px;outline:none;display:inline-block`;
+  const selStyle = `width:auto !important;min-width:unset !important;flex:none !important;padding:4px 24px 4px 10px;font-size:12px;border-radius:20px;background:var(--bg3);border:1px solid #00b4ff;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;height:28px;outline:none;display:inline-block`;
   const showMonth = dashPeriod === 'month' || dashSelectedMonth !== '';
   const showYear  = dashPeriod === 'year'  || dashSelectedYear  !== '';
   const monthSelect = showMonth ? `
@@ -1488,9 +1488,9 @@ function renderDashFilters() {
       ${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}
     </select>` : '';
   const resetBtn = (dashSelectedMonth || dashSelectedYear) ? `
-    <button onclick="setDashFilter('reset','')" style="font-size:11px;color:#8b9ab0;background:none;border:none;cursor:pointer;padding:2px 6px;flex-shrink:0">× Réinit.</button>` : '';
+    <button onclick="setDashFilter('reset','')" style="font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;padding:2px 6px;flex-shrink:0">× Réinit.</button>` : '';
   const isMobile = window.innerWidth < 768;
-  const mSelStyle = `width:100%;padding:10px 12px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #00b4ff;color:#f9fafb;-webkit-appearance:none;appearance:none`;
+  const mSelStyle = `width:100%;padding:10px 12px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid #00b4ff;color:var(--text);-webkit-appearance:none;appearance:none`;
   const monthOpts = `<option value="">Tous</option><option value="01" ${dashSelectedMonth==='01'?'selected':''}>Janvier</option><option value="02" ${dashSelectedMonth==='02'?'selected':''}>Février</option><option value="03" ${dashSelectedMonth==='03'?'selected':''}>Mars</option><option value="04" ${dashSelectedMonth==='04'?'selected':''}>Avril</option><option value="05" ${dashSelectedMonth==='05'?'selected':''}>Mai</option><option value="06" ${dashSelectedMonth==='06'?'selected':''}>Juin</option><option value="07" ${dashSelectedMonth==='07'?'selected':''}>Juillet</option><option value="08" ${dashSelectedMonth==='08'?'selected':''}>Août</option><option value="09" ${dashSelectedMonth==='09'?'selected':''}>Septembre</option><option value="10" ${dashSelectedMonth==='10'?'selected':''}>Octobre</option><option value="11" ${dashSelectedMonth==='11'?'selected':''}>Novembre</option><option value="12" ${dashSelectedMonth==='12'?'selected':''}>Décembre</option>`;
   const yearOpts = `<option value="">Toutes</option>${years.map(y=>`<option value="${y}" ${dashSelectedYear===y?'selected':''}>${y}</option>`).join('')}`;
   const mobileSelects = (showMonth||showYear) && isMobile ? `
@@ -1512,11 +1512,11 @@ function renderDashFilters() {
     ${mobileSelects}
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <div style="position:relative;flex:1">
-        <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" placeholder="Rechercher événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="width:100% !important;padding:8px 10px 8px 30px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;box-sizing:border-box">
+        <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Rechercher événement…" value="${dashEventFilter}" oninput="setDashFilter('event',this.value)" style="width:100% !important;padding:8px 10px 8px 30px;font-size:13px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);box-sizing:border-box">
       </div>
       <div style="position:relative;flex:1">
-        <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="width:100% !important;padding:8px 10px;font-size:13px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;box-sizing:border-box">
+        <input type="text" placeholder="Acheteur…" value="${dashBuyerFilter}" oninput="setDashFilter('buyer',this.value)" style="width:100% !important;padding:8px 10px;font-size:13px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);box-sizing:border-box">
       </div>
     </div>`;
 }
@@ -1572,7 +1572,7 @@ function renderWTSSection(prefix, section, values, type) {
     ? values.map(v => `<label class="share-item"><input type="checkbox" class="${prefix}-${type}-cb" value="${v}" checked onchange="${onch}"
         style="width:18px;height:18px;min-width:18px;padding:0;margin:0;border:none;background:none;-webkit-appearance:checkbox;appearance:checkbox;cursor:pointer;flex-shrink:0">
         <div style="font-size:14px;font-weight:600">${type === 'date' ? fmtDate(v) : v+'x'}</div></label>`).join('')
-    : '<div style="font-size:13px;color:#8b9ab0;padding:6px 8px">Aucune option disponible</div>';
+    : '<div style="font-size:13px;color:var(--text2);padding:6px 8px">Aucune option disponible</div>';
 }
 
 function toggleAllShareSection(cls, v) {
@@ -1654,15 +1654,15 @@ function renderPublicStock(raw) {
   document.getElementById('publicContent').innerHTML = `
     <div style="background:#111827;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif">
       <div style="max-width:700px;margin:0 auto;padding:0 16px 60px">
-        <div style="text-align:center;padding:40px 20px 32px;border-bottom:1px solid #2d3d55;margin-bottom:32px">
-          <div style="font-size:12px;font-weight:800;letter-spacing:6px;text-transform:uppercase;margin-bottom:8px"><span style="color:#00b4ff">T</span><span style="color:#f9fafb">ICKETDESK</span></div>
-          <div style="font-size:22px;font-weight:700;color:#f9fafb;margin-bottom:4px">Billets disponibles</div>
-          <div style="font-size:13px;color:#8b9ab0">${totalPlaces} place${totalPlaces>1?'s':''} · Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+        <div style="text-align:center;padding:40px 20px 32px;border-bottom:1px solid var(--border);margin-bottom:32px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:6px;text-transform:uppercase;margin-bottom:8px"><span style="color:#00b4ff">T</span><span style="color:var(--text)">ICKETDESK</span></div>
+          <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">Billets disponibles</div>
+          <div style="font-size:13px;color:var(--text2)">${totalPlaces} place${totalPlaces>1?'s':''} · Mis à jour le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
         </div>
-        ${!data.length ? '<p style="color:#8b9ab0;font-size:14px;text-align:center">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
-          <div style="background:#1a2540;border:1px solid #2d3d55;border-radius:16px;padding:0;margin-bottom:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
-            <div style="padding:20px 24px;border-bottom:1px solid #2d3d55;background:#131f35">
-              <div style="font-size:22px;font-weight:800;color:#f9fafb;letter-spacing:0.3px">${eventName}</div>
+        ${!data.length ? '<p style="color:var(--text2);font-size:14px;text-align:center">Aucun billet disponible.</p>' : Object.entries(byEvent).map(([eventName,byDate])=>`
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:0;margin-bottom:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3)">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:#131f35">
+              <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:0.3px">${eventName}</div>
             </div>
             ${Object.entries(byDate).map(([date,tickets])=>`
               <div style="padding:16px 24px">
@@ -1672,16 +1672,16 @@ function renderPublicStock(raw) {
                 </div>`:''}
                 ${tickets.map(t=>{
                   const ppp = t.wanted&&t.qty ? t.wanted/t.qty : null;
-                  return `<div style="background:#0d1424;border:1px solid #2d3d55;border-left:3px solid #00b4ff;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:16px">
+                  return `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid #00b4ff;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:16px">
                     <div style="flex:1;min-width:0">
                       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-                        <span style="font-size:16px;font-weight:700;color:#f9fafb">${t.qty}x</span>
+                        <span style="font-size:16px;font-weight:700;color:var(--text)">${t.qty}x</span>
                         <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(0,180,255,0.15);color:#00b4ff;white-space:nowrap">${t.cat||'—'}</span>
                       </div>
-                      ${t.place?`<div style="font-size:13px;color:#8b9ab0;margin-top:2px">${t.place}</div>`:''}
+                      ${t.place?`<div style="font-size:13px;color:var(--text2);margin-top:2px">${t.place}</div>`:''}
                     </div>
                     <div style="text-align:right;flex-shrink:0">
-                      ${ppp?`<div style="font-size:20px;font-weight:700;color:#f9fafb">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:#8b9ab0">/place</span></div>`:`<div style="font-size:13px;color:#4a5568;font-style:italic">Prix sur demande</div>`}
+                      ${ppp?`<div style="font-size:20px;font-weight:700;color:var(--text)">${fmtFull(ppp)}<span style="font-size:12px;font-weight:400;color:var(--text2)">/place</span></div>`:`<div style="font-size:13px;color:var(--text3);font-style:italic">Prix sur demande</div>`}
                     </div>
                   </div>`;
                 }).join('')}
@@ -1689,16 +1689,16 @@ function renderPublicStock(raw) {
             `).join('')}
           </div>
         `).join('')}
-        <div style="text-align:center;padding:20px;background:#1a2540;border:1px solid #2d3d55;border-radius:12px;margin-top:16px">
-          <div style="font-size:14px;font-weight:600;color:#f9fafb;margin-bottom:12px">Nous contacter</div>
+        <div style="text-align:center;padding:20px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-top:16px">
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px">Nous contacter</div>
           <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
-            ${pubContact.discord?`<div style="font-size:13px;color:#8b9ab0">Discord : <span style="color:#f9fafb">${pubContact.discord}</span></div>`:''}
-            ${pubContact.instagram?`<div style="font-size:13px;color:#8b9ab0">Instagram : <span style="color:#f9fafb">${pubContact.instagram}</span></div>`:''}
-            ${pubContact.phone?`<div style="font-size:13px;color:#8b9ab0">Téléphone : <span style="color:#f9fafb">${pubContact.phone}</span></div>`:''}
-            ${!pubContact.discord&&!pubContact.instagram&&!pubContact.phone?`<div style="font-size:13px;color:#8b9ab0">Contactez-nous pour plus d'informations.</div>`:''}
+            ${pubContact.discord?`<div style="font-size:13px;color:var(--text2)">Discord : <span style="color:var(--text)">${pubContact.discord}</span></div>`:''}
+            ${pubContact.instagram?`<div style="font-size:13px;color:var(--text2)">Instagram : <span style="color:var(--text)">${pubContact.instagram}</span></div>`:''}
+            ${pubContact.phone?`<div style="font-size:13px;color:var(--text2)">Téléphone : <span style="color:var(--text)">${pubContact.phone}</span></div>`:''}
+            ${!pubContact.discord&&!pubContact.instagram&&!pubContact.phone?`<div style="font-size:13px;color:var(--text2)">Contactez-nous pour plus d'informations.</div>`:''}
           </div>
         </div>
-        <div style="text-align:center;margin-top:20px;font-size:11px;color:#4a5568;letter-spacing:1px">TICKETDESK · Gestion de revente privée</div>
+        <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--text3);letter-spacing:1px">TICKETDESK · Gestion de revente privée</div>
       </div>
     </div>`;
 }
@@ -1714,32 +1714,32 @@ function computeAlerts() {
     // Invendu + événement imminent
     if (t.statut !== 'Vendu') {
       if (daysUntil <= 1)
-        alerts.push({urgency:0, color:'#ff6b6b', msg:`${t.event} dans moins de 24h — pas encore vendu`,       id:t.id, type:'24h-invendu'});
+        alerts.push({urgency:0, color:'var(--red)', msg:`${t.event} dans moins de 24h — pas encore vendu`,       id:t.id, type:'24h-invendu'});
       else if (daysUntil <= 3)
-        alerts.push({urgency:1, color:'#ff6b6b', msg:`${t.event} dans moins de 3 jours — pas encore vendu`,   id:t.id, type:'3j-invendu'});
+        alerts.push({urgency:1, color:'var(--red)', msg:`${t.event} dans moins de 3 jours — pas encore vendu`,   id:t.id, type:'3j-invendu'});
       else if (daysUntil <= 7)
-        alerts.push({urgency:2, color:'#ff6b6b', msg:`${t.event} dans moins de 7 jours — pas encore vendu`,   id:t.id, type:'7j-invendu'});
+        alerts.push({urgency:2, color:'var(--red)', msg:`${t.event} dans moins de 7 jours — pas encore vendu`,   id:t.id, type:'7j-invendu'});
       else if (daysUntil <= 15)
-        alerts.push({urgency:3, color:'#ff9f43', msg:`${t.event} dans moins de 15 jours — pas encore vendu`,  id:t.id, type:'15j-invendu'});
+        alerts.push({urgency:3, color:'var(--orange)', msg:`${t.event} dans moins de 15 jours — pas encore vendu`,  id:t.id, type:'15j-invendu'});
     }
 
     // Vendu mais non livré + événement imminent
     if (t.statut === 'Vendu' && t.livraison !== 'Livré') {
       if (daysUntil <= 1)
-        alerts.push({urgency:0, color:'#ff6b6b', msg:`${t.event} dans moins de 24h — transfert en attente`,       id:t.id, type:'24h-nonlivre'});
+        alerts.push({urgency:0, color:'var(--red)', msg:`${t.event} dans moins de 24h — transfert en attente`,       id:t.id, type:'24h-nonlivre'});
       else if (daysUntil <= 3)
-        alerts.push({urgency:1, color:'#ff6b6b', msg:`${t.event} dans moins de 3 jours — transfert en attente`,   id:t.id, type:'3j-nonlivre'});
+        alerts.push({urgency:1, color:'var(--red)', msg:`${t.event} dans moins de 3 jours — transfert en attente`,   id:t.id, type:'3j-nonlivre'});
       else if (daysUntil <= 7)
-        alerts.push({urgency:2, color:'#ff6b6b', msg:`${t.event} dans moins de 7 jours — transfert en attente`,   id:t.id, type:'7j-nonlivre'});
+        alerts.push({urgency:2, color:'var(--red)', msg:`${t.event} dans moins de 7 jours — transfert en attente`,   id:t.id, type:'7j-nonlivre'});
     }
 
     // Paiement en attente
     if (t.statut === 'Vendu' && t.pay === 'En attente' && t.saleDate) {
       const daysSinceSale = Math.floor((now - new Date(t.saleDate)) / (1000*60*60*24));
       if (daysSinceSale >= 7)
-        alerts.push({urgency:4, color:'#ff9f43', msg:`Paiement en attente depuis 7 jours — ${t.event}`, id:t.id, type:'paiement7j'});
+        alerts.push({urgency:4, color:'var(--orange)', msg:`Paiement en attente depuis 7 jours — ${t.event}`, id:t.id, type:'paiement7j'});
       else if (daysSinceSale >= 3)
-        alerts.push({urgency:5, color:'#ff9f43', msg:`Paiement en attente depuis 3 jours — ${t.event}`, id:t.id, type:'paiement3j'});
+        alerts.push({urgency:5, color:'var(--orange)', msg:`Paiement en attente depuis 3 jours — ${t.event}`, id:t.id, type:'paiement3j'});
     }
   });
   alerts.sort((a,b) => a.urgency - b.urgency);
@@ -1756,7 +1756,7 @@ function renderDashAlerts() {
     } else {
       el.innerHTML = `<div class="alerts-wrap">
         <div class="alert-header" onclick="toggleAlerts()">
-          <span style="color:#ff6b6b">${alerts.length} alerte${alerts.length>1?'s':''}</span>
+          <span style="color:var(--red)">${alerts.length} alerte${alerts.length>1?'s':''}</span>
           <svg style="flex-shrink:0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="${alertsCollapsed?'6 9 12 15 18 9':'6 15 12 9 18 15'}"/></svg>
         </div>
         ${alertsCollapsed?'':alerts.map(a=>`<div class="alert-item" onclick="openTicketInJournal(${a.id})"><span style="width:6px;height:6px;border-radius:50%;background:${a.color};flex-shrink:0;display:inline-block"></span>${a.msg}<span style="margin-left:auto;color:var(--text3);font-size:12px">›</span></div>`).join('')}
@@ -1896,7 +1896,7 @@ function renderDashMetrics() {
   const stock = tx.filter(t => t.statut === 'En stock' || t.statut === 'Réservé');
 
   const _fz = v => (Math.abs(v) < 0.005) ? 0 : v;
-  const _db = v => Math.round(v) >= 0 ? '#00ff88' : '#ff6b6b';
+  const _db = v => Math.round(v) >= 0 ? 'var(--green)' : 'var(--red)';
   const _cls = v => Math.round(v) >= 0 ? 'mv-pos' : 'mv-neg';
   const _fmt = v => fmtFull(v);
   const _cs = 'min-height:100px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box';
@@ -1905,24 +1905,24 @@ function renderDashMetrics() {
   document.getElementById('metricsGrid').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;align-items:stretch;margin-bottom:14px">
 
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value" data-metric="tBuy" style="color:#f9fafb">${fmtFull(tBuy)}</div></div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value" data-metric="tSell" style="color:#f9fafb">${fmtFull(tSell)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coût total achats</div><div class="metric-value" data-metric="tBuy" style="color:var(--text)">${fmtFull(tBuy)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Chiffre d'affaires</div><div class="metric-value" data-metric="tSell" style="color:var(--text)">${fmtFull(tSell)}</div></div>
       <div class="metric-card hover-card" style="${_csB(profitWithStock)}"><div class="metric-label">Bénéfice avec invendus</div><div class="metric-value ${_cls(profitWithStock)}" data-metric="profitWithStock">${_fmt(profitWithStock)}</div></div>
 
       <div class="metric-card hover-card" style="${_csB(grossP)}"><div class="metric-label">Bénéfice brut</div><div class="metric-value ${_cls(grossP)}" data-metric="grossP">${_fmt(grossP)}</div></div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value" data-metric="paidC" style="color:#f9fafb">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Coûts fixes payés</div><div class="metric-value" data-metric="paidC" style="color:var(--text)">${paidC===0?fmtFull(0):'−'+fmtFull(paidC)}</div></div>
       <div class="metric-card hover-card" style="${_csB(netP)}"><div class="metric-label">Bénéfice net</div><div class="metric-value ${_cls(netP)}" data-metric="netP">${_fmt(netP)}</div></div>
 
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Prix d'achat stock</div><div class="metric-value" data-metric="stockBuyTotal" style="color:#f9fafb">${stockBuyTotal>0?fmtFull(stockBuyTotal):'—'}</div></div>
-      <div class="metric-card hover-card" style="border-top:2px solid #ff9f43;${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" data-metric="totalARecevoir" style="color:#ff9f43">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
-      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" data-metric="totalWanted" style="color:#f9fafb">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Prix d'achat stock</div><div class="metric-value" data-metric="stockBuyTotal" style="color:var(--text)">${stockBuyTotal>0?fmtFull(stockBuyTotal):'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:2px solid var(--orange);${_cs}"><div class="metric-label">À recevoir</div><div class="metric-value" data-metric="totalARecevoir" style="color:var(--orange)">${totalARecevoir>0?fmtFull(totalARecevoir):'—'}</div>${totalARecevoir>0?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">dont ${fmtFull(pendingPay)} vendus en attente · ${fmtFull(reservedAmt)} réservés</div>`:''}</div>
+      <div class="metric-card hover-card" style="border-top:none;${_cs}"><div class="metric-label">Valeur stock voulue</div><div class="metric-value" data-metric="totalWanted" style="color:var(--text)">${totalWanted>0?fmtFull(totalWanted):'—'}</div></div>
 
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value" data-metric="soldQty" style="color:#f9fafb">${soldQty}</div></div>
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" data-metric="reservedQty" style="color:#f9fafb">${reservedQty||'—'}</div></div>
-      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value" data-metric="sQty" style="color:#f9fafb">${sQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places vendues</div><div class="metric-value" data-metric="soldQty" style="color:var(--text)">${soldQty}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places réservées</div><div class="metric-value" data-metric="reservedQty" style="color:var(--text)">${reservedQty||'—'}</div></div>
+      <div class="metric-card hover-card" style="border-top:1px solid var(--border);${_cs}"><div class="metric-label">Places en stock</div><div class="metric-value" data-metric="sQty" style="color:var(--text)">${sQty}</div></div>
 
       <div></div>
-      ${(()=>{const rc=roi!==null?(roi>=0?'#00ff88':'#ff6b6b'):'#8b9ab0';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI Global</div><div class="metric-value" data-metric="roi" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+Math.round(roi)+'%':'—'}</div></div>`;})()}
+      ${(()=>{const rc=roi!==null?(roi>=0?'var(--green)':'var(--red)'):'var(--text2)';return`<div class="metric-card hover-card" style="border-top:2px solid ${rc};${_cs}"><div class="metric-label">ROI Global</div><div class="metric-value" data-metric="roi" style="color:${rc}">${roi!==null?(roi>=0?'+':'')+Math.round(roi)+'%':'—'}</div></div>`;})()}
       <div></div>
 
     </div>
@@ -1956,13 +1956,13 @@ function renderDashMetrics() {
 
   if(chartEvents)chartEvents.destroy();
   const _ctx=document.getElementById('chartEvents').getContext('2d');
-  const _gPos=_ctx.createLinearGradient(0,0,0,200);_gPos.addColorStop(0,'rgba(0,255,136,.9)');_gPos.addColorStop(1,'rgba(0,255,136,.4)');
-  const _gNeg=_ctx.createLinearGradient(0,0,0,200);_gNeg.addColorStop(0,'rgba(255,107,107,.9)');_gNeg.addColorStop(1,'rgba(255,107,107,.4)');
+  const _gPos=_ctx.createLinearGradient(0,0,0,200);_gPos.addColorStop(0,'rgba(82,201,138,.9)');_gPos.addColorStop(1,'rgba(82,201,138,.4)');
+  const _gNeg=_ctx.createLinearGradient(0,0,0,200);_gNeg.addColorStop(0,'rgba(224,107,107,.9)');_gNeg.addColorStop(1,'rgba(224,107,107,.4)');
   chartEvents=new Chart(_ctx,{
     type:'bar',
     data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?_gPos:_gNeg),borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2540',borderColor:'#2d3d55',borderWidth:1,padding:12,callbacks:{label:ctx=>' Bénéfice : '+new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(ctx.raw)}},datalabels:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'var(--bg3)',borderColor:'var(--border)',borderWidth:1,padding:12,callbacks:{label:ctx=>' Bénéfice : '+new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(ctx.raw)}},datalabels:false},
       scales:{
         x:{ticks:{color:'#484f58',font:{size:10},maxRotation:30,autoSkip:false},grid:{display:false},border:{display:false}},
         y:{ticks:{color:'#484f58',font:{size:10},callback:v=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v)},grid:{color:'rgba(45,61,85,0.3)'},border:{display:false}}
@@ -1973,14 +1973,14 @@ function renderDashMetrics() {
   if(chartPie)chartPie.destroy();
   chartPie=new Chart(document.getElementById('chartPie'),{
     type:'doughnut',
-    data:{labels:['Vendus','En stock'],datasets:[{data:[soldPaid.length,base.filter(t=>t.statut==='En stock'||t.statut==='Réservé').length],backgroundColor:['rgba(0,255,136,.75)','rgba(255,107,107,.75)'],borderWidth:0,hoverOffset:4}]},
+    data:{labels:['Vendus','En stock'],datasets:[{data:[soldPaid.length,base.filter(t=>t.statut==='En stock'||t.statut==='Réservé').length],backgroundColor:['rgba(82,201,138,.75)','rgba(224,107,107,.75)'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
   });
   const _stockCount = base.filter(t => t.statut==='En stock' || t.statut==='Réservé').length;
   document.getElementById('pieCenter').innerHTML=`<span style="font-size:16px;font-weight:600;color:var(--text)">${soldPaid.length + _stockCount}</span>`;
   document.getElementById('pieLegend').innerHTML=`
-    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,255,136,.75);margin-right:6px"></span>Vendus — ${soldPaid.length}</div>
-    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,107,107,.75);margin-right:6px"></span>En stock — ${_stockCount} (${sQty} places)</div>
+    <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(82,201,138,.75);margin-right:6px"></span>Vendus — ${soldPaid.length}</div>
+    <div style="margin-top:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(224,107,107,.75);margin-right:6px"></span>En stock — ${_stockCount} (${sQty} places)</div>
   `;
 }
 
@@ -2004,7 +2004,7 @@ function renderFilters() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div style="position:relative;flex-shrink:0">
-            <select id="sel-statut" onchange="setFilter('statut',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <select id="sel-statut" onchange="setFilter('statut',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
               <option value="">Statut</option>
               <option value="Vendu">Vendus</option>
               <option value="En stock">En stock</option>
@@ -2014,7 +2014,7 @@ function renderFilters() {
             <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
           </div>
           <div style="position:relative;flex-shrink:0">
-            <select id="sel-pay" onchange="setFilter('pay',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <select id="sel-pay" onchange="setFilter('pay',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
               <option value="">Paiement</option>
               <option value="Payé">Payé</option>
               <option value="En attente">En attente</option>
@@ -2022,7 +2022,7 @@ function renderFilters() {
             <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
           </div>
           <div style="position:relative;flex-shrink:0">
-            <select id="sel-livraison" onchange="setFilter('livraison',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <select id="sel-livraison" onchange="setFilter('livraison',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
               <option value="">Livraison</option>
               <option value="Livré">Livré</option>
               <option value="Non livré">Non livré</option>
@@ -2030,7 +2030,7 @@ function renderFilters() {
             <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2);font-size:9px">▼</span>
           </div>
           <div style="position:relative;flex-shrink:0">
-            <select id="sel-sort" onchange="setFilter('sort',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
+            <select id="sel-sort" onchange="setFilter('sort',this.value)" onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'" style="appearance:none;-webkit-appearance:none;padding:10px 28px 10px 12px;font-size:15px;border-radius:6px">
               <option value="date">Date</option>
               <option value="event">A – Z</option>
               <option value="profit">Bénéfice</option>
@@ -2041,14 +2041,14 @@ function renderFilters() {
             <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="search-input" type="text" placeholder="Rechercher événement…"
               oninput="setFilter('search',this.value)"
-              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'"
               style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:220px">
           </div>
           <div style="position:relative;flex-shrink:0">
             <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <input id="buyer-input" type="text" placeholder="Acheteur…"
               oninput="setFilter('buyer',this.value)"
-              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='#2d3d55'"
+              onmouseenter="this.style.borderColor='#00b4ff'" onmouseleave="this.style.borderColor='var(--border)'"
               style="padding:10px 12px 10px 34px;font-size:15px;border-radius:6px;width:180px">
           </div>
         </div>
@@ -2060,19 +2060,19 @@ function renderFilters() {
     </div>
     <div class="filters-mobile">
       <div style="display:flex;gap:6px">
-        <select id="sel-statut-m" onchange="setFilter('statut',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+        <select id="sel-statut-m" onchange="setFilter('statut',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);-webkit-appearance:none;appearance:none">
           <option value="">Statut</option>
           <option value="Vendu">Vendus</option>
           <option value="En stock">En stock</option>
           <option value="Réservé">Réservés</option>
           <option value="Archivé">Archivés</option>
         </select>
-        <select id="sel-pay-m" onchange="setFilter('pay',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+        <select id="sel-pay-m" onchange="setFilter('pay',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);-webkit-appearance:none;appearance:none">
           <option value="">Paiement</option>
           <option value="Payé">Payé</option>
           <option value="En attente">En attente</option>
         </select>
-        <select id="sel-livraison-m" onchange="setFilter('livraison',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;-webkit-appearance:none;appearance:none">
+        <select id="sel-livraison-m" onchange="setFilter('livraison',this.value)" style="flex:1;padding:10px 8px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);-webkit-appearance:none;appearance:none">
           <option value="">Livraison</option>
           <option value="Livré">Livré</option>
           <option value="Non livré">Non livré</option>
@@ -2080,12 +2080,12 @@ function renderFilters() {
       </div>
       <div style="display:flex;gap:6px">
         <div style="position:relative;flex:1">
-          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="search-input-m" type="search" placeholder="Événement…" oninput="setFilter('search',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="search-input-m" type="search" placeholder="Événement…" oninput="setFilter('search',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text)">
         </div>
         <div style="position:relative;flex:1">
-          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8b9ab0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input id="buyer-input-m" type="text" placeholder="Acheteur…" oninput="setFilter('buyer',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text2)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input id="buyer-input-m" type="text" placeholder="Acheteur…" oninput="setFilter('buyer',this.value)" style="width:100%;padding:10px 10px 10px 32px;font-size:16px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text)">
         </div>
       </div>
     </div>
@@ -2159,7 +2159,7 @@ function renderJournalList() {
   }
 
   if(!list.length){
-    document.getElementById('journalList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucune transaction</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Ajoute ton premier billet pour commencer</div><button onclick="openAddModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un billet</button></div>';
+    document.getElementById('journalList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--bg4)" stroke-width="1.2" style="margin-bottom:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div style="font-size:16px;font-weight:600;color:var(--text3);margin-bottom:8px">Aucune transaction</div><div style="font-size:13px;color:var(--border);margin-bottom:20px">Ajoute ton premier billet pour commencer</div><button onclick="openAddModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un billet</button></div>';
     return;
   }
 
@@ -2177,8 +2177,8 @@ function renderJournalList() {
       {l:'Lieu',         v: t.lieu    || '—'},
       {l:'Placement',    v: t.place   || '—'},
       {l:'Site achat',   v: t.site    || '—'},
-      {l:'Compte',       html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-compte-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.compte?'••••••••':'—'}</span>${t.compte?`<button onclick="event.stopPropagation();_toggleReveal('reveal-compte-${t.id}','${(t.compte||'').replace(/'/g,"\\'")}','compte')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.compte||'').replace(/'/g,"\\'")}','Compte copié')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
-      {l:'Mot de passe', html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-mdp-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.mdp?'••••••••':'—'}</span>${t.mdp?`<button onclick="event.stopPropagation();_toggleReveal('reveal-mdp-${t.id}','${(t.mdp||'').replace(/'/g,"\\'")}','mdp')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.mdp||'').replace(/'/g,"\\'")}','Mot de passe copié')" style="background:none;border:none;cursor:pointer;color:#8b9ab0;padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
+      {l:'Compte',       html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-compte-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.compte?'••••••••':'—'}</span>${t.compte?`<button onclick="event.stopPropagation();_toggleReveal('reveal-compte-${t.id}','${(t.compte||'').replace(/'/g,"\\'")}','compte')" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.compte||'').replace(/'/g,"\\'")}','Compte copié')" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
+      {l:'Mot de passe', html:`<div style="display:flex;align-items:center;gap:6px"><span id="reveal-mdp-${t.id}" data-revealed="0" style="color:var(--text-primary);font-size:14px">${t.mdp?'••••••••':'—'}</span>${t.mdp?`<button onclick="event.stopPropagation();_toggleReveal('reveal-mdp-${t.id}','${(t.mdp||'').replace(/'/g,"\\'")}','mdp')" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px 6px;line-height:1" title="Révéler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="event.stopPropagation();_copyField('${(t.mdp||'').replace(/'/g,"\\'")}','Mot de passe copié')" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px 6px;line-height:1" title="Copier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>`:''}</div>`},
       {l:'Prix achat',   v: t.buy  ? fmtFull(t.buy)  : '—', c:'var(--text-primary)'},
       {l:'Prix revente', v: t.sell ? fmtFull(t.sell) : '—'},
     ];
@@ -2189,7 +2189,7 @@ function renderJournalList() {
       {l:'Plateforme',  v: t.platform || '—'},
       {l:'Bénéfice',    v: fmt(profit), c: isPos ? 'var(--green)' : 'var(--red)'},
       {l:'Marge',       v: margin !== null ? (margin >= 0?'+':'')+Math.round(margin)+'%' : '—', c: margin !== null ? (margin >= 0 ? 'var(--green)' : 'var(--red)') : undefined},
-      {l:'Prix voulu',  html: `<div style="display:flex;align-items:center;gap:8px"><input type="number" value="${t.wanted||0}" min="0" step="1" onchange="updateWanted(${t.id},this.value)" onclick="event.stopPropagation()" style="width:90px;padding:4px 8px;font-size:13px;border-radius:6px;background:#1a2540;border:1px solid #2d3d55;color:#f9fafb;text-align:right"><span style="font-size:12px;color:#8b9ab0">€</span></div>`},
+      {l:'Prix voulu',  html: `<div style="display:flex;align-items:center;gap:8px"><input type="number" value="${t.wanted||0}" min="0" step="1" onchange="updateWanted(${t.id},this.value)" onclick="event.stopPropagation()" style="width:90px;padding:4px 8px;font-size:13px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text);text-align:right"><span style="font-size:12px;color:var(--text2)">€</span></div>`},
       {l:'Quantité',    v: t.qty+'x', c:'var(--text-primary)'},
     ];
 
@@ -2198,8 +2198,8 @@ function renderJournalList() {
     for(let i=0;i<maxRows;i++){
       const l = colL[i]||null, r = colR[i]||null;
       rows += `<div style="display:contents">
-        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div>${l.html||`<div class="tx-drow-val" style="color:${l.c||'#f9fafb'}">${l.v}</div>`}`:''}</div>
-        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div>${r.html||`<div class="tx-drow-val" style="color:${r.c||'#f9fafb'}">${r.v}</div>`}`:''}</div>
+        <div class="tx-drow" style="padding-right:12px">${l?`<div class="tx-drow-label">${l.l}</div>${l.html||`<div class="tx-drow-val" style="color:${l.c||'var(--text)'}">${l.v}</div>`}`:''}</div>
+        <div class="tx-drow" style="padding-left:12px;border-left:1px solid var(--border)">${r?`<div class="tx-drow-label">${r.l}</div>${r.html||`<div class="tx-drow-val" style="color:${r.c||'var(--text)'}">${r.v}</div>`}`:''}</div>
       </div>`;
     }
 
@@ -2211,11 +2211,11 @@ function renderJournalList() {
       const _btn = (onclick, bg, border, ico) => `<button onclick="${onclick}" style="width:54px;height:54px;border-radius:50%;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s" onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'" ontouchstart="this.style.opacity='.75'" ontouchend="this.style.opacity='1'">${ico}</button>`;
       const _svg = (d, stroke) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
       const _bVendre  = _btn(`openSellModal(${t.id})`,          '#0a2a3d', 'rgba(0,180,255,0.35)',  _svg('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',                              '#00b4ff'));
-      const _bReserve = _btn(`openReserveModal(${t.id})`,       '#2d1f0a', 'rgba(255,159,67,0.35)', _svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',                                                          '#ff9f43'));
-      const _bAnnuler = _btn(`annulerReservation(${t.id})`,     '#1a1f28', 'rgba(139,154,176,0.35)',_svg('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',             '#8b9ab0'));
-      const _bArchive = _btn(`archiveTransaction(${t.id})`,     '#1a1f28', 'rgba(139,154,176,0.35)',_svg('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>','#8b9ab0'));
-      const _bUnarc   = _btn(`unarchiveTransaction(${t.id})`,   '#0a2d1a', 'rgba(0,255,136,0.35)',  _svg('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>',                                               '#00ff88'));
-      const _bDel     = _btn(`deleteTransaction(${t.id})`,      '#2d0f0f', 'rgba(255,107,107,0.35)',_svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>','#ff6b6b'));
+      const _bReserve = _btn(`openReserveModal(${t.id})`,       '#2d1f0a', 'rgba(201,145,74,0.35)', _svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',                                                          'var(--orange)'));
+      const _bAnnuler = _btn(`annulerReservation(${t.id})`,     'var(--bg4)', 'rgba(139,154,176,0.35)',_svg('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',             'var(--text2)'));
+      const _bArchive = _btn(`archiveTransaction(${t.id})`,     'var(--bg4)', 'rgba(139,154,176,0.35)',_svg('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>','var(--text2)'));
+      const _bUnarc   = _btn(`unarchiveTransaction(${t.id})`,   '#0a2d1a', 'rgba(82,201,138,0.35)',  _svg('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/>',                                               'var(--green)'));
+      const _bDel     = _btn(`deleteTransaction(${t.id})`,      '#2d0f0f', 'rgba(224,107,107,0.35)',_svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>','var(--red)'));
       const swipeBtns = t.statut==='En stock' ? _bVendre+_bReserve+_bDel
         : t.statut==='Réservé' ? _bVendre+_bAnnuler+_bDel
         : t.statut==='Vendu'   ? _bArchive+_bDel
@@ -2227,12 +2227,12 @@ function renderJournalList() {
           <span class="badge ${badgeClass}" style="font-size:11px">${badgeLabel}</span>
           <div style="text-align:right">
             <div style="font-size:16px;font-weight:600;color:${pc}">${fmt(profit)}</div>
-            ${margin!==null?`<div style="font-size:11px;color:${margin>=0?'#00ff88':'#ff6b6b'};font-weight:500">${margin>=0?'+':''}${margin}%</div>`:''}
+            ${margin!==null?`<div style="font-size:11px;color:${margin>=0?'var(--green)':'var(--red)'};font-weight:500">${margin>=0?'+':''}${margin}%</div>`:''}
           </div>
         </div>
         <div style="font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.event}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div style="font-size:14px"><span style="color:#00b4ff">${fmtDate(t.date)}</span>${t.qty||t.cat?`<span style="color:#8b9ab0"> · </span><span style="color:#f9fafb">${t.qty?t.qty+'x':''}${t.qty&&t.cat?' · ':''}${t.cat||''}</span>`:''}</div>
+          <div style="font-size:14px"><span style="color:#00b4ff">${fmtDate(t.date)}</span>${t.qty||t.cat?`<span style="color:var(--text2)"> · </span><span style="color:var(--text)">${t.qty?t.qty+'x':''}${t.qty&&t.cat?' · ':''}${t.cat||''}</span>`:''}</div>
           <div style="display:flex;gap:4px;flex-wrap:nowrap;flex-shrink:0">
             ${t.pay?`<span class="badge ${t.pay==='Payé'?'b-paye':'b-attente'}" style="cursor:pointer;font-size:11px;padding:2px 6px" onclick="event.stopPropagation();toggleTxPay(${t.id})">${t.pay}</span>`:''}
             ${t.livraison?`<span class="badge ${t.livraison==='Livré'?'b-livre':'b-nonlivre'}" style="cursor:pointer;font-size:11px;padding:2px 6px" onclick="event.stopPropagation();toggleTxLivraison(${t.id})">${t.livraison}</span>`:''}
@@ -2250,7 +2250,7 @@ function renderJournalList() {
         <span class="tx-date">${fmtDate(t.date)}</span>
         <span class="tx-info">${t.qty}x${t.cat?' · '+t.cat:''}</span>
         <span class="tx-buyer">${t.buyer||''}</span>
-        <span class="tx-profit" style="flex-direction:column;align-items:flex-end;color:${pc}">${fmt(profit)}${margin!==null?`<span style="font-size:11px;color:${margin>=0?'#00ff88':'#ff6b6b'};font-weight:500">${margin>=0?'+':''}${margin}%</span>`:''}</span>
+        <span class="tx-profit" style="flex-direction:column;align-items:flex-end;color:${pc}">${fmt(profit)}${margin!==null?`<span style="font-size:11px;color:${margin>=0?'var(--green)':'var(--red)'};font-weight:500">${margin>=0?'+':''}${margin}%</span>`:''}</span>
         <div class="tx-badges">
           ${t.pay==='Payé'?`<span class="badge b-paye" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">Payé</span>`:''}
           ${t.pay==='En attente'?`<span class="badge b-attente" style="cursor:pointer" onclick="event.stopPropagation();toggleTxPay(${t.id})">En attente</span>`:''}
@@ -2261,19 +2261,19 @@ function renderJournalList() {
       <div class="tx-detail" id="${did}">
         <div style="display:grid;grid-template-columns:1fr 1fr">${rows}</div>
         <div class="tx-detail-actions">
-          <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="editTransaction(${t.id})">Modifier</button>
+          <button style="border:1px solid var(--border);background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'" onclick="editTransaction(${t.id})">Modifier</button>
           ${t.statut==='Archivé'
-            ? `<button style="border:1px solid #00ff88;background:transparent;color:#00ff88;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00ff88';this.style.background='rgba(0,255,136,0.08)'" onmouseleave="this.style.borderColor='#00ff88';this.style.background='transparent'" onclick="unarchiveTransaction(${t.id})">Désarchiver</button>`
+            ? `<button style="border:1px solid var(--green);background:transparent;color:var(--green);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='var(--green)';this.style.background='rgba(82,201,138,0.08)'" onmouseleave="this.style.borderColor='var(--green)';this.style.background='transparent'" onclick="unarchiveTransaction(${t.id})">Désarchiver</button>`
             : t.statut==='Réservé'
-            ? `<button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="openSellModal(${t.id})">Vendre</button>
-               <button style="border:1px solid #ff9f43;background:transparent;color:#ff9f43;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff9f43';this.style.background='rgba(255,159,67,0.08)'" onmouseleave="this.style.borderColor='#ff9f43';this.style.background='transparent'" onclick="annulerReservation(${t.id})">Annuler réservation</button>
-               <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`
+            ? `<button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#19bcff';this.style.borderColor='#19bcff'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="openSellModal(${t.id})">Vendre</button>
+               <button style="border:1px solid var(--orange);background:transparent;color:var(--orange);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='var(--orange)';this.style.background='rgba(201,145,74,0.08)'" onmouseleave="this.style.borderColor='var(--orange)';this.style.background='transparent'" onclick="annulerReservation(${t.id})">Annuler réservation</button>
+               <button style="border:1px solid var(--border);background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`
             : t.statut==='En stock'
-            ? `<button style="border:1px solid #ff9f43;background:transparent;color:#ff9f43;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff9f43';this.style.background='rgba(255,159,67,0.08)'" onmouseleave="this.style.borderColor='#ff9f43';this.style.background='transparent'" onclick="openReserveModal(${t.id})">Réserver</button>
-               <button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#007aa3';this.style.borderColor='#007aa3'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="openSellModal(${t.id})">Vendre</button>
-               <button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`
-            : `<button style="border:1px solid #2d3d55;background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='#1f2d4a'" onmouseleave="this.style.borderColor='#2d3d55';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`}
-          <button style="border:1px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#ff6b6b';this.style.background='rgba(255,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(255,107,107,0.4)';this.style.background='transparent'" onclick="deleteTransaction(${t.id})">Supprimer</button>
+            ? `<button style="border:1px solid var(--orange);background:transparent;color:var(--orange);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='var(--orange)';this.style.background='rgba(201,145,74,0.08)'" onmouseleave="this.style.borderColor='var(--orange)';this.style.background='transparent'" onclick="openReserveModal(${t.id})">Réserver</button>
+               <button style="border:1px solid #00b4ff;background:#00b4ff;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.background='#19bcff';this.style.borderColor='#19bcff'" onmouseleave="this.style.background='#00b4ff';this.style.borderColor='#00b4ff'" onclick="openSellModal(${t.id})">Vendre</button>
+               <button style="border:1px solid var(--border);background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`
+            : `<button style="border:1px solid var(--border);background:transparent;color:var(--text-primary);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='#00b4ff';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'" onclick="archiveTransaction(${t.id})">Archiver</button>`}
+          <button style="border:1px solid rgba(224,107,107,0.4);background:transparent;color:var(--red);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit" onmouseenter="this.style.borderColor='var(--red)';this.style.background='rgba(224,107,107,0.08)'" onmouseleave="this.style.borderColor='rgba(224,107,107,0.4)';this.style.background='transparent'" onclick="deleteTransaction(${t.id})">Supprimer</button>
         </div>
       </div>
     </div>${isMobile ? '<div style="height:4px"></div>' : ''}`;
@@ -2478,7 +2478,7 @@ function renderWTS(){
       const da=a.date||'9999-99-99', db=b.date||'9999-99-99';
       return da.localeCompare(db)||a.event.localeCompare(b.event);
     });
-  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucun billet en stock</div><div style="font-size:13px;color:#2d3d55">Tes billets en stock apparaîtront ici</div></div>';return;}
+  if(!stock.length){document.getElementById('wtsPreview').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--bg4)" stroke-width="1.2" style="margin-bottom:20px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div style="font-size:16px;font-weight:600;color:var(--text3);margin-bottom:8px">Aucun billet en stock</div><div style="font-size:13px;color:var(--border)">Tes billets en stock apparaîtront ici</div></div>';return;}
   let lines=['**WTS**'],lastEv=null,lastDt=null;
   stock.forEach(t=>{
     if(t.event!==lastEv){lines.push('');lines.push(`**${t.event}**`);lastEv=t.event;lastDt=null;}
@@ -2528,7 +2528,7 @@ function renderReservations() {
     .sort((a,b) => (a.event||'').localeCompare(b.event||'') || (a.date||'').localeCompare(b.date||''));
 
   if (!reserved.length) {
-    document.getElementById('resaPreview').innerHTML = '<div style="text-align:center;padding:40px 20px;color:#4a5568">Aucune réservation</div>';
+    document.getElementById('resaPreview').innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3)">Aucune réservation</div>';
     return;
   }
 
@@ -2909,7 +2909,7 @@ function initPullToRefresh() {
 
 // COSTS
 function renderCosts(){
-  if(!costs.length){document.getElementById('costsList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1f2d4a" stroke-width="1.2" style="margin-bottom:20px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div style="font-size:16px;font-weight:600;color:#4a5568;margin-bottom:8px">Aucun coût fixe</div><div style="font-size:13px;color:#2d3d55;margin-bottom:20px">Ajoute tes abonnements et frais de plateforme</div><button onclick="openCostModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un coût</button></div>';document.getElementById('costsTotal').innerHTML='';return;}
+  if(!costs.length){document.getElementById('costsList').innerHTML='<div style="text-align:center;padding:80px 20px"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--bg4)" stroke-width="1.2" style="margin-bottom:20px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div style="font-size:16px;font-weight:600;color:var(--text3);margin-bottom:8px">Aucun coût fixe</div><div style="font-size:13px;color:var(--border);margin-bottom:20px">Ajoute tes abonnements et frais de plateforme</div><button onclick="openCostModal()" class="btn btn-primary" style="margin:0 auto">+ Ajouter un coût</button></div>';document.getElementById('costsTotal').innerHTML='';return;}
   document.getElementById('costsList').innerHTML=costs.map(c=>`
     <div class="card hover-card ${c.status==='Payé'?'is-vendu':'is-stock'}" style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px">
       <div style="flex:1;min-width:0">
@@ -2918,9 +2918,9 @@ function renderCosts(){
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:16px;font-weight:600">${fmtFull(c.amount)}</div>
-        <span onclick="toggleCostStatus(${c.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;${c.status==='Payé'?'background:rgba(0,255,136,.15);color:#00ff88':'background:rgba(255,159,67,.15);color:#ff9f43'}">${c.status}</span>
+        <span onclick="toggleCostStatus(${c.id})" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;${c.status==='Payé'?'background:rgba(82,201,138,.15);color:var(--green)':'background:rgba(201,145,74,.15);color:var(--orange)'}">${c.status}</span>
       </div>
-      <button onclick="deleteCost(${c.id})" onmouseenter="this.style.color='#ff6b6b'" onmouseleave="this.style.color='var(--text3)'" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0;transition:color .15s">×</button>
+      <button onclick="deleteCost(${c.id})" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0;transition:color .15s">×</button>
     </div>`).join('');
   const total=costs.reduce((s,c)=>s+c.amount,0);
   const paid=costs.filter(c=>c.status==='Payé').reduce((s,c)=>s+c.amount,0);
@@ -2939,7 +2939,7 @@ function renderSettings(){
   const gi = document.getElementById('settings-gmail-info');
   const gd = document.getElementById('settings-gmail-dot');
   if(gi) gi.textContent = gmailToken ? 'Connecté : ' + (localStorage.getItem('ticketdesk_gmail_email')||'') : 'Non connecté';
-  if(gd) gd.style.background = gmailToken ? '#00ff88' : '#484f58';
+  if(gd) gd.style.background = gmailToken ? 'var(--green)' : '#484f58';
   if(creds) { document.getElementById('s-user').value = creds.user; }
   const sd = document.getElementById('s-discord'); if(sd) sd.value = contact.discord || '';
   const si = document.getElementById('s-instagram'); if(si) si.value = contact.instagram || '';
@@ -3252,13 +3252,13 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch
 function applyModalStyles(root) {
   const modal = root && root.querySelector ? (root.querySelector('.modal') || root) : root;
   if (!modal) return;
-  modal.style.background = '#0d1424';
+  modal.style.background = 'var(--bg2)';
   modal.querySelectorAll('input:not([type=checkbox]):not([type=radio]),select,textarea').forEach(function(el) {
-    el.style.background = '#1a2540';
-    el.style.border = '1px solid #2d3d55';
-    el.style.color = '#f9fafb';
+    el.style.background = 'var(--bg3)';
+    el.style.border = '1px solid var(--border)';
+    el.style.color = 'var(--text)';
   });
-  modal.querySelectorAll('.flabel').forEach(function(el) { el.style.color = '#8b9ab0'; });
+  modal.querySelectorAll('.flabel').forEach(function(el) { el.style.color = 'var(--text2)'; });
 }
 
 // Login button listeners + public share page detection
