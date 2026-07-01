@@ -1011,9 +1011,32 @@ function unlockApp() {
   }
 }
 
-function checkDriveAccess() {
-  if (!gmailToken) {
-    showToast('Connecte Drive pour modifier', 'err', 3000);
+async function verifyDriveToken() {
+  if (!gmailToken) return false;
+  try {
+    const resp = await fetch('https://www.googleapis.com/gmail/v1/users/me/profile', {
+      headers: { Authorization: 'Bearer ' + gmailToken }
+    });
+    if (resp.status === 401) {
+      gmailToken = null;
+      localStorage.removeItem('ticketdesk_gmail');
+      localStorage.removeItem('ticketdesk_drive_fid');
+      showToast('Session Google expirée — reconnecte-toi', 'err', 4000);
+      renderGmail();
+      return false;
+    }
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+async function checkDriveAccess() {
+  const valid = await verifyDriveToken();
+  if (!valid) {
+    showToast('Connecte Google Drive pour modifier les données', 'err', 3000);
+    const el = document.getElementById('driveWarnReadOnly');
+    if (el) el.style.display = 'flex';
     return false;
   }
   return true;
@@ -1060,8 +1083,8 @@ function autoArchive() {
   });
   if (changed) saveTx();
 }
-function archiveTransaction(id) {
-  if (!checkDriveAccess()) return;
+async function archiveTransaction(id) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1069,8 +1092,8 @@ function archiveTransaction(id) {
   saveTx(); renderJournal(); renderDashboard(); renderWTS();
   showToast('Archivé');
 }
-function unarchiveTransaction(id) {
-  if (!checkDriveAccess()) return;
+async function unarchiveTransaction(id) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.statut = 'En stock';
@@ -1084,16 +1107,16 @@ function savePreorders() {
   driveSyncDebounced();
 }
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='block'?'none':'block';}
-function cyclePOStatus(id){
-  if (!checkDriveAccess()) return;
+async function cyclePOStatus(id){
+  if (!await checkDriveAccess()) return;
   const p=preorders.find(x=>x.id===id);if(!p)return;
   if('vibrate' in navigator) navigator.vibrate(10);
   const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
   p.statut=cycle[p.statut]||'En recherche';
   savePreorders();renderPreorders();
 }
-function togglePOPay(id) {
-  if (!checkDriveAccess()) return;
+async function togglePOPay(id) {
+  if (!await checkDriveAccess()) return;
   const p = preorders.find(x => x.id === id);
   if (!p) return;
   p.pay = p.pay === 'Payé' ? 'Non payé' : 'Payé';
@@ -1206,8 +1229,8 @@ function transferPreorderToJournal(id) {
   window._transferringPreorderId = id;
   document.getElementById('addModal').classList.add('open');
 }
-function openPreorderModal(id) {
-  if (!checkDriveAccess()) return;
+async function openPreorderModal(id) {
+  if (!await checkDriveAccess()) return;
   editingPreorderId = id || null;
   const p = id ? preorders.find(x => x.id === id) : null;
   document.getElementById('preorderModalTitle').textContent = p ? 'Modifier précommande' : 'Nouvelle précommande';
@@ -1224,8 +1247,8 @@ function openPreorderModal(id) {
   document.getElementById('po-statut').value   = p ? (p.statut   || 'En recherche') : 'En recherche';
   document.getElementById('preorderModal').classList.add('open');
 }
-function savePreorder() {
-  if (!checkDriveAccess()) return;
+async function savePreorder() {
+  if (!await checkDriveAccess()) return;
   const event = document.getElementById('po-event').value.trim();
   if (!event) { showToast('Événement obligatoire', 'err'); return; }
   const data = {
@@ -1252,8 +1275,8 @@ function savePreorder() {
   renderPreorders();
   showToast(editingPreorderId ? 'Précommande modifiée' : 'Précommande ajoutée');
 }
-function deletePreorder(id) {
-  if (!checkDriveAccess()) return;
+async function deletePreorder(id) {
+  if (!await checkDriveAccess()) return;
   preorders = preorders.filter(x => x.id !== id);
   savePreorders();
   renderPreorders();
@@ -1301,8 +1324,8 @@ function openSellModal(id) {
   document.getElementById('sm-livraison').checked = false;
   document.getElementById('sellModal').classList.add('open');
 }
-function confirmSale() {
-  if (!checkDriveAccess()) return;
+async function confirmSale() {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === sellingId);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1389,8 +1412,8 @@ function openReserveModal(id) {
   document.getElementById('rm-price').value = t.wanted || '';
   document.getElementById('reserveModal').classList.add('open');
 }
-function confirmReserve() {
-  if (!checkDriveAccess()) return;
+async function confirmReserve() {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === reservingId);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1404,8 +1427,8 @@ function confirmReserve() {
   renderJournal(); renderDashboard(); renderWTS();
   showToast('Billet réservé');
 }
-function annulerReservation(id) {
-  if (!checkDriveAccess()) return;
+async function annulerReservation(id) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.statut = 'En stock';
@@ -2492,8 +2515,8 @@ function resetFilters(){
   renderJournalList();
 }
 function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
-function deleteTransaction(id){
-  if (!checkDriveAccess()) return;
+async function deleteTransaction(id){
+  if (!await checkDriveAccess()) return;
   if(!confirm('Supprimer ?'))return;
   transactions=transactions.filter(t=>t.id!==id);
   saveTx();renderJournal();renderDashboard();renderWTS();
@@ -2505,8 +2528,8 @@ function deleteAllTransactions(){
   saveTx();renderJournal();renderDashboard();renderWTS();
   showToast('Toutes les transactions supprimées');
 }
-function updateWanted(id, val) {
-  if (!checkDriveAccess()) return;
+async function updateWanted(id, val) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.wanted = parseFloat(val) || 0;
@@ -2541,8 +2564,8 @@ function autoArchiveExpired() {
   });
   if (changed) saveTx();
 }
-function toggleTxPay(id) {
-  if (!checkDriveAccess()) return;
+async function toggleTxPay(id) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -2550,8 +2573,8 @@ function toggleTxPay(id) {
   saveTx(); renderJournalList(); renderDashboard();
   showToast(t.pay === 'Payé' ? 'Marqué Payé' : 'Marqué En attente');
 }
-function toggleTxLivraison(id) {
-  if (!checkDriveAccess()) return;
+async function toggleTxLivraison(id) {
+  if (!await checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -3047,7 +3070,7 @@ function renderCosts(){
       <span style="font-size:14px;font-weight:600">${fmtFull(total)} <span style="font-size:11px;color:var(--text2);font-weight:400">dont ${fmtFull(paid)} payé</span></span>
     </div>`;
 }
-function deleteCost(id){if (!checkDriveAccess()) return;costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
+async function deleteCost(id){if (!await checkDriveAccess()) return;costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
 
 function renderSettings(){
   const creds = getStoredCreds();
@@ -3091,8 +3114,8 @@ function _logout(){
   sessionStorage.removeItem('td_unlocked');
   location.reload();
 }
-function toggleCostStatus(id){
-  if (!checkDriveAccess()) return;
+async function toggleCostStatus(id){
+  if (!await checkDriveAccess()) return;
   const c=costs.find(x=>x.id===id);
   if(!c)return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -3159,9 +3182,10 @@ function _submitMasterKey() {
     if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
   }
 }
-function _toggleReveal(spanId, encVal) {
-  if (!gmailToken) {
-    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
+async function _toggleReveal(spanId, encVal) {
+  const valid = await verifyDriveToken();
+  if (!valid) {
+    showToast('Connecte Google Drive pour accéder aux données sensibles', 'err', 3000);
     return;
   }
   getMasterKey();
@@ -3180,9 +3204,10 @@ function _toggleReveal(spanId, encVal) {
   if (masterKey) doReveal();
   else openMasterKeyModal(doReveal);
 }
-function _copyField(encVal, successMsg) {
-  if (!gmailToken) {
-    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
+async function _copyField(encVal, successMsg) {
+  const valid = await verifyDriveToken();
+  if (!valid) {
+    showToast('Connecte Google Drive pour accéder aux données sensibles', 'err', 3000);
     return;
   }
   getMasterKey();
@@ -3204,8 +3229,8 @@ function _copyField(encVal, successMsg) {
 }
 
 // MODALS
-function openAddModal(id){
-  if (!checkDriveAccess()) return;
+async function openAddModal(id){
+  if (!await checkDriveAccess()) return;
   editingId=id||null;
   if(id){
     const t=transactions.find(x=>x.id===id);if(!t)return;
@@ -3259,8 +3284,8 @@ function openAddModal(id){
   document.getElementById('addModal').classList.add('open');
 }
 function editTransaction(id){openAddModal(id);}
-function saveTransaction(){
-  if (!checkDriveAccess()) return;
+async function saveTransaction(){
+  if (!await checkDriveAccess()) return;
   const ev=document.getElementById('f-event').value.trim();
   if(!ev){showToast("Renseigne l'événement",'err');return;}
   const t={
@@ -3319,9 +3344,9 @@ function saveTransaction(){
   }
   renderDashboard();renderJournal();renderWTS();
 }
-function openCostModal(){if (!checkDriveAccess()) return;document.getElementById('costModal').classList.add('open');}
-function saveCost(){
-  if (!checkDriveAccess()) return;
+async function openCostModal(){if (!await checkDriveAccess()) return;document.getElementById('costModal').classList.add('open');}
+async function saveCost(){
+  if (!await checkDriveAccess()) return;
   const type=document.getElementById('fc-type').value.trim();
   if(!type){showToast('Renseigne le type','err');return;}
   costs.push({id:Date.now(),date:document.getElementById('fc-date').value,type,amount:parseFloat(document.getElementById('fc-amount').value)||0,status:document.getElementById('fc-status').value,notes:document.getElementById('fc-notes').value.trim()});
