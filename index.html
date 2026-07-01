@@ -934,7 +934,7 @@ let transactions    = JSON.parse(localStorage.getItem(TX_KEY)         || '[]');
 let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
 let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
 let masterKey       = null;
-let masterKeyHash   = null;
+let masterKeyHash   = localStorage.getItem('ticketdesk_mkh') || null;
 let _masterKeyCallback = null;
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
@@ -3047,6 +3047,7 @@ function _logout(){
   localStorage.removeItem('ticketdesk_gmail_email');
   localStorage.removeItem('ticketdesk_drive_fid');
   localStorage.removeItem('ticketdesk_last_sync');
+  localStorage.removeItem('ticketdesk_mkh');
   sessionStorage.removeItem('td_unlocked');
   location.reload();
 }
@@ -3094,6 +3095,7 @@ function _submitMasterKey() {
     const conf = document.getElementById('masterKeyConfirm').value.trim();
     if (val !== conf) { err.textContent = 'Les mots de passe ne correspondent pas'; return; }
     masterKeyHash = hashKey(val);
+    localStorage.setItem('ticketdesk_mkh', masterKeyHash);
     masterKey = val;
     sessionStorage.setItem('td_mk', val);
     closeModal('masterKeyModal');
