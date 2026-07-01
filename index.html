@@ -930,9 +930,10 @@ const COST_KEY     = 'ticketdesk_costs';
 const GMAIL_KEY    = 'ticketdesk_gmail';
 const PREORDER_KEY = 'ticketdesk_preorders';
 
-let transactions    = JSON.parse(localStorage.getItem(TX_KEY)         || '[]');
-let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
-let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
+let transactions    = [];
+let costs           = [];
+let preorders       = [];
+let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
 let masterKey       = null;
 let masterKeyHash   = null;
 let _masterKeyCallback = null;
