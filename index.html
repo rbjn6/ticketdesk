@@ -930,12 +930,11 @@ const COST_KEY     = 'ticketdesk_costs';
 const GMAIL_KEY    = 'ticketdesk_gmail';
 const PREORDER_KEY = 'ticketdesk_preorders';
 
-let transactions    = [];
-let costs           = [];
-let preorders       = [];
-let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
+let transactions    = JSON.parse(localStorage.getItem(TX_KEY)         || '[]');
+let costs           = JSON.parse(localStorage.getItem(COST_KEY)      || '[]');
+let preorders       = JSON.parse(localStorage.getItem(PREORDER_KEY)  || '[]');
 let masterKey       = null;
-let masterKeyHash   = null;
+let masterKeyHash   = localStorage.getItem('ticketdesk_mkh') || null;
 let _masterKeyCallback = null;
 let gmailToken      = localStorage.getItem(GMAIL_KEY) || null;
 let contact         = JSON.parse(localStorage.getItem('ticketdesk_contact') || '{}');
@@ -985,8 +984,6 @@ function doLogin() {
     if (!gmailToken) { err.textContent = 'Connecte Gmail + Drive en premier.'; return; }
     // Crée les credentials
     saveLocalCreds(user, pin);
-    const localKey = CryptoJS.SHA256(user + pin).toString();
-    sessionStorage.setItem('td_local_key', localKey);
     unlockApp();
     showToast('Identifiant et PIN créés');
   } else {
@@ -995,29 +992,12 @@ function doLogin() {
       document.getElementById('loginPin').value = '';
       return;
     }
-    const localKey = CryptoJS.SHA256(user + pin).toString();
-    sessionStorage.setItem('td_local_key', localKey);
     unlockApp();
   }
 }
 
 function unlockApp() {
   sessionStorage.setItem('td_unlocked', '1');
-  const _lk = getLocalKey();
-  if (_lk) {
-    const _txRaw = localStorage.getItem(TX_KEY);
-    if (_txRaw) transactions = decryptLocal(_txRaw) || [];
-    const _cRaw = localStorage.getItem(COST_KEY);
-    if (_cRaw) costs = decryptLocal(_cRaw) || [];
-    const _poRaw = localStorage.getItem(PREORDER_KEY);
-    if (_poRaw) preorders = decryptLocal(_poRaw) || [];
-    const _ctRaw = localStorage.getItem('ticketdesk_contact');
-    if (_ctRaw) contact = decryptLocal(_ctRaw) || {};
-  }
-  saveTx();
-  saveCosts();
-  savePreorders();
-  saveContact();
   document.getElementById('loginScreen').style.display = 'none';
   initNotifPermission();
   if (gmailToken) {
@@ -1043,32 +1023,8 @@ if (!costs.length) {
   costs = [];
 }
 
-function getLocalKey() {
-  return sessionStorage.getItem('td_local_key') || null;
-}
-
-function encryptLocal(data) {
-  const key = getLocalKey();
-  if (!key) return JSON.stringify(data);
-  return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
-}
-
-function decryptLocal(raw) {
-  if (!raw) return null;
-  const key = getLocalKey();
-  if (!key) {
-    try { return JSON.parse(raw); } catch(e) { return null; }
-  }
-  try {
-    const dec = CryptoJS.AES.decrypt(raw, key).toString(CryptoJS.enc.Utf8);
-    return JSON.parse(dec);
-  } catch(e) {
-    try { return JSON.parse(raw); } catch(e2) { return null; }
-  }
-}
-
-function saveTx()    { localStorage.setItem(TX_KEY, encryptLocal(transactions)); driveSyncDebounced(); if(document.getElementById('page-reservations')?.classList.contains('active')) renderReservations(); }
-function saveCosts() { localStorage.setItem(COST_KEY, encryptLocal(costs)); driveSyncDebounced(); }
+function saveTx()    { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); driveSyncDebounced(); if(document.getElementById('page-reservations')?.classList.contains('active')) renderReservations(); }
+function saveCosts() { localStorage.setItem(COST_KEY, JSON.stringify(costs)); driveSyncDebounced(); }
 function autoArchive() {
   const today = new Date().toISOString().substring(0, 10);
   let changed = false;
@@ -1097,7 +1053,7 @@ function unarchiveTransaction(id) {
 
 // PRÉCOMMANDES
 function savePreorders() {
-  localStorage.setItem(PREORDER_KEY, encryptLocal(preorders));
+  localStorage.setItem(PREORDER_KEY, JSON.stringify(preorders));
   driveSyncDebounced();
 }
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='block'?'none':'block';}
@@ -2532,7 +2488,7 @@ function saveContact() {
     iban: iban?iban.value.trim():'',
     beneficiaire: benef?benef.value.trim():''
   };
-  localStorage.setItem('ticketdesk_contact', encryptLocal(contact));
+  localStorage.setItem('ticketdesk_contact', JSON.stringify(contact));
   driveSyncDebounced();
 }
 function autoArchiveExpired() {
@@ -3091,6 +3047,7 @@ function _logout(){
   localStorage.removeItem('ticketdesk_gmail_email');
   localStorage.removeItem('ticketdesk_drive_fid');
   localStorage.removeItem('ticketdesk_last_sync');
+  localStorage.removeItem('ticketdesk_mkh');
   sessionStorage.removeItem('td_unlocked');
   location.reload();
 }
@@ -3135,13 +3092,10 @@ function _submitMasterKey() {
   err.textContent = '';
   if (!val) return;
   if (!masterKeyHash) {
-    if (!gmailToken) {
-      err.textContent = 'Connecte-toi à Google Drive pour créer ton mot de passe maître.';
-      return;
-    }
     const conf = document.getElementById('masterKeyConfirm').value.trim();
     if (val !== conf) { err.textContent = 'Les mots de passe ne correspondent pas'; return; }
     masterKeyHash = hashKey(val);
+    localStorage.setItem('ticketdesk_mkh', masterKeyHash);
     masterKey = val;
     sessionStorage.setItem('td_mk', val);
     closeModal('masterKeyModal');
@@ -3160,10 +3114,6 @@ function _submitMasterKey() {
   }
 }
 function _toggleReveal(spanId, encVal) {
-  if (!gmailToken) {
-    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
-    return;
-  }
   getMasterKey();
   const span = document.getElementById(spanId);
   if (!span) return;
@@ -3181,10 +3131,6 @@ function _toggleReveal(spanId, encVal) {
   else openMasterKeyModal(doReveal);
 }
 function _copyField(encVal, successMsg) {
-  if (!gmailToken) {
-    showToast('Connecte-toi à Google Drive pour accéder aux données sensibles', 'err', 3000);
-    return;
-  }
   getMasterKey();
   const doCopy = () => {
     const plain = decryptField(encVal) || (isEncrypted(encVal) ? null : encVal);
