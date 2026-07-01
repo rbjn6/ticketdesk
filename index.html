@@ -1014,6 +1014,26 @@ function unlockApp() {
   }
 }
 
+function rechiffrerDonneesExistantes() {
+  if (!masterKey) return;
+  let changed = false;
+  transactions.forEach(t => {
+    if (t.compte && !isEncrypted(t.compte)) {
+      t.compte = encryptField(t.compte);
+      changed = true;
+    }
+    if (t.mdp && !isEncrypted(t.mdp)) {
+      t.mdp = encryptField(t.mdp);
+      changed = true;
+    }
+  });
+  if (changed) {
+    saveTx();
+    driveSync();
+    showToast('Données sensibles chiffrées', 'ok', 2000);
+  }
+}
+
 // Données chargées depuis Drive uniquement
 if (!transactions.length) {
   transactions = [];
@@ -3099,6 +3119,7 @@ function _submitMasterKey() {
     masterKeyHash = hashKey(val);
     masterKey = val;
     sessionStorage.setItem('td_mk', val);
+    rechiffrerDonneesExistantes();
     closeModal('masterKeyModal');
     driveSync();
     if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
@@ -3110,6 +3131,7 @@ function _submitMasterKey() {
     }
     masterKey = val;
     sessionStorage.setItem('td_mk', val);
+    rechiffrerDonneesExistantes();
     closeModal('masterKeyModal');
     if (_masterKeyCallback) { const cb = _masterKeyCallback; _masterKeyCallback = null; cb(); }
   }
