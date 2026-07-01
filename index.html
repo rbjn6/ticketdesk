@@ -100,7 +100,7 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-primary);font-f
 .drawer{position:fixed;top:0;left:0;width:78%;max-width:300px;height:100%;background:#0d1424;border-right:1px solid #2d3d55;z-index:295;transform:translateX(-100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;overflow:hidden}
 .drawer.open{transform:translateX(0)}
 .drawer-head{height:20px;display:flex;align-items:flex-end;padding:0 16px 16px;border-bottom:1px solid #2d3d55;flex-shrink:0}
-#journalFab{display:none;position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
+#journalFab{display:none;position:fixed;bottom:calc(90px + env(safe-area-inset-bottom, 0px));right:20px;width:56px;height:56px;border-radius:50%;background:#00b4ff;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:none;z-index:150}
 @keyframes spin{from{transform:rotate(0deg)} to{transform:rotate(360deg)}}
 .drawer-logo{font-size:13px;font-weight:800;letter-spacing:3px;color:#f9fafb;text-transform:uppercase;flex:1}
 .drawer-close{background:none;border:none;color:#8b9ab0;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
@@ -359,6 +359,10 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
     </div>
 
   <div class="content">
+    <div id="driveWarnReadOnly" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:#1a0f00;border:1px solid rgba(255,159,67,0.3);border-bottom:1px solid rgba(255,159,67,0.2);font-size:12px;color:#ff9f43;flex-shrink:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Mode lecture seule — connecte Google Drive pour modifier
+    </div>
     <div id="pullRefreshIndicator" style="display:none;align-items:center;justify-content:center;gap:8px;padding:12px;color:#8b9ab0;font-size:13px;background:#111827">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
       Synchronisation...
@@ -625,7 +629,7 @@ input:focus,select:focus{outline:none;border-color:var(--accent-blue);box-shadow
 
 <div id="autresOverlay" onclick="closeAutresMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98"></div>
 
-<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
+<div id="autresMenu" style="display:none;position:fixed;left:14px;right:14px;bottom:calc(76px + env(safe-area-inset-bottom, 0px));background:#0d1424;border:1px solid rgba(255,255,255,0.10);border-radius:16px;z-index:99;overflow:hidden;box-shadow:0 -8px 32px rgba(0,0,0,0.6)">
   <button onclick="closeAutresMenu();showPage('preorders')" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:none;background:none;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;text-align:left">
     <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,180,255,0.10);border:1px solid rgba(0,180,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b4ff" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1014,6 +1018,14 @@ function unlockApp() {
   }
 }
 
+function checkDriveAccess() {
+  if (!gmailToken) {
+    showToast('Connecte Google Drive pour modifier les données', 'err', 3000);
+    return false;
+  }
+  return true;
+}
+
 function rechiffrerDonneesExistantes() {
   if (!masterKey) return;
   let changed = false;
@@ -1056,6 +1068,7 @@ function autoArchive() {
   if (changed) saveTx();
 }
 function archiveTransaction(id) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1064,6 +1077,7 @@ function archiveTransaction(id) {
   showToast('Archivé');
 }
 function unarchiveTransaction(id) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.statut = 'En stock';
@@ -1078,6 +1092,7 @@ function savePreorders() {
 }
 function togglePODetail(did){const el=document.getElementById(did);if(el)el.style.display=el.style.display==='block'?'none':'block';}
 function cyclePOStatus(id){
+  if (!checkDriveAccess()) return;
   const p=preorders.find(x=>x.id===id);if(!p)return;
   if('vibrate' in navigator) navigator.vibrate(10);
   const cycle={'En recherche':'Trouvé','Trouvé':'En recherche'};
@@ -1085,6 +1100,7 @@ function cyclePOStatus(id){
   savePreorders();renderPreorders();
 }
 function togglePOPay(id) {
+  if (!checkDriveAccess()) return;
   const p = preorders.find(x => x.id === id);
   if (!p) return;
   p.pay = p.pay === 'Payé' ? 'Non payé' : 'Payé';
@@ -1198,6 +1214,7 @@ function transferPreorderToJournal(id) {
   document.getElementById('addModal').classList.add('open');
 }
 function openPreorderModal(id) {
+  if (!checkDriveAccess()) return;
   editingPreorderId = id || null;
   const p = id ? preorders.find(x => x.id === id) : null;
   document.getElementById('preorderModalTitle').textContent = p ? 'Modifier précommande' : 'Nouvelle précommande';
@@ -1215,6 +1232,7 @@ function openPreorderModal(id) {
   document.getElementById('preorderModal').classList.add('open');
 }
 function savePreorder() {
+  if (!checkDriveAccess()) return;
   const event = document.getElementById('po-event').value.trim();
   if (!event) { showToast('Événement obligatoire', 'err'); return; }
   const data = {
@@ -1242,6 +1260,7 @@ function savePreorder() {
   showToast(editingPreorderId ? 'Précommande modifiée' : 'Précommande ajoutée');
 }
 function deletePreorder(id) {
+  if (!checkDriveAccess()) return;
   preorders = preorders.filter(x => x.id !== id);
   savePreorders();
   renderPreorders();
@@ -1290,6 +1309,7 @@ function openSellModal(id) {
   document.getElementById('sellModal').classList.add('open');
 }
 function confirmSale() {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === sellingId);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1377,6 +1397,7 @@ function openReserveModal(id) {
   document.getElementById('reserveModal').classList.add('open');
 }
 function confirmReserve() {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === reservingId);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -1391,6 +1412,7 @@ function confirmReserve() {
   showToast('Billet réservé');
 }
 function annulerReservation(id) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.statut = 'En stock';
@@ -1452,6 +1474,7 @@ function toggleAutresMenu() {
     overlay.style.display = 'none';
     btn.classList.remove('active');
   } else {
+    document.querySelectorAll('.bnav').forEach(n => n.classList.remove('active'));
     menu.style.display = 'block';
     overlay.style.display = 'block';
     btn.classList.add('active');
@@ -1917,6 +1940,10 @@ function sendAlertNotifs(alerts) {
 }
 
 function renderDashboard() {
+  const driveWarnReadOnly = document.getElementById('driveWarnReadOnly');
+  if (driveWarnReadOnly) {
+    driveWarnReadOnly.style.display = !gmailToken ? 'flex' : 'none';
+  }
   const driveWarn = document.getElementById('driveWarning');
   if (driveWarn) driveWarn.style.display = !gmailToken ? 'flex' : 'none';
   renderDashAlerts();
@@ -2475,6 +2502,7 @@ function resetFilters(){
 }
 function toggleDetail(id){const el=document.getElementById(id);if(el)el.classList.toggle('open')}
 function deleteTransaction(id){
+  if (!checkDriveAccess()) return;
   if(!confirm('Supprimer ?'))return;
   transactions=transactions.filter(t=>t.id!==id);
   saveTx();renderJournal();renderDashboard();renderWTS();
@@ -2487,6 +2515,7 @@ function deleteAllTransactions(){
   showToast('Toutes les transactions supprimées');
 }
 function updateWanted(id, val) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   t.wanted = parseFloat(val) || 0;
@@ -2522,6 +2551,7 @@ function autoArchiveExpired() {
   if (changed) saveTx();
 }
 function toggleTxPay(id) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -2530,6 +2560,7 @@ function toggleTxPay(id) {
   showToast(t.pay === 'Payé' ? 'Marqué Payé' : 'Marqué En attente');
 }
 function toggleTxLivraison(id) {
+  if (!checkDriveAccess()) return;
   const t = transactions.find(x => x.id === id);
   if (!t) return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -3025,7 +3056,7 @@ function renderCosts(){
       <span style="font-size:14px;font-weight:600">${fmtFull(total)} <span style="font-size:11px;color:var(--text2);font-weight:400">dont ${fmtFull(paid)} payé</span></span>
     </div>`;
 }
-function deleteCost(id){costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
+function deleteCost(id){if (!checkDriveAccess()) return;costs=costs.filter(c=>c.id!==id);saveCosts();renderCosts();renderDashboard();}
 
 function renderSettings(){
   const creds = getStoredCreds();
@@ -3070,6 +3101,7 @@ function _logout(){
   location.reload();
 }
 function toggleCostStatus(id){
+  if (!checkDriveAccess()) return;
   const c=costs.find(x=>x.id===id);
   if(!c)return;
   if('vibrate' in navigator) navigator.vibrate(10);
@@ -3182,6 +3214,7 @@ function _copyField(encVal, successMsg) {
 
 // MODALS
 function openAddModal(id){
+  if (!checkDriveAccess()) return;
   editingId=id||null;
   if(id){
     const t=transactions.find(x=>x.id===id);if(!t)return;
@@ -3236,6 +3269,7 @@ function openAddModal(id){
 }
 function editTransaction(id){openAddModal(id);}
 function saveTransaction(){
+  if (!checkDriveAccess()) return;
   const ev=document.getElementById('f-event').value.trim();
   if(!ev){showToast("Renseigne l'événement",'err');return;}
   const t={
@@ -3294,8 +3328,9 @@ function saveTransaction(){
   }
   renderDashboard();renderJournal();renderWTS();
 }
-function openCostModal(){document.getElementById('costModal').classList.add('open');}
+function openCostModal(){if (!checkDriveAccess()) return;document.getElementById('costModal').classList.add('open');}
 function saveCost(){
+  if (!checkDriveAccess()) return;
   const type=document.getElementById('fc-type').value.trim();
   if(!type){showToast('Renseigne le type','err');return;}
   costs.push({id:Date.now(),date:document.getElementById('fc-date').value,type,amount:parseFloat(document.getElementById('fc-amount').value)||0,status:document.getElementById('fc-status').value,notes:document.getElementById('fc-notes').value.trim()});
